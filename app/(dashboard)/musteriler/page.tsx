@@ -14,6 +14,7 @@ type Customer = {
   totalSpent: number
   orderCount: number
   segment: 'vip' | 'aktif' | 'yeni' | 'kayip'
+  abonelik?: any   // ← EKLENDİ
 }
 
 export default function MusterilerPage() {
