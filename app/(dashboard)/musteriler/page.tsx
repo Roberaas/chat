@@ -29,14 +29,13 @@ export default function MusterilerPage() {
 
   async function load() {
     setLoading(true)
-    const [sessionRes, aboneRes, orderRes] = await Promise.all([
+    const [sessionRes] = await Promise.all([
       supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }),
     ])
 
     const sessions = (sessionRes.data || []) as any[]
-    const aboneler = aboneRes.subs || []
-    const orders = orderRes.orders || []
-
+    const aboneler: any[] = []
+    const orders: any[] = []
     // Telefon bazlı müşteri map'i
     const customerMap: Record<string, Customer> = {}
 
