@@ -433,19 +433,17 @@ export default function RaporlarPage() {
                 )
               })}
             </div>
-          </div>
+           
 
           
-    </div>
-      )}
+    
+      </div>
 
-      
         </div>
       )}
 
       {/* Etiket ekleme modal */}
-      {/* Etiket ekleme modal */}
-      {etiketForm.show && (
+      {etiketForm.show &&  (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEtiketForm(f => ({ ...f, show: false }))}>
           <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" />
           <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
