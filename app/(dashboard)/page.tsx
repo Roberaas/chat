@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [sadikMusteriler, setSadikMusteriler] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [fiyatlar, setFiyatlar] = useState<{ altin: any; gumus: any; guncelleme: string } | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -119,6 +120,13 @@ export default function DashboardPage() {
     setSessions(list.slice(0, 6))
     setLoading(false)
 
+    // Altın/gümüş fiyatları
+    try {
+      const fRes = await fetch('/api/fiyat')
+      const fData = await fRes.json()
+      if (!fData.hata) setFiyatlar(fData)
+    } catch {}
+
   }, [])
 
   useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t) }, [load])
@@ -169,6 +177,51 @@ export default function DashboardPage() {
           </div>
         </div>
       </header>
+
+
+      {/* Altın & Gümüş Fiyatları */}
+      {fiyatlar && (
+        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+          {[
+            {
+              label: '14 Ayar Altın',
+              fiyat: fiyatlar.altin?.ayar14 || fiyatlar.altin?.alis,
+              satis: fiyatlar.altin?.satis,
+              degisim: fiyatlar.altin?.degisim,
+              renk: '#c4a154',
+              icon: '✦',
+            },
+            {
+              label: '925 Gümüş (Gram)',
+              fiyat: fiyatlar.gumus?.alis,
+              satis: fiyatlar.gumus?.satis,
+              degisim: fiyatlar.gumus?.degisim,
+              renk: '#928c79',
+              icon: '◆',
+            },
+          ].map((item) => (
+            <div key={item.label} className="bg-white border border-cream-200 rounded-2xl p-4 md:p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-ink-300">{item.label}</span>
+                <span className="text-lg" style={{ color: item.renk }}>{item.icon}</span>
+              </div>
+              <div className="font-display text-2xl md:text-3xl text-ink-900 mb-1">
+                {item.fiyat ? `${Math.round(item.fiyat).toLocaleString('tr')} ₺` : '—'}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-ink-400 font-mono">
+                  satış: {item.satis ? `${Math.round(item.satis).toLocaleString('tr')} ₺` : '—'}
+                </span>
+                {item.degisim != null && (
+                  <span className={`text-[10px] font-mono font-medium flex items-center gap-0.5 ${Number(item.degisim) >= 0 ? 'text-moss-500' : 'text-ember-500'}`}>
+                    {Number(item.degisim) >= 0 ? '▲' : '▼'} %{Math.abs(Number(item.degisim)).toFixed(2)}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
