@@ -17,7 +17,6 @@ const COLORS = ['#7c9059','#a8b885','#d9c07a','#c4a154','#d97757','#c4633f','#a6
 const ETIKET_RENKLER = ['#7c9059','#c4633f','#d9c07a','#928c79','#a8b885','#d97757','#3d3a30','#cfd9b4']
 const tooltipStyle = { background: '#fdfcf7', border: '1px solid #e8d9a8', borderRadius: '8px', fontSize: '11px' }
 
-const MILGO_FIYAT = 130 // TL per 2L
 
 export default function RaporlarPage() {
   const [sessions, setSessions] = useState<any[]>([])
@@ -82,7 +81,7 @@ export default function RaporlarPage() {
   })
   const rakipKarsilastirma = Object.entries(rakipGruplar).map(([rakip, veriler]) => {
     const sonFiyat = veriler[0]?.fiyat || 0
-    return { rakip, fiyat: sonFiyat, fark: sonFiyat - MILGO_FIYAT, farkYuzde: Math.round((sonFiyat - MILGO_FIYAT) / MILGO_FIYAT * 100) }
+    return { rakip, fiyat: sonFiyat, fark: sonFiyat - 0, farkYuzde: Math.round((sonFiyat - 0) / 0 * 100) }
   })
 
   async function rakipEkle() {
@@ -407,26 +406,26 @@ export default function RaporlarPage() {
                 <div className="w-24 text-sm font-bold text-moss-700">roberto.</div>
                 <div className="flex-1 h-8 bg-moss-100 rounded-lg relative flex items-center">
                   <div className="h-full bg-moss-500 rounded-lg" style={{ width: '100%' }} />
-                  <span className="absolute right-3 text-xs font-bold text-white">{MILGO_FIYAT} TL</span>
+                  <span className="absolute right-3 text-xs font-bold text-white">{0} TL</span>
                 </div>
                 <div className="w-20 text-right">
                   <span className="text-xs bg-moss-100 text-moss-700 px-2 py-0.5 rounded-full font-medium">bizim fiyat</span>
                 </div>
               </div>
               {rakipKarsilastirma.map(r => {
-                const maxFiyat = Math.max(...rakipKarsilastirma.map(x => x.fiyat), MILGO_FIYAT)
+                const maxFiyat = Math.max(...rakipKarsilastirma.map(x => x.fiyat), 0)
                 const pct = (r.fiyat / maxFiyat) * 100
-                const daha = r.fiyat > MILGO_FIYAT ? 'pahalı' : r.fiyat < MILGO_FIYAT ? 'ucuz' : 'aynı'
+                const daha = r.fiyat > 0 ? 'pahalı' : r.fiyat < 0 ? 'ucuz' : 'aynı'
                 return (
                   <div key={r.rakip} className="flex items-center gap-4">
                     <div className="w-24 text-sm text-ink-600 font-medium truncate">{r.rakip}</div>
                     <div className="flex-1 h-8 bg-cream-100 rounded-lg relative flex items-center">
-                      <div className="h-full rounded-lg" style={{ width: `${pct}%`, background: r.fiyat > MILGO_FIYAT ? '#c4633f' : '#7c9059' }} />
+                      <div className="h-full rounded-lg" style={{ width: `${pct}%`, background: r.fiyat > 0 ? '#c4633f' : '#7c9059' }} />
                       <span className="absolute right-3 text-xs font-bold text-ink-700">{r.fiyat} TL</span>
                     </div>
                     <div className="w-20 text-right">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 justify-end ${r.fiyat > MILGO_FIYAT ? 'text-ember-600' : r.fiyat < MILGO_FIYAT ? 'text-moss-600' : 'text-ink-500'}`}>
-                        {r.fiyat > MILGO_FIYAT ? <TrendingUp className="w-3 h-3" /> : r.fiyat < MILGO_FIYAT ? <TrendingDown className="w-3 h-3" /> : null}
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 justify-end ${r.fiyat > 0 ? 'text-ember-600' : r.fiyat < 0 ? 'text-moss-600' : 'text-ink-500'}`}>
+                        {r.fiyat > 0 ? <TrendingUp className="w-3 h-3" /> : r.fiyat < 0 ? <TrendingDown className="w-3 h-3" /> : null}
                         {daha}
                       </span>
                     </div>
@@ -436,76 +435,11 @@ export default function RaporlarPage() {
             </div>
           </div>
 
-          {/* Rakip detay tablosu */}
-          <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-cream-100 bg-cream-50">
-              <h3 className="font-display text-lg text-ink-900">Rakip Fiyat Geçmişi</h3>
-            </div>
-            {rakipler.length === 0 ? (
-              <div className="p-12 text-center">
-                <DollarSign className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-                <p className="text-sm text-ink-500">Henüz rakip fiyatı girilmedi</p>
-              </div>
-            ) : (
-              <table className="w-full">
-                <thead>
-                  <tr>{['Rakip','Ürün','Fiyat','Fark','Kaynak','Tarih',''].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-ink-300">{h}</th>
-                  ))}</tr>
-                </thead>
-                <tbody>
-                  {rakipler.map(r => (
-                    <tr key={r.id} className="border-t border-cream-100 hover:bg-cream-50">
-                      <td className="px-5 py-3 text-sm font-medium text-ink-900">{r.rakip_adi}</td>
-                      <td className="px-5 py-3 text-sm text-ink-500">{r.urun}</td>
-                      <td className="px-5 py-3 font-mono text-sm font-bold text-ink-900">{r.fiyat} TL</td>
-                      <td className="px-5 py-3">
-                        <span className={`text-sm font-mono font-medium flex items-center gap-1 ${r.fiyat > MILGO_FIYAT ? 'text-ember-600' : 'text-moss-600'}`}>
-                          {r.fiyat > MILGO_FIYAT ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-                          {r.fiyat > MILGO_FIYAT ? '+' : ''}{r.fiyat - MILGO_FIYAT} TL
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-xs text-ink-400 font-mono">{r.kaynak}</td>
-                      <td className="px-5 py-3 text-xs text-ink-300 font-mono">{format(new Date(r.tarih || r.created_at), 'd MMM yyyy', { locale: tr })}</td>
-                      <td className="px-5 py-3">
-                        <button onClick={() => rakipSil(r.id)} className="w-7 h-7 flex items-center justify-center text-ink-300 hover:text-ember-500 transition-colors">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          
         </div>
       )}
 
-      {/* Rakip ekleme modal */}
-      {rakipForm.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setRakipForm(f => ({ ...f, show: false }))}>
-          <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-display text-2xl text-ink-900">Rakip Ekle</h2>
-              <button onClick={() => setRakipForm(f => ({ ...f, show: false }))}><X className="w-5 h-5 text-ink-300" /></button>
-            </div>
-            <div className="space-y-3">
-              {[
-                { label: 'Rakip Adı', key: 'rakip_adi', placeholder: 'Rakip A' },
-                { label: 'Ürün', key: 'urun', placeholder: 'Çiğ Süt 2L' },
-                { label: 'Fiyat (TL)', key: 'fiyat', placeholder: '120' },
-                { label: 'Kaynak', key: 'kaynak', placeholder: 'website, instagram...' },
-              ].map(({ label, key, placeholder }) => (
-                <div key={key}>
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1">{label}</label>
-                  <input value={(rakipForm as any)[key]} onChange={e => setRakipForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder}
-                    className="w-full px-3 py-2.5 bg-cream-50 border border-cream-200 rounded-xl text-sm text-ink-700 focus:outline-none focus:border-moss-400" />
-                </div>
-              ))}
-              <button onClick={rakipEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Kaydet</button>
-            </div>
-          </div>
+      
         </div>
       )}
 

@@ -55,8 +55,6 @@ export default function TakvimPage() {
       const [gorevRes, aramaRes, aboneRes, sipRes] = await Promise.all([
         fetch('/api/gorev').then(r => r.json()),
         fetch('/api/arama-log').then(r => r.json()),
-        fetch('/api/aboneliker').then(r => r.json()),
-        fetch('/api/shopify/orders').then(r => r.json()),
       ])
 
       const events: Etkinlik[] = []

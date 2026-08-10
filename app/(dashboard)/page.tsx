@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase, Session } from '@/lib/supabase'
 import StatCard from '@/components/StatCard'
-import { MessagesSquare, Users, Headphones, CheckCircle2, TrendingUp, AlertTriangle, Star, Lightbulb, ArrowUp, ArrowDown, Minus, DollarSign } from 'lucide-react'
+import { MessagesSquare, Users, Headphones, CheckCircle2, TrendingUp, AlertTriangle, Star, Lightbulb, ArrowUp, ArrowDown, Minus } from 'lucide-react'
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from 'recharts'
 import { formatDistanceToNow, format, startOfDay, subDays, startOfWeek } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -35,8 +35,6 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [sadikMusteriler, setSadikMusteriler] = useState<any[]>([])
-  const [aboneler, setAboneler] = useState<any[]>([])
-  const [aylikGelir, setAylikGelir] = useState(0)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -50,14 +48,8 @@ export default function DashboardPage() {
       if (combo === 'gd') router.push('/')
       if (combo === 'gc') router.push('/canli-destek')
       if (combo === 'gk') router.push('/konusmalar')
-      if (combo === 'gs') router.push('/siparisler')
-      if (combo === 'ga') router.push('/abonelikler')
       if (combo === 'gr') router.push('/raporlar')
       if (combo === 'gm') router.push('/musteriler')
-      if (combo === 'gt') router.push('/satis')
-      if (combo === 'go') router.push('/odemeler')
-      if (combo === 'gh') router.push('/harita')
-      if (combo === 'gu') router.push('/muhasebe')
       if (combo === 'gl') router.push('/calisma')
     }
     window.addEventListener('keydown', handleKey)
@@ -127,26 +119,6 @@ export default function DashboardPage() {
     setSessions(list.slice(0, 6))
     setLoading(false)
 
-    // Aboneleri çek
-    const res = await fetch('/api/aboneliker')
-    const abData = await res.json()
-    setAboneler(abData.subs || [])
-
-    // Bu ay gelir
-    try {
-      const sipRes = await fetch('/api/shopify/orders')
-      const sipData = await sipRes.json()
-      const buAy = new Date()
-      const ayBas = new Date(buAy.getFullYear(), buAy.getMonth(), 1)
-      const ayGelir = (sipData.orders || [])
-        .filter((o: any) => {
-          const d = new Date(o.created_at)
-          const status = (o.financial_status || '').toLowerCase()
-          return d >= ayBas && status === 'paid'
-        })
-        .reduce((s: number, o: any) => s + parseFloat(o.total_price || 0), 0)
-      setAylikGelir(ayGelir)
-    } catch {}
   }, [])
 
   useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t) }, [load])
@@ -169,13 +141,6 @@ export default function DashboardPage() {
   // 7. Akıllı öneriler
   const oneriler: { icon: string; mesaj: string; href: string; renk: string }[] = []
   if (stats!.canli > 0) oneriler.push({ icon: '🔴', mesaj: `${stats!.canli} müşteri canlı destek bekliyor`, href: '/canli-destek', renk: 'ember' })
-  const aktifAboneler = aboneler.filter(a => a.durum === 'abone')
-  if (aktifAboneler.length > 0) {
-    const bugun2 = new Date()
-    const gun = bugun2.getDay()
-    const cumaGun = gun === 5 ? 0 : (5 - gun + 7) % 7
-    if (cumaGun <= 2 && cumaGun >= 0) oneriler.push({ icon: '📦', mesaj: `Cuma teslimatına ${cumaGun === 0 ? 'bugün' : cumaGun + ' gün'} kaldı — bildirim gönder`, href: '/abonelikler', renk: 'moss' })
-  }
   if (stats!.kvkkOranı < 50) oneriler.push({ icon: '📋', mesaj: `KVKK onay oranı düşük (%${stats!.kvkkOranı}) — bot akışını kontrol et`, href: '/raporlar', renk: 'cream' })
   if (haftaTrend !== null && haftaTrend < -20) oneriler.push({ icon: '📉', mesaj: `Bu hafta trafik %${Math.abs(haftaTrend)} düştü — geçen haftaya göre`, href: '/raporlar', renk: 'cream' })
   if (stats!.yeniMusteri > 5) oneriler.push({ icon: '🎉', mesaj: `Bu hafta ${stats!.yeniMusteri} yeni müşteri — harika!`, href: '/konusmalar', renk: 'moss' })
@@ -206,12 +171,11 @@ export default function DashboardPage() {
       </header>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
         <StatCard label="Toplam Müşteri" value={stats!.toplam} delta={`${stats!.bugun} bugün`} icon={Users} />
         <StatCard label="Bugün Aktif" value={stats!.bugun} delta={trendBugun !== null ? `${trendBugun > 0 ? '+' : ''}${trendBugun}% dün` : '—'} icon={MessagesSquare} tone="moss" />
         <StatCard label="Canlı Destek" value={stats!.canli} delta={stats!.canli > 0 ? 'bekliyor' : 'boş'} icon={Headphones} tone={stats!.canli > 0 ? 'ember' : 'default'} />
         <StatCard label="KVKK" value={`%${stats!.kvkkOranı}`} delta={`${stats!.kvkkOnayli} onaylı`} icon={CheckCircle2} />
-        <StatCard label="Bu Ay Gelir" value={`${aylikGelir.toLocaleString('tr')} TL`} delta="shopify" icon={DollarSign} tone="moss" />
       </div>
 
       {/* 5. Bu haftanın özeti */}

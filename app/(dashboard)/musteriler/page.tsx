@@ -10,7 +10,6 @@ type Customer = {
   phone: string
   name?: string
   orders: any[]
-  abonelik?: any
   session?: any
   totalSpent: number
   orderCount: number
@@ -31,8 +30,6 @@ export default function MusterilerPage() {
     setLoading(true)
     const [sessionRes, aboneRes, orderRes] = await Promise.all([
       supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }),
-      fetch('/api/aboneliker').then(r => r.json()),
-      fetch('/api/shopify/orders').then(r => r.json()),
     ])
 
     const sessions = (sessionRes.data || []) as any[]
