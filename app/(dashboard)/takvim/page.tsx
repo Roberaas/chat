@@ -52,10 +52,12 @@ export default function TakvimPage() {
   async function load() {
     setLoading(true)
     try {
-      const [gorevRes, aramaRes, aboneRes, sipRes] = await Promise.all([
+     const [gorevRes, aramaRes] = await Promise.all([
         fetch('/api/gorev').then(r => r.json()),
         fetch('/api/arama-log').then(r => r.json()),
       ])
+      const aboneRes: any = { subs: [] }
+      const sipRes: any = { orders: [] }
 
       const events: Etkinlik[] = []
 
