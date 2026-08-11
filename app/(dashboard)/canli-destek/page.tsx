@@ -224,7 +224,7 @@ export default function CanliDestekPage() {
             ) : messages.map(m => {
               // Temsilci: username roberto-admin VEYA is_bot:false
               // Müşteri: is_bot:true (n8n WhatsApp'tan iletir)
-              const isAdmin = !m.is_bot  // is_bot:false = temsilci, is_bot:true = müşteri (n8n iletisi)
+              const isAdmin = !(m as any)._bot_id  // _bot_id null = temsilci, dolu = müşteri (n8n)
               const metin = parseSlackText(m.text)
               if (!metin) return null
               const saat = new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })
