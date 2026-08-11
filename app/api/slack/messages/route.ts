@@ -20,16 +20,33 @@ export async function GET(req: Request) {
     return NextResponse.json({ messages: [], error: data.error })
   }
 
-  const messages = (data.messages || []).map((m: any) => ({
-    ts: m.ts,
-    text: m.text,
-    user: m.user || m.bot_id || 'unknown',
-    is_bot: !!m.bot_id,
-    username: m.username || '',
-    _bot_id: m.bot_id || null,
-    _raw_user: m.user || null,
-    is_admin: m.username === 'roberto-admin',
-  }))
+  const messages = (data.messages || []).map((m: any) => {
+    // n8n blocks'tan gerçek metni çıkar
+    let text = m.text || ''
+    if (m.blocks?.length) {
+      const parts: string[] = []
+      for (const block of m.blocks) {
+        if (block.type === 'rich_text') {
+          for (const section of block.elements || []) {
+            for (const el of section.elements || []) {
+              if (el.type === 'text') parts.push(el.text)
+            }
+          }
+        } else if (block.type === 'section' && block.text?.text) {
+          parts.push(block.text.text)
+        }
+      }
+      if (parts.length) text = parts.join('')
+    }
+    return {
+      ts: m.ts,
+      text,
+      user: m.user || m.bot_id || 'unknown',
+      is_bot: !!m.bot_id,
+      username: m.username || '',
+      is_admin: m.username === 'roberto-admin',
+    }
+  })
 
   return NextResponse.json({ messages })
 }
