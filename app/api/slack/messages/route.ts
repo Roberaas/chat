@@ -26,10 +26,9 @@ export async function GET(req: Request) {
     user: m.user || m.bot_id || 'unknown',
     is_bot: !!m.bot_id,
     username: m.username || '',
-    // Temsilci mi müşteri mi: username roberto-admin ise temsilci,
-    // yoksa bot_id var ama username yoksa müşteri iletisi (n8n)
+    _bot_id: m.bot_id || null,
+    _raw_user: m.user || null,
     is_admin: m.username === 'roberto-admin',
-    is_musteri: !!m.bot_id && m.username !== 'roberto-admin',
   }))
 
   return NextResponse.json({ messages })
