@@ -39,9 +39,10 @@ export async function GET(req: Request) {
       if (parts.length) text = parts.join('')
     }
 
-    // is_bot: true  → admin (bot token ile panel üzerinden gönderilen)
-    // is_bot: false → müşteri (WhatsApp'tan Slack'e iletilen insan mesajı)
-    const isAdmin = !!m.bot_id
+    // username 'roberto-admin' ise admin panelden gönderilmiş
+    // diğer tüm bot mesajlar n8n'den gelen müşteri iletisi
+    const username = m.username || ''
+    const isAdmin = username === 'roberto-admin'
 
     return {
       ts: m.ts,
