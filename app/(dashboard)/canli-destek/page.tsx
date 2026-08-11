@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase, Session } from '@/lib/supabase'
 import { Headphones, Clock, X, Send, RefreshCw, CheckCheck, Bell, BellOff } from 'lucide-react'
 
-type SlackMessage = { ts: string; text: string; user: string; is_bot: boolean; username: string }
+type SlackMessage = { ts: string; text: string; user: string; is_bot: boolean; is_admin: boolean; username: string }
 
 function parseSlackText(text: string): string {
   // Müşteri mesajı başlığını temizle: ":speech_balloon: *İsim* (tel)\n" → sadece mesaj
@@ -222,9 +222,8 @@ export default function CanliDestekPage() {
                 <p style={{ color: '#4A4540', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>Müşteri mesaj gönderdiğinde burada görünür</p>
               </div>
             ) : messages.map(m => {
-              // Temsilci: username roberto-admin VEYA is_bot:false
-              // Müşteri: is_bot:true (n8n WhatsApp'tan iletir)
-              const isAdmin = !(m as any)._bot_id  // _bot_id null = temsilci, dolu = müşteri (n8n)
+              // is_bot:true → admin (bot token ile panelden), is_bot:false → müşteri
+              const isAdmin = m.is_admin
               const metin = parseSlackText(m.text)
               if (!metin) return null
               const saat = new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })
