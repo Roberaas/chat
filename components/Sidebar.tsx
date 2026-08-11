@@ -49,20 +49,20 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
   ]
 
   return (
-    <aside style={{ background: '#0D0B09', borderRight: '1px solid rgba(201,168,76,0.1)' }} className="w-60 h-full flex flex-col">
+    <aside style={{ background: '#120F0C', borderRight: '1px solid rgba(201,168,76,0.1)' }} className="w-60 h-full flex flex-col">
       {/* Logo */}
       <div className="px-6 py-6" style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#F5F0E8' }}>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#EDE8DF' }}>
               roberto<span style={{ color: '#C9A84C' }}>.</span>
             </div>
-            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: '#6B6760', marginTop: 2, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: '#7A7468', marginTop: 2, textTransform: 'uppercase' }}>
               admin panel
             </div>
           </div>
           {onClose && (
-            <button onClick={onClose} className="lg:hidden" style={{ color: '#6B6760' }}>
+            <button onClick={onClose} className="lg:hidden" style={{ color: '#7A7468' }}>
               <X size={16} />
             </button>
           )}
@@ -78,7 +78,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
             </div>
             <div>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#E8D5A3' }}>{mevcutKullanici.ad}</div>
-              <div style={{ fontSize: 10, color: '#6B6760', fontFamily: 'JetBrains Mono, monospace' }}>{mevcutKullanici.rol}</div>
+              <div style={{ fontSize: 10, color: '#7A7468', fontFamily: 'JetBrains Mono, monospace' }}>{mevcutKullanici.rol}</div>
             </div>
           </div>
         </div>
@@ -101,11 +101,11 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
                     border: '1px solid rgba(201,168,76,0.18)',
                     color: '#E8D5A3',
                   } : {
-                    color: '#6B6760',
+                    color: '#7A7468',
                     border: '1px solid transparent',
                   }}
                   onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#C8C0B0' }}
-                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#6B6760' }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#7A7468' }}
                 >
                   <Icon size={15} strokeWidth={1.75} />
                   <span style={{ fontSize: 13, fontWeight: active ? 500 : 400, flex: 1 }}>{item.label}</span>
@@ -132,9 +132,9 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
         <button
           onClick={logout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all"
-          style={{ color: '#3A3730', fontSize: 13 }}
+          style={{ color: '#5A5550', fontSize: 13 }}
           onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#C8C0B0'}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#3A3730'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#5A5550'}
         >
           <LogOut size={15} strokeWidth={1.75} />
           Çıkış Yap

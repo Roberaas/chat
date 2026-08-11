@@ -18,8 +18,8 @@ type Not = { id: number; icerik: string; created_at: string }
 
 const S = {
   page: { padding: '32px 28px', maxWidth: 1280, margin: '0 auto' },
-  card: { background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' as const },
-  th: { padding: '12px 18px', textAlign: 'left' as const, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#3A3730', fontWeight: 500, background: 'rgba(201,168,76,0.03)' },
+  card: { background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' as const },
+  th: { padding: '12px 18px', textAlign: 'left' as const, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#5A5550', fontWeight: 500, background: 'rgba(201,168,76,0.03)' },
   td: { padding: '14px 18px', fontSize: 12, borderTop: '1px solid rgba(201,168,76,0.05)' },
 }
 
@@ -80,10 +80,10 @@ export default function KonusmalarPage() {
     <div style={S.page}>
       {/* Header */}
       <header style={{ marginBottom: 28 }}>
-        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
           {sessions.length} kayıt
         </p>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: '#EDE8DF', letterSpacing: '-0.03em', lineHeight: 1 }}>
           Konuşmalar
         </h1>
         <div style={{ height: 1, background: 'linear-gradient(90deg, rgba(201,168,76,0.3), transparent)', marginTop: 16 }} />
@@ -92,7 +92,7 @@ export default function KonusmalarPage() {
       {/* Arama + Filtreler */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' as const }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-          <Search size={14} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#3A3730' }} />
+          <Search size={14} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#5A5550' }} />
           <input
             type="text"
             placeholder="Telefon veya mesaj ara..."
@@ -101,11 +101,11 @@ export default function KonusmalarPage() {
             className="input-premium"
             style={{ paddingLeft: 40, paddingRight: 40, paddingTop: 11, paddingBottom: 11, fontSize: 13 }}
           />
-          {search && <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#3A3730', background: 'none', border: 'none', cursor: 'pointer' }}><X size={14} /></button>}
+          {search && <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#5A5550', background: 'none', border: 'none', cursor: 'pointer' }}><X size={14} /></button>}
         </div>
-        <div style={{ display: 'flex', background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, padding: 4, gap: 2 }}>
+        <div style={{ display: 'flex', background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, padding: 4, gap: 2 }}>
           {filters.map(f => (
-            <button key={f.v} onClick={() => setFilter(f.v as any)} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: filter === f.v ? 600 : 400, background: filter === f.v ? 'rgba(201,168,76,0.15)' : 'transparent', color: filter === f.v ? '#E8D5A3' : '#6B6760', border: filter === f.v ? '1px solid rgba(201,168,76,0.2)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' as const }}>
+            <button key={f.v} onClick={() => setFilter(f.v as any)} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: filter === f.v ? 600 : 400, background: filter === f.v ? 'rgba(201,168,76,0.15)' : 'transparent', color: filter === f.v ? '#E8D5A3' : '#7A7468', border: filter === f.v ? '1px solid rgba(201,168,76,0.2)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' as const }}>
               {f.l}
             </button>
           ))}
@@ -116,7 +116,7 @@ export default function KonusmalarPage() {
       <div style={S.card}>
         {loading ? (
           <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[1,2,3,4,5].map(i => <div key={i} style={{ height: 44, background: '#181612', borderRadius: 8, animation: 'pulse 1.5s ease-in-out infinite' }} />)}
+            {[1,2,3,4,5].map(i => <div key={i} style={{ height: 44, background: '#211E18', borderRadius: 8, animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -133,8 +133,8 @@ export default function KonusmalarPage() {
                   onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(201,168,76,0.03)'}
                   onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
                 >
-                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#C8C0B0' }}>{s.phone}</td>
-                  <td style={{ ...S.td, color: '#6B6760', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
+                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#B8B0A0' }}>{s.phone}</td>
+                  <td style={{ ...S.td, color: '#7A7468', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
                   <td style={S.td}>
                     <span style={{ display: 'inline-flex', padding: '3px 8px', borderRadius: 4, fontSize: 10, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.12)' }}>
                       {INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}
@@ -143,20 +143,20 @@ export default function KonusmalarPage() {
                   <td style={S.td}>
                     {s.bulundugu_menu === 'canli'
                       ? <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#C4364A', fontSize: 12 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block' }} />Canlı</span>
-                      : <span style={{ color: '#3A3730', fontSize: 12 }}>Bot</span>}
+                      : <span style={{ color: '#5A5550', fontSize: 12 }}>Bot</span>}
                   </td>
                   <td style={S.td}>
-                    <span style={{ fontSize: 11, fontWeight: 500, color: s.kvkk_onay ? '#C9A84C' : '#3A3730' }}>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: s.kvkk_onay ? '#C9A84C' : '#5A5550' }}>
                       {s.kvkk_onay ? '✓ Onaylı' : '✗ Yok'}
                     </span>
                   </td>
-                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#3A3730', whiteSpace: 'nowrap' }}>
+                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#5A5550', whiteSpace: 'nowrap' }}>
                     {formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>sonuç bulunamadı</td></tr>
+                <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>sonuç bulunamadı</td></tr>
               )}
             </tbody>
           </table>
@@ -167,7 +167,7 @@ export default function KonusmalarPage() {
       {selected && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setSelected(null)}>
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }} />
-          <div style={{ position: 'relative', width: '100%', maxWidth: 420, background: '#0D0B09', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(201,168,76,0.15)' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: 420, background: '#120F0C', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(201,168,76,0.15)' }} onClick={e => e.stopPropagation()}>
 
             {/* Drawer header */}
             <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(13,11,9,0.95)', backdropFilter: 'blur(12px)', padding: '20px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -176,19 +176,19 @@ export default function KonusmalarPage() {
                   {selected.phone.slice(-2)}
                 </div>
                 <div>
-                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#C8C0B0' }}>{selected.phone}</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#B8B0A0' }}>{selected.phone}</div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' as const }}>
-                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.2)' : 'rgba(58,55,48,0.3)', color: selected.bulundugu_menu === 'canli' ? '#C4364A' : '#6B6760', border: `1px solid ${selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.3)' : 'rgba(58,55,48,0.2)'}` }}>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.2)' : 'rgba(58,55,48,0.3)', color: selected.bulundugu_menu === 'canli' ? '#C4364A' : '#7A7468', border: `1px solid ${selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.3)' : 'rgba(58,55,48,0.2)'}` }}>
                       {selected.bulundugu_menu === 'canli' ? '⬤ Canlı' : '⬤ Bot'}
                     </span>
-                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.kvkk_onay ? 'rgba(201,168,76,0.1)' : 'rgba(31,29,23,0.5)', color: selected.kvkk_onay ? '#C9A84C' : '#3A3730', border: `1px solid ${selected.kvkk_onay ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.2)'}` }}>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.kvkk_onay ? 'rgba(201,168,76,0.1)' : 'rgba(31,29,23,0.5)', color: selected.kvkk_onay ? '#C9A84C' : '#5A5550', border: `1px solid ${selected.kvkk_onay ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.2)'}` }}>
                       {selected.kvkk_onay ? '✓ KVKK' : '✗ KVKK'}
                     </span>
                     {etiketler.map(e => <span key={e.id} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, color: '#fff', background: e.renk }}>{e.etiket}</span>)}
                   </div>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: 'rgba(58,55,48,0.3)', border: 'none', color: '#6B6760', cursor: 'pointer' }}>
+              <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: 'rgba(58,55,48,0.3)', border: 'none', color: '#7A7468', cursor: 'pointer' }}>
                 <X size={14} />
               </button>
             </div>
@@ -196,17 +196,17 @@ export default function KonusmalarPage() {
             <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Son mesaj */}
               {selected.musteri_yazdigi && (
-                <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                    <MessageSquare size={12} color="#3A3730" strokeWidth={1.5} />
-                    <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730' }}>Son Mesaj</span>
+                    <MessageSquare size={12} color="#5A5550" strokeWidth={1.5} />
+                    <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Son Mesaj</span>
                   </div>
-                  <p style={{ fontSize: 13, color: '#8A8580', fontStyle: 'italic' }}>"{selected.musteri_yazdigi}"</p>
+                  <p style={{ fontSize: 13, color: '#9A928A', fontStyle: 'italic' }}>"{selected.musteri_yazdigi}"</p>
                 </div>
               )}
 
               {/* Detaylar */}
-              <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, overflow: 'hidden' }}>
+              <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, overflow: 'hidden' }}>
                 {[
                   { label: 'Son Niyet', value: INTENT_LABEL[selected.last_intent||'other'] || '—' },
                   { label: 'Bekleyen Aksiyon', value: (selected as any).pending_action || '—' },
@@ -214,28 +214,28 @@ export default function KonusmalarPage() {
                   { label: 'Son Güncelleme', value: new Date(selected.updated_at).toLocaleString('tr') },
                 ].map(({ label, value }, i) => (
                   <div key={label} style={{ padding: '12px 16px', borderTop: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                    <dt style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#3A3730', whiteSpace: 'nowrap', marginTop: 1 }}>{label}</dt>
-                    <dd style={{ fontSize: 12, color: '#8A8580', textAlign: 'right', wordBreak: 'break-all' }}>{value}</dd>
+                    <dt style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#5A5550', whiteSpace: 'nowrap', marginTop: 1 }}>{label}</dt>
+                    <dd style={{ fontSize: 12, color: '#9A928A', textAlign: 'right', wordBreak: 'break-all' }}>{value}</dd>
                   </div>
                 ))}
               </div>
 
               {/* Notlar */}
-              <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+              <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                  <StickyNote size={12} color="#3A3730" strokeWidth={1.5} />
-                  <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730' }}>Notlar</span>
-                  <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: 'rgba(201,168,76,0.08)', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>{notlar.length}</span>
+                  <StickyNote size={12} color="#5A5550" strokeWidth={1.5} />
+                  <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Notlar</span>
+                  <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: 'rgba(201,168,76,0.08)', color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>{notlar.length}</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10, maxHeight: 160, overflowY: 'auto' }}>
                   {notlar.length === 0
                     ? <p style={{ fontSize: 11, color: '#272420', fontFamily: 'JetBrains Mono, monospace' }}>henüz not yok</p>
                     : notlar.map(n => (
                       <div key={n.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#1F1D17', border: '1px solid rgba(201,168,76,0.06)', borderRadius: 8, padding: '8px 12px' }}>
-                        <p style={{ fontSize: 12, color: '#8A8580', flex: 1 }}>{n.icerik}</p>
-                        <button onClick={() => notSil(n.id)} style={{ background: 'none', border: 'none', color: '#3A3730', cursor: 'pointer', padding: 0, marginTop: 1 }}
+                        <p style={{ fontSize: 12, color: '#9A928A', flex: 1 }}>{n.icerik}</p>
+                        <button onClick={() => notSil(n.id)} style={{ background: 'none', border: 'none', color: '#5A5550', cursor: 'pointer', padding: 0, marginTop: 1 }}
                           onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#C4364A'}
-                          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#3A3730'}>
+                          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#5A5550'}>
                           <Trash2 size={13} />
                         </button>
                       </div>
@@ -267,7 +267,7 @@ export default function KonusmalarPage() {
                     <ShoppingCart size={12} color="#C9A84C" strokeWidth={1.5} />
                     <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C' }}>Aktif Sepet</span>
                   </div>
-                  <p style={{ fontSize: 11, color: '#8A8580', fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all' }}>{String(selected.pending_action)}</p>
+                  <p style={{ fontSize: 11, color: '#9A928A', fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all' }}>{String(selected.pending_action)}</p>
                 </div>
               )}
 
@@ -278,7 +278,7 @@ export default function KonusmalarPage() {
                     Canlı Destek'te Aç →
                   </a>
                 )}
-                <button onClick={() => setSelected(null)} style={{ padding: '11px 0', background: '#1F1D17', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', fontSize: 13, cursor: 'pointer' }}>
+                <button onClick={() => setSelected(null)} style={{ padding: '11px 0', background: '#1F1D17', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#7A7468', fontSize: 13, cursor: 'pointer' }}>
                   Kapat
                 </button>
               </div>

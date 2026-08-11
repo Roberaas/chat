@@ -20,10 +20,10 @@ function isSystemMessage(m: SlackMessage, idx: number): boolean {
 }
 
 const P = {
-  sidebar: { width: 280, background: '#0D0B09', borderRight: '1px solid rgba(201,168,76,0.1)', display: 'flex', flexDirection: 'column' as const, flexShrink: 0 },
+  sidebar: { width: 280, background: '#120F0C', borderRight: '1px solid rgba(201,168,76,0.1)', display: 'flex', flexDirection: 'column' as const, flexShrink: 0 },
   sideHeader: { padding: '20px 20px 16px', borderBottom: '1px solid rgba(201,168,76,0.08)' },
-  msgBubbleAdmin: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 4px 16px', background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: '#0A0908', fontSize: 13, lineHeight: 1.5 },
-  msgBubbleClient: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 16px 4px', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', color: '#C8C0B0', fontSize: 13, lineHeight: 1.5 },
+  msgBubbleAdmin: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 4px 16px', background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: '#0E0C0A', fontSize: 13, lineHeight: 1.5 },
+  msgBubbleClient: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 16px 4px', background: '#211E18', border: '1px solid rgba(201,168,76,0.1)', color: '#B8B0A0', fontSize: 13, lineHeight: 1.5 },
 }
 
 export default function CanliDestekPage() {
@@ -120,21 +120,21 @@ export default function CanliDestekPage() {
       <div style={P.sidebar}>
         <div style={P.sideHeader}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <p style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>
+            <p style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>
               {sessions.length} aktif
               {totalUnread > 0 && <span style={{ marginLeft: 8, background: '#8B2635', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8 }}>{totalUnread}</span>}
             </p>
-            <button onClick={notifOn ? () => setNotifOn(false) : requestNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: notifOn ? '#C9A84C' : '#3A3730' }}>
+            <button onClick={notifOn ? () => setNotifOn(false) : requestNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: notifOn ? '#C9A84C' : '#5A5550' }}>
               {notifOn ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
           </div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, color: '#F5F0E8' }}>Canlı Destek</h1>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, color: '#EDE8DF' }}>Canlı Destek</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block', animation: 'urgentPulse 1.5s infinite' }} />
-            <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#3A3730' }}>otomatik · 15s</span>
+            <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#5A5550' }}>otomatik · 15s</span>
           </div>
           {!notifOn && (
-            <button onClick={requestNotif} style={{ marginTop: 10, width: '100%', padding: '7px 0', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 8, fontSize: 11, color: '#6B6760', cursor: 'pointer' }}>
+            <button onClick={requestNotif} style={{ marginTop: 10, width: '100%', padding: '7px 0', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 8, fontSize: 11, color: '#7A7468', cursor: 'pointer' }}>
               🔔 Bildirimleri etkinleştir
             </button>
           )}
@@ -143,13 +143,13 @@ export default function CanliDestekPage() {
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading ? (
             <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[1,2,3].map(i => <div key={i} style={{ height: 72, background: '#181612', borderRadius: 8 }} />)}
+              {[1,2,3].map(i => <div key={i} style={{ height: 72, background: '#211E18', borderRadius: 8 }} />)}
             </div>
           ) : sessions.length === 0 ? (
             <div style={{ padding: 40, textAlign: 'center' }}>
-              <Headphones size={32} color="#272420" strokeWidth={1} style={{ margin: '0 auto 12px' }} />
-              <p style={{ fontSize: 13, color: '#3A3730' }}>Kuyruk boş</p>
-              <p style={{ fontSize: 11, color: '#272420', marginTop: 4, fontFamily: 'JetBrains Mono, monospace' }}>Canlı destek talebi yok</p>
+              <Headphones size={32} color="#4A4540" strokeWidth={1} style={{ margin: '0 auto 12px' }} />
+              <p style={{ fontSize: 13, color: '#5A5550' }}>Kuyruk boş</p>
+              <p style={{ fontSize: 11, color: '#4A4540', marginTop: 4, fontFamily: 'JetBrains Mono, monospace' }}>Canlı destek talebi yok</p>
             </div>
           ) : sessions.map(s => {
             const waitMin = Math.floor((Date.now() - new Date(s.updated_at).getTime()) / 60000)
@@ -163,11 +163,11 @@ export default function CanliDestekPage() {
                   {sessionUnread > 0 && <span style={{ position: 'absolute', top: -2, right: -2, width: 16, height: 16, background: '#8B2635', color: '#fff', fontSize: 9, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{sessionUnread}</span>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#C8C0B0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.phone}</div>
-                  <div style={{ fontSize: 11, color: '#3A3730', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 3 }}>{s.musteri_yazdigi || '—'}</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#B8B0A0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.phone}</div>
+                  <div style={{ fontSize: 11, color: '#5A5550', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 3 }}>{s.musteri_yazdigi || '—'}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                    <Clock size={9} color={urgent ? '#C4364A' : '#3A3730'} />
-                    <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: urgent ? '#C4364A' : '#3A3730' }}>{waitMin < 60 ? `${waitMin}dk` : `${Math.floor(waitMin/60)}sa`}</span>
+                    <Clock size={9} color={urgent ? '#C4364A' : '#5A5550'} />
+                    <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: urgent ? '#C4364A' : '#5A5550' }}>{waitMin < 60 ? `${waitMin}dk` : `${Math.floor(waitMin/60)}sa`}</span>
                     {urgent && <span style={{ fontSize: 9, padding: '1px 5px', background: 'rgba(139,38,53,0.2)', color: '#C4364A', borderRadius: 4 }}>acil</span>}
                   </div>
                 </div>
@@ -181,49 +181,49 @@ export default function CanliDestekPage() {
       {selected ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {/* Header */}
-          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', background: '#0D0B09', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', background: '#120F0C', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ position: 'relative' }}>
                 <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#C9A84C', fontWeight: 600 }}>WA</div>
-                <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, background: '#C9A84C', borderRadius: '50%', border: '2px solid #0D0B09' }} />
+                <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, background: '#C9A84C', borderRadius: '50%', border: '2px solid #120F0C' }} />
               </div>
               <div>
-                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#C8C0B0' }}>{selected.phone}</div>
-                <div style={{ fontSize: 11, color: '#3A3730', marginTop: 2 }}>Canlı destek aktif</div>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#B8B0A0' }}>{selected.phone}</div>
+                <div style={{ fontSize: 11, color: '#5A5550', marginTop: 2 }}>Canlı destek aktif</div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button onClick={() => loadMessages(selected.slack_thread_ts!)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', cursor: 'pointer' }}>
+              <button onClick={() => loadMessages(selected.slack_thread_ts!)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#211E18', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#7A7468', cursor: 'pointer' }}>
                 <RefreshCw size={13} />
               </button>
               <button onClick={() => endLiveSupport(selected.phone)} style={{ padding: '7px 14px', background: 'rgba(139,38,53,0.15)', border: '1px solid rgba(139,38,53,0.3)', borderRadius: 8, color: '#C4364A', fontSize: 12, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <CheckCheck size={13} /> Sohbeti Bitir
               </button>
-              <button onClick={() => { setSelected(null); setMessages([]) }} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', cursor: 'pointer' }}>
+              <button onClick={() => { setSelected(null); setMessages([]) }} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#211E18', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#7A7468', cursor: 'pointer' }}>
                 <X size={13} />
               </button>
             </div>
           </div>
 
           {/* Mesajlar */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 16, background: '#0A0908' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 16, background: '#0E0C0A' }}>
             {msgLoading ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[1,2,3].map(i => <div key={i} style={{ height: 48, background: '#111009', borderRadius: 12, width: i % 2 === 0 ? 200 : 260, alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }} />)}
+                {[1,2,3].map(i => <div key={i} style={{ height: 48, background: '#1A1712', borderRadius: 12, width: i % 2 === 0 ? 200 : 260, alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }} />)}
               </div>
             ) : messages.length === 0 ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#111009', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Headphones size={24} color="#272420" strokeWidth={1} />
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Headphones size={24} color="#4A4540" strokeWidth={1} />
                 </div>
-                <p style={{ color: '#3A3730', fontSize: 13 }}>Henüz mesaj yok</p>
-                <p style={{ color: '#272420', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>Müşteri mesaj gönderdiğinde burada görünür</p>
+                <p style={{ color: '#5A5550', fontSize: 13 }}>Henüz mesaj yok</p>
+                <p style={{ color: '#4A4540', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>Müşteri mesaj gönderdiğinde burada görünür</p>
               </div>
             ) : messages.map(m => {
               const isAdmin = m.username === 'roberto-admin'
               return (
                 <div key={m.ts} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0, marginBottom: 2, background: isAdmin ? 'linear-gradient(135deg,#C9A84C,#8B6914)' : '#181612', color: isAdmin ? '#0A0908' : '#6B6760', border: isAdmin ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0, marginBottom: 2, background: isAdmin ? 'linear-gradient(135deg,#C9A84C,#8B6914)' : '#211E18', color: isAdmin ? '#0E0C0A' : '#7A7468', border: isAdmin ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>
                     {isAdmin ? 'A' : 'M'}
                   </div>
                   <div style={isAdmin ? P.msgBubbleAdmin : P.msgBubbleClient}>
@@ -239,9 +239,9 @@ export default function CanliDestekPage() {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(201,168,76,0.08)', background: '#0D0B09', flexShrink: 0 }}>
+          <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(201,168,76,0.08)', background: '#120F0C', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#0A0908', flexShrink: 0 }}>A</div>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#0E0C0A', flexShrink: 0 }}>A</div>
               <input
                 type="text" value={reply} onChange={e => setReply(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
@@ -250,20 +250,20 @@ export default function CanliDestekPage() {
                 style={{ flex: 1, padding: '11px 16px', fontSize: 13 }}
               />
               <button onClick={sendMessage} disabled={sending || !reply.trim()} className="btn-gold" style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, flexShrink: 0 }}>
-                {sending ? <div style={{ width: 14, height: 14, border: '2px solid rgba(0,0,0,0.3)', borderTopColor: '#0A0908', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} /> : <Send size={15} />}
+                {sending ? <div style={{ width: 14, height: 14, border: '2px solid rgba(0,0,0,0.3)', borderTopColor: '#0E0C0A', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} /> : <Send size={15} />}
               </button>
             </div>
-            <p style={{ fontSize: 10, color: '#272420', fontFamily: 'JetBrains Mono, monospace', marginTop: 8, marginLeft: 42 }}>→ Slack thread → n8n → WhatsApp</p>
+            <p style={{ fontSize: 10, color: '#4A4540', fontFamily: 'JetBrains Mono, monospace', marginTop: 8, marginLeft: 42 }}>→ Slack thread → n8n → WhatsApp</p>
           </div>
         </div>
       ) : (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0908' }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0E0C0A' }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: 16, background: '#111009', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <Headphones size={28} color="#272420" strokeWidth={1} />
+            <div style={{ width: 64, height: 64, borderRadius: 16, background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <Headphones size={28} color="#4A4540" strokeWidth={1} />
             </div>
-            <p style={{ color: '#6B6760', fontSize: 14 }}>Konuşma seç</p>
-            <p style={{ color: '#3A3730', fontSize: 12, marginTop: 6, fontFamily: 'JetBrains Mono, monospace' }}>Soldaki listeden bir müşteriyi seç</p>
+            <p style={{ color: '#7A7468', fontSize: 14 }}>Konuşma seç</p>
+            <p style={{ color: '#5A5550', fontSize: 12, marginTop: 6, fontFamily: 'JetBrains Mono, monospace' }}>Soldaki listeden bir müşteriyi seç</p>
           </div>
         </div>
       )}

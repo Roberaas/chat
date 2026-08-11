@@ -28,27 +28,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+    <div style={{ minHeight: '100vh', background: '#0E0C0A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       {/* Subtle radial glow */}
       <div style={{ position: 'fixed', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, background: 'radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <div style={{ width: '100%', maxWidth: 360, position: 'relative' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 300, color: '#EDE8DF', letterSpacing: '-0.03em', lineHeight: 1 }}>
             roberto<span style={{ color: '#C9A84C' }}>.</span>
           </div>
           <div style={{ marginTop: 10, height: 1, background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)' }} />
-          <div style={{ fontSize: 10, letterSpacing: '0.35em', color: '#3A3730', marginTop: 10, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.35em', color: '#5A5550', marginTop: 10, textTransform: 'uppercase' }}>
             yönetim paneli
           </div>
         </div>
 
         {/* Card */}
-        <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 16, padding: 32 }}>
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 16, padding: 32 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div>
-              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550', display: 'block', marginBottom: 8 }}>
                 Kullanıcı Adı
               </label>
               <input
@@ -62,7 +62,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550', display: 'block', marginBottom: 8 }}>
                 Şifre
               </label>
               <input
@@ -93,7 +93,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 10, color: '#272420', marginTop: 24, fontFamily: 'JetBrains Mono, monospace' }}>
+        <p style={{ textAlign: 'center', fontSize: 10, color: '#4A4540', marginTop: 24, fontFamily: 'JetBrains Mono, monospace' }}>
           roberto admin · v2.0
         </p>
       </div>
