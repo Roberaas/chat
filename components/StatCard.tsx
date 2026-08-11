@@ -6,34 +6,43 @@ export default function StatCard({
   delta,
   icon: Icon,
   tone = 'default',
+  sub,
 }: {
   label: string
   value: string | number
   delta?: string
   icon: LucideIcon
-  tone?: 'default' | 'moss' | 'ember'
+  tone?: 'default' | 'gold' | 'ruby'
+  sub?: string
 }) {
-  const tones = {
-    default: 'bg-white border-cream-200',
-    moss: 'bg-moss-50 border-moss-200',
-    ember: 'bg-ember-400/10 border-ember-400/30',
+  const styles = {
+    default: { bg: '#181612', border: 'rgba(201,168,76,0.1)', iconColor: '#6B6760' },
+    gold: { bg: 'rgba(201,168,76,0.06)', border: 'rgba(201,168,76,0.2)', iconColor: '#C9A84C' },
+    ruby: { bg: 'rgba(139,38,53,0.08)', border: 'rgba(139,38,53,0.25)', iconColor: '#C4364A' },
   }
+  const s = styles[tone]
 
   return (
     <div
-      className={`relative ${tones[tone]} border rounded-2xl p-6 transition-all hover:shadow-[0_8px_24px_-12px_rgba(34,32,26,0.15)]`}
+      className="relative rounded-xl p-5 transition-all"
+      style={{ background: s.bg, border: `1px solid ${s.border}` }}
     >
-      <div className="flex items-start justify-between mb-6">
-        <span className="text-xs uppercase tracking-[0.2em] text-ink-300 font-medium">
+      <div className="flex items-start justify-between mb-4">
+        <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#6B6760', fontWeight: 500 }}>
           {label}
         </span>
-        <Icon className="w-4 h-4 text-ink-300" strokeWidth={1.5} />
+        <Icon size={14} color={s.iconColor} strokeWidth={1.5} />
       </div>
-      <div className="font-display text-4xl text-ink-900 leading-none tracking-tight">
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 42, color: '#F5F0E8', lineHeight: 1, letterSpacing: '-0.02em', fontWeight: 300 }}>
         {value}
       </div>
+      {sub && (
+        <div style={{ fontSize: 11, color: '#3A3730', marginTop: 6 }}>{sub}</div>
+      )}
       {delta && (
-        <div className="mt-3 text-xs text-ink-500 font-mono">{delta}</div>
+        <div style={{ fontSize: 11, color: '#6B6760', fontFamily: 'JetBrains Mono, monospace', marginTop: 8 }}>
+          {delta}
+        </div>
       )}
     </div>
   )

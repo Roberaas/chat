@@ -21,53 +21,63 @@ export default function LoginPage() {
         body: JSON.stringify({ kullanici_adi, sifre })
       })
       const data = await res.json()
-      if (data.ok) {
-        router.push('/')
-        router.refresh()
-      } else {
-        setError(data.error || 'Giriş başarısız')
-      }
-    } catch {
-      setError('Bağlantı hatası')
-    }
+      if (data.ok) { router.push('/'); router.refresh() }
+      else setError(data.error || 'Giriş başarısız')
+    } catch { setError('Bağlantı hatası') }
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-cream-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <div className="font-display text-5xl text-ink-900 mb-2">roberto<span className="text-moss-500">.</span></div>
-          <div className="text-xs uppercase tracking-[0.3em] text-ink-400">yönetim paneli</div>
+    <div style={{ minHeight: '100vh', background: '#0A0908', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      {/* Subtle radial glow */}
+      <div style={{ position: 'fixed', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, background: 'radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      <div style={{ width: '100%', maxWidth: 360, position: 'relative' }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            roberto<span style={{ color: '#C9A84C' }}>.</span>
+          </div>
+          <div style={{ marginTop: 10, height: 1, background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)' }} />
+          <div style={{ fontSize: 10, letterSpacing: '0.35em', color: '#3A3730', marginTop: 10, textTransform: 'uppercase' }}>
+            yönetim paneli
+          </div>
         </div>
 
-        <div className="bg-white border border-cream-200 rounded-2xl p-8 shadow-sm">
-          <div className="space-y-4">
+        {/* Card */}
+        <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 16, padding: 32 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div>
-              <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1.5">Kullanıcı Adı</label>
+              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', display: 'block', marginBottom: 8 }}>
+                Kullanıcı Adı
+              </label>
               <input
                 type="text"
                 value={kullanici_adi}
                 onChange={e => setKullaniciAdi(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && login()}
                 placeholder="kullanici.adi"
-                className="w-full px-4 py-3 bg-cream-50 border border-cream-200 rounded-xl text-ink-700 font-mono placeholder-ink-300 focus:outline-none focus:border-moss-400 transition-colors"
+                className="input-premium"
+                style={{ padding: '11px 14px', fontSize: 13 }}
               />
             </div>
             <div>
-              <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1.5">Şifre</label>
+              <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', display: 'block', marginBottom: 8 }}>
+                Şifre
+              </label>
               <input
                 type="password"
                 value={sifre}
                 onChange={e => setSifre(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && login()}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-cream-50 border border-cream-200 rounded-xl text-ink-700 placeholder-ink-300 focus:outline-none focus:border-moss-400 transition-colors"
+                className="input-premium"
+                style={{ padding: '11px 14px', fontSize: 13 }}
               />
             </div>
 
             {error && (
-              <div className="px-4 py-3 bg-ember-50 border border-ember-200 rounded-xl text-ember-700 text-sm">
+              <div style={{ padding: '10px 14px', background: 'rgba(139,38,53,0.12)', border: '1px solid rgba(139,38,53,0.3)', borderRadius: 8, fontSize: 12, color: '#C4364A' }}>
                 {error}
               </div>
             )}
@@ -75,15 +85,16 @@ export default function LoginPage() {
             <button
               onClick={login}
               disabled={loading}
-              className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl font-medium hover:bg-ink-700 transition-colors disabled:opacity-40"
+              className="btn-gold"
+              style={{ padding: '12px 0', fontSize: 13, letterSpacing: '0.05em', marginTop: 4 }}
             >
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              {loading ? 'Doğrulanıyor...' : 'Giriş Yap'}
             </button>
           </div>
         </div>
 
-        <p className="text-center text-xs text-ink-300 mt-6 font-mono">
-          roberto. admin · v1.0
+        <p style={{ textAlign: 'center', fontSize: 10, color: '#272420', marginTop: 24, fontFamily: 'JetBrains Mono, monospace' }}>
+          roberto admin · v2.0
         </p>
       </div>
     </div>

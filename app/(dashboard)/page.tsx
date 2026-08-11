@@ -143,77 +143,77 @@ export default function DashboardPage() {
     </div>
   )
 
+  if (loading) return (
+    <div style={{ padding: '40px 32px', maxWidth: 1280, margin: '0 auto' }}>
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ height: 12, width: 160, background: '#181612', borderRadius: 6, marginBottom: 12 }} />
+        <div style={{ height: 40, width: 240, background: '#111009', borderRadius: 8 }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        {[1,2,3,4].map(i => <div key={i} style={{ height: 110, background: '#111009', borderRadius: 12, border: '1px solid rgba(201,168,76,0.06)' }} />)}
+      </div>
+    </div>
+  )
+
   const trendBugun = stats!.dun > 0 ? Math.round(((stats!.bugun - stats!.dun) / stats!.dun) * 100) : null
   const haftaTrend = stats!.gecenHafta > 0 ? Math.round(((stats!.buHafta - stats!.gecenHafta) / stats!.gecenHafta) * 100) : null
 
-  // 7. Akıllı öneriler
   const oneriler: { icon: string; mesaj: string; href: string; renk: string }[] = []
-  if (stats!.canli > 0) oneriler.push({ icon: '🔴', mesaj: `${stats!.canli} müşteri canlı destek bekliyor`, href: '/canli-destek', renk: 'ember' })
-  if (stats!.kvkkOranı < 50) oneriler.push({ icon: '📋', mesaj: `KVKK onay oranı düşük (%${stats!.kvkkOranı}) — bot akışını kontrol et`, href: '/raporlar', renk: 'cream' })
-  if (haftaTrend !== null && haftaTrend < -20) oneriler.push({ icon: '📉', mesaj: `Bu hafta trafik %${Math.abs(haftaTrend)} düştü — geçen haftaya göre`, href: '/raporlar', renk: 'cream' })
-  if (stats!.yeniMusteri > 5) oneriler.push({ icon: '🎉', mesaj: `Bu hafta ${stats!.yeniMusteri} yeni müşteri — harika!`, href: '/konusmalar', renk: 'moss' })
+  if (stats!.canli > 0) oneriler.push({ icon: '⬤', mesaj: `${stats!.canli} müşteri canlı destek bekliyor`, href: '/canli-destek', renk: 'ruby' })
+  if (stats!.kvkkOranı < 50) oneriler.push({ icon: '◆', mesaj: `KVKK onay oranı düşük (%${stats!.kvkkOranı}) — bot akışını kontrol et`, href: '/raporlar', renk: 'default' })
+  if (haftaTrend !== null && haftaTrend < -20) oneriler.push({ icon: '▼', mesaj: `Bu hafta trafik %${Math.abs(haftaTrend)} düştü`, href: '/raporlar', renk: 'default' })
+  if (stats!.yeniMusteri > 5) oneriler.push({ icon: '✦', mesaj: `Bu hafta ${stats!.yeniMusteri} yeni müşteri`, href: '/konusmalar', renk: 'gold' })
 
   return (
-    <div className="p-4 md:p-10 max-w-7xl mx-auto">
+    <div style={{ padding: '32px 28px', maxWidth: 1280, margin: '0 auto' }} className="stagger">
 
       {/* Alert */}
       {stats!.canli > 0 && (
-        <div className="mb-4 md:mb-6 bg-ember-50 border border-ember-200 rounded-2xl px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 md:gap-3 min-w-0">
-            <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-ember-500 shrink-0" strokeWidth={1.5} />
-            <span className="text-ember-700 font-medium text-sm truncate">{stats!.canli} müşteri canlı destek bekliyor</span>
+        <div style={{ marginBottom: 20, padding: '14px 20px', background: 'rgba(139,38,53,0.1)', border: '1px solid rgba(196,54,74,0.25)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C4364A', display: 'inline-block', animation: 'urgentPulse 1.5s ease-in-out infinite' }} />
+            <span style={{ color: '#C4364A', fontWeight: 500, fontSize: 13 }}>{stats!.canli} müşteri canlı destek bekliyor</span>
           </div>
-          <a href="/canli-destek" className="shrink-0 px-3 py-1.5 bg-ember-600 text-white text-xs font-medium rounded-xl hover:bg-ember-700 transition-colors">Aç →</a>
+          <a href="/canli-destek" style={{ padding: '6px 14px', background: '#8B2635', color: '#fff', borderRadius: 8, fontSize: 12, fontWeight: 500, textDecoration: 'none' }}>Görüntüle →</a>
         </div>
       )}
 
-      <header className="mb-6 md:mb-10">
-        <p className="text-xs uppercase tracking-[0.3em] text-ink-300 font-medium mb-2">{format(new Date(), "d MMMM yyyy", { locale: tr })}</p>
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl md:text-5xl text-ink-900 tracking-tight">Genel Bakış</h1>
-          <div className="flex items-center gap-2 text-xs text-ink-500">
-            <span className="w-2 h-2 rounded-full bg-moss-400 animate-pulse" />
-            <span className="font-mono hidden sm:block">canlı yayın</span>
+      {/* Header */}
+      <header style={{ marginBottom: 32 }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#3A3730', marginBottom: 8, fontFamily: 'JetBrains Mono, monospace' }}>
+          {format(new Date(), "d MMMM yyyy", { locale: tr })}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            Genel Bakış
+          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9A84C', display: 'inline-block', animation: 'pulse-gold 2s infinite' }} />
+            canlı
           </div>
         </div>
+        <div style={{ height: 1, background: 'linear-gradient(90deg, rgba(201,168,76,0.3), transparent)', marginTop: 16 }} />
       </header>
-
 
       {/* Altın & Gümüş Fiyatları */}
       {fiyatlar && (
-        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
           {[
-            {
-              label: '14 Ayar Altın',
-              fiyat: fiyatlar.altin?.ayar14 || fiyatlar.altin?.alis,
-              satis: fiyatlar.altin?.satis,
-              degisim: fiyatlar.altin?.degisim,
-              renk: '#c4a154',
-              icon: '✦',
-            },
-            {
-              label: '925 Gümüş (Gram)',
-              fiyat: fiyatlar.gumus?.alis,
-              satis: fiyatlar.gumus?.satis,
-              degisim: fiyatlar.gumus?.degisim,
-              renk: '#928c79',
-              icon: '◆',
-            },
+            { label: '14 Ayar Altın', fiyat: fiyatlar.altin?.ayar14 || fiyatlar.altin?.alis, satis: fiyatlar.altin?.satis, degisim: fiyatlar.altin?.degisim, color: '#C9A84C', sym: '✦' },
+            { label: '925 Gümüş (gr)', fiyat: fiyatlar.gumus?.alis, satis: fiyatlar.gumus?.satis, degisim: fiyatlar.gumus?.degisim, color: '#8A8580', sym: '◆' },
           ].map((item) => (
-            <div key={item.label} className="bg-white border border-cream-200 rounded-2xl p-4 md:p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-ink-300">{item.label}</span>
-                <span className="text-lg" style={{ color: item.renk }}>{item.icon}</span>
+            <div key={item.label} style={{ background: '#111009', border: `1px solid rgba(${item.color === '#C9A84C' ? '201,168,76' : '138,133,128'},0.15)`, borderRadius: 12, padding: '16px 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730' }}>{item.label}</span>
+                <span style={{ color: item.color, fontSize: 16 }}>{item.sym}</span>
               </div>
-              <div className="font-display text-2xl md:text-3xl text-ink-900 mb-1">
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {item.fiyat ? `${Math.round(item.fiyat).toLocaleString('tr')} ₺` : '—'}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-ink-400 font-mono">
-                  satış: {item.satis ? `${Math.round(item.satis).toLocaleString('tr')} ₺` : '—'}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                <span style={{ fontSize: 10, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>satış: {item.satis ? `${Math.round(item.satis).toLocaleString('tr')} ₺` : '—'}</span>
                 {item.degisim != null && (
-                  <span className={`text-[10px] font-mono font-medium flex items-center gap-0.5 ${Number(item.degisim) >= 0 ? 'text-moss-500' : 'text-ember-500'}`}>
+                  <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: Number(item.degisim) >= 0 ? '#C9A84C' : '#C4364A' }}>
                     {Number(item.degisim) >= 0 ? '▲' : '▼'} %{Math.abs(Number(item.degisim)).toFixed(2)}
                   </span>
                 )}
@@ -223,55 +223,50 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+      {/* Stat Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }} className="lg:grid-cols-4">
         <StatCard label="Toplam Müşteri" value={stats!.toplam} delta={`${stats!.bugun} bugün`} icon={Users} />
-        <StatCard label="Bugün Aktif" value={stats!.bugun} delta={trendBugun !== null ? `${trendBugun > 0 ? '+' : ''}${trendBugun}% dün` : '—'} icon={MessagesSquare} tone="moss" />
-        <StatCard label="Canlı Destek" value={stats!.canli} delta={stats!.canli > 0 ? 'bekliyor' : 'boş'} icon={Headphones} tone={stats!.canli > 0 ? 'ember' : 'default'} />
-        <StatCard label="KVKK" value={`%${stats!.kvkkOranı}`} delta={`${stats!.kvkkOnayli} onaylı`} icon={CheckCircle2} />
+        <StatCard label="Bugün Aktif" value={stats!.bugun} delta={trendBugun !== null ? `${trendBugun > 0 ? '+' : ''}${trendBugun}% dün` : '—'} icon={MessagesSquare} tone="gold" />
+        <StatCard label="Canlı Destek" value={stats!.canli} delta={stats!.canli > 0 ? 'bekliyor' : 'boş'} icon={Headphones} tone={stats!.canli > 0 ? 'ruby' : 'default'} />
+        <StatCard label="KVKK Onay" value={`%${stats!.kvkkOranı}`} delta={`${stats!.kvkkOnayli} onaylı`} icon={CheckCircle2} />
       </div>
 
-      {/* 5. Bu haftanın özeti */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 md:mb-8">
+      {/* Haftalık Özet */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }} className="grid-cols-2 lg:grid-cols-4">
         {[
           { label: 'Bu Hafta', value: stats!.buHafta, sub: haftaTrend !== null ? `${haftaTrend > 0 ? '+' : ''}${haftaTrend}% geçen hafta` : 'ilk hafta', trend: haftaTrend },
           { label: 'Geçen Hafta', value: stats!.gecenHafta, sub: 'karşılaştırma', trend: null },
           { label: 'Yeni Müşteri', value: stats!.yeniMusteri, sub: 'bu hafta ilk kez', trend: null },
-          { label: 'Tekrar Yazan', value: stats!.tekrar, sub: 'bu hafta geri dönen', trend: null },
+          { label: 'Tekrar Yazan', value: stats!.tekrar, sub: 'geri dönen', trend: null },
         ].map(({ label, value, sub, trend }) => (
-          <div key={label} className="bg-white border border-cream-200 rounded-2xl p-4">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-ink-300 mb-2">{label}</p>
-            <div className="flex items-end gap-2">
-              <span className="font-display text-2xl md:text-3xl text-ink-900">{value}</span>
+          <div key={label} style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 12, padding: '16px 18px' }}>
+            <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', marginBottom: 10 }}>{label}</p>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: '#F5F0E8', lineHeight: 1, letterSpacing: '-0.02em' }}>{value}</span>
               {trend !== null && (
-                <span className={`text-xs font-mono mb-0.5 flex items-center gap-0.5 ${trend > 0 ? 'text-moss-500' : trend < 0 ? 'text-ember-500' : 'text-ink-300'}`}>
-                  {trend > 0 ? <ArrowUp className="w-3 h-3" /> : trend < 0 ? <ArrowDown className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
-                  %{Math.abs(trend)}
+                <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', marginBottom: 3, color: trend > 0 ? '#C9A84C' : trend < 0 ? '#C4364A' : '#3A3730' }}>
+                  {trend > 0 ? '▲' : trend < 0 ? '▼' : '—'} %{Math.abs(trend)}
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-ink-300 font-mono mt-1">{sub}</p>
+            <p style={{ fontSize: 10, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', marginTop: 6 }}>{sub}</p>
           </div>
         ))}
       </div>
 
-      {/* 7. Akıllı öneriler */}
+      {/* Öneriler */}
       {oneriler.length > 0 && (
-        <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6 mb-6 md:mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="w-4 h-4 text-ink-400" strokeWidth={1.5} />
-            <h2 className="font-display text-xl text-ink-900">Öneriler</h2>
+        <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Lightbulb size={14} color="#C9A84C" strokeWidth={1.5} />
+            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, color: '#F5F0E8' }}>Öneriler</span>
           </div>
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {oneriler.map((o, i) => (
-              <a key={i} href={o.href} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors hover:opacity-80 ${
-                o.renk === 'ember' ? 'bg-ember-50 border-ember-200' :
-                o.renk === 'moss' ? 'bg-moss-50 border-moss-200' :
-                'bg-cream-50 border-cream-200'
-              }`}>
-                <span className="text-lg shrink-0">{o.icon}</span>
-                <span className={`text-sm font-medium flex-1 ${o.renk === 'ember' ? 'text-ember-700' : o.renk === 'moss' ? 'text-moss-700' : 'text-ink-600'}`}>{o.mesaj}</span>
-                <span className="text-xs text-ink-300">→</span>
+              <a key={i} href={o.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, border: `1px solid ${o.renk === 'ruby' ? 'rgba(139,38,53,0.3)' : o.renk === 'gold' ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.3)'}`, background: o.renk === 'ruby' ? 'rgba(139,38,53,0.08)' : o.renk === 'gold' ? 'rgba(201,168,76,0.06)' : 'rgba(31,29,23,0.5)', textDecoration: 'none', transition: 'opacity 0.2s' }}>
+                <span style={{ color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#C9A84C' : '#6B6760', fontSize: 12 }}>{o.icon}</span>
+                <span style={{ fontSize: 13, color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#E8D5A3' : '#8A8580', flex: 1 }}>{o.mesaj}</span>
+                <span style={{ color: '#3A3730', fontSize: 12 }}>→</span>
               </a>
             ))}
           </div>
@@ -279,40 +274,40 @@ export default function DashboardPage() {
       )}
 
       {/* Grafikler */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-        <div className="lg:col-span-2 bg-white border border-cream-200 rounded-2xl p-4 md:p-8">
-          <div className="flex items-baseline justify-between mb-4 md:mb-8">
-            <h2 className="font-display text-xl md:text-2xl text-ink-900">Son 24 Saat</h2>
-            <span className="text-xs text-ink-300 hidden md:flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" strokeWidth={1.5} />saatlik trafik
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 20 }} className="lg:grid-cols-3">
+        <div style={{ gridColumn: 'span 2', background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: '#F5F0E8' }}>Son 24 Saat</h2>
+            <span style={{ fontSize: 10, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <TrendingUp size={11} /> saatlik trafik
             </span>
           </div>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={stats!.son24Saat} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
-              <XAxis dataKey="saat" tick={{ fontSize: 9, fill: '#928c79' }} axisLine={false} tickLine={false} interval={3} />
-              <YAxis tick={{ fontSize: 9, fill: '#928c79' }} axisLine={false} tickLine={false} />
-              <Tooltip cursor={{ fill: 'rgba(124,144,89,0.08)' }} contentStyle={{ background: '#fdfcf7', border: '1px solid #e8d9a8', borderRadius: '8px', fontSize: '11px' }} />
-              <Bar dataKey="sayi" radius={[4,4,0,0]}>
-                {stats!.son24Saat.map((e,i) => <Cell key={i} fill={e.sayi === Math.max(...stats!.son24Saat.map(h=>h.sayi)) && e.sayi > 0 ? '#c4633f' : '#7c9059'} />)}
+              <XAxis dataKey="saat" tick={{ fontSize: 9, fill: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }} axisLine={false} tickLine={false} interval={3} />
+              <YAxis tick={{ fontSize: 9, fill: '#3A3730' }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: 'rgba(201,168,76,0.04)' }} contentStyle={{ background: '#181612', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 8, fontSize: 11, color: '#C8C0B0' }} />
+              <Bar dataKey="sayi" radius={[3,3,0,0]}>
+                {stats!.son24Saat.map((e,i) => <Cell key={i} fill={e.sayi === Math.max(...stats!.son24Saat.map(h=>h.sayi)) && e.sayi > 0 ? '#C9A84C' : '#272420'} />)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-8">
-          <h2 className="font-display text-xl md:text-2xl text-ink-900 mb-4 md:mb-8">Niyet Dağılımı</h2>
-          <div className="space-y-2 md:space-y-3">
+        <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: '#F5F0E8', marginBottom: 24 }}>Niyet Dağılımı</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {stats!.intentDagilimi.slice(0,6).map(item => {
               const total = stats!.intentDagilimi.reduce((a,b) => a+b.count, 0)
               const pct = total ? Math.round((item.count/total)*100) : 0
               return (
                 <div key={item.intent}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-ink-700 font-medium truncate mr-2">{INTENT_LABEL[item.intent] || item.intent}</span>
-                    <span className="text-ink-300 font-mono shrink-0">{item.count}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                    <span style={{ fontSize: 12, color: '#8A8580' }}>{INTENT_LABEL[item.intent] || item.intent}</span>
+                    <span style={{ fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>{item.count}</span>
                   </div>
-                  <div className="h-1.5 bg-cream-100 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: TONE[item.intent] || '#7c9059' }} />
+                  <div style={{ height: 2, background: '#1F1D17', borderRadius: 1 }}>
+                    <div style={{ height: '100%', borderRadius: 1, background: 'linear-gradient(90deg, #C9A84C, #8B6914)', width: `${pct}%`, transition: 'width 0.8s ease' }} />
                   </div>
                 </div>
               )
@@ -322,67 +317,64 @@ export default function DashboardPage() {
       </div>
 
       {/* Alt: Sadık müşteriler + Son konuşmalar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
-
-        {/* 6. En sadık müşteriler */}
-        <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden">
-          <div className="px-4 md:px-6 py-4 border-b border-cream-100 flex items-center gap-2">
-            <Star className="w-4 h-4 text-ink-400" strokeWidth={1.5} />
-            <h2 className="font-display text-lg md:text-xl text-ink-900">En Sadık Müşteriler</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }} className="lg:grid-cols-3">
+        <div style={{ background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Star size={13} color="#C9A84C" strokeWidth={1.5} />
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: '#F5F0E8' }}>En Sadık Müşteriler</h2>
           </div>
-          <div className="divide-y divide-cream-100">
+          <div>
             {sadikMusteriler.map((s, i) => (
-              <div key={s.phone} className="px-4 md:px-6 py-3 flex items-center gap-3">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-ink-900 text-cream-50' : i === 1 ? 'bg-moss-200 text-moss-800' : 'bg-cream-200 text-ink-600'}`}>
-                  {i + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-mono text-xs text-ink-700 truncate">{s.phone}</div>
-                  <div className="text-[10px] text-ink-300 font-mono">
+              <div key={s.phone} style={{ padding: '12px 20px', borderBottom: '1px solid rgba(201,168,76,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0, background: i === 0 ? 'linear-gradient(135deg, #C9A84C, #8B6914)' : '#1F1D17', color: i === 0 ? '#0A0908' : '#6B6760', border: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>{i+1}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#C8C0B0' }}>{s.phone}</div>
+                  <div style={{ fontSize: 10, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
                     {formatDistanceToNow(new Date(s.ilkGorulme), { addSuffix: true, locale: tr })}
                   </div>
                 </div>
-                {s.kvkk && <span className="text-[10px] text-moss-500 font-mono shrink-0">✓ KVKK</span>}
+                {s.kvkk && <span style={{ fontSize: 10, color: '#C9A84C', fontFamily: 'JetBrains Mono, monospace' }}>✓</span>}
               </div>
             ))}
-            {sadikMusteriler.length === 0 && <div className="px-6 py-8 text-center text-ink-300 font-mono text-xs">henüz veri yok</div>}
+            {sadikMusteriler.length === 0 && <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>henüz veri yok</div>}
           </div>
         </div>
 
-        {/* Son konuşmalar */}
-        <div className="lg:col-span-2 bg-white border border-cream-200 rounded-2xl overflow-hidden">
-          <div className="px-4 md:px-6 py-4 border-b border-cream-100 flex items-center justify-between">
-            <h2 className="font-display text-lg md:text-xl text-ink-900">Son Konuşmalar</h2>
-            <a href="/konusmalar" className="text-xs text-moss-600 hover:text-moss-700">Hepsini Gör →</a>
+        <div style={{ gridColumn: 'span 2', background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: '#F5F0E8' }}>Son Konuşmalar</h2>
+            <a href="/konusmalar" style={{ fontSize: 11, color: '#C9A84C', textDecoration: 'none' }}>Hepsini Gör →</a>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[400px]">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', minWidth: 400, borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="bg-cream-50">
+                <tr style={{ background: 'rgba(201,168,76,0.03)' }}>
                   {['Müşteri','Son Mesaj','Niyet','Durum','Zaman'].map(h => (
-                    <th key={h} className="px-4 md:px-6 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-ink-300">{h}</th>
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730', fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {sessions.map(s => (
-                  <tr key={s.phone} className="border-t border-cream-100 hover:bg-cream-50 cursor-pointer" onClick={() => router.push('/konusmalar')}>
-                    <td className="px-4 md:px-6 py-3 font-mono text-xs text-ink-700">{s.phone}</td>
-                    <td className="px-4 md:px-6 py-3 text-xs text-ink-500 max-w-[120px] truncate">{s.musteri_yazdigi || '—'}</td>
-                    <td className="px-4 md:px-6 py-3">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: `${TONE[s.last_intent||'other']}20`, color: TONE[s.last_intent||'other'] }}>
+                  <tr key={s.phone} style={{ borderTop: '1px solid rgba(201,168,76,0.05)', cursor: 'pointer' }} onClick={() => router.push('/konusmalar')}>
+                    <td style={{ padding: '12px 16px', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#C8C0B0' }}>{s.phone}</td>
+                    <td style={{ padding: '12px 16px', fontSize: 12, color: '#6B6760', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{ display: 'inline-flex', padding: '3px 8px', borderRadius: 4, fontSize: 10, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.12)' }}>
                         {INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}
                       </span>
                     </td>
-                    <td className="px-4 md:px-6 py-3">
-                      {s.bulundugu_menu === 'canli' ? <span className="flex items-center gap-1 text-xs text-ember-600"><span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" />Canlı</span> : <span className="text-xs text-moss-500">Bot</span>}
+                    <td style={{ padding: '12px 16px' }}>
+                      {s.bulundugu_menu === 'canli'
+                        ? <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#C4364A' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block' }} />Canlı</span>
+                        : <span style={{ fontSize: 11, color: '#3A3730' }}>Bot</span>}
                     </td>
-                    <td className="px-4 md:px-6 py-3 text-xs text-ink-300 font-mono whitespace-nowrap">
+                    <td style={{ padding: '12px 16px', fontSize: 10, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
                       {formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}
                     </td>
                   </tr>
                 ))}
-                {sessions.length === 0 && <tr><td colSpan={5} className="px-6 py-8 text-center text-ink-300 font-mono text-xs">henüz konuşma yok</td></tr>}
+                {sessions.length === 0 && <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>henüz konuşma yok</td></tr>}
               </tbody>
             </table>
           </div>
