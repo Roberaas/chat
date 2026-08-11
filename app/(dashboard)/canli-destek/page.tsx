@@ -7,6 +7,8 @@ import { Headphones, Clock, X, Send, RefreshCw, CheckCheck, Bell, BellOff } from
 type SlackMessage = { ts: string; text: string; user: string; is_bot: boolean; username: string }
 
 function parseSlackText(text: string): string {
+  // Müşteri mesajı başlığını temizle: ":speech_balloon: *İsim* (tel)\n" → sadece mesaj
+  text = text.replace(/^:speech_balloon:.*?\n/s, '')
   return text
     .replace(/:large_green_circle:/g,'🟢').replace(/:envelope_with_arrow:/g,'📩')
     .replace(/:wave:/g,'👋').replace(/:white_check_mark:/g,'✅').replace(/:x:/g,'❌')
@@ -222,7 +224,7 @@ export default function CanliDestekPage() {
             ) : messages.map(m => {
               // Temsilci: username roberto-admin VEYA is_bot:false
               // Müşteri: is_bot:true (n8n WhatsApp'tan iletir)
-              const isAdmin = (m as any).is_admin || m.username === 'roberto-admin' || (!m.is_bot && !!m.user && m.user !== 'unknown')
+              const isAdmin = !m.is_bot  // is_bot:false = temsilci, is_bot:true = müşteri (n8n iletisi)
               const metin = parseSlackText(m.text)
               if (!metin) return null
               const saat = new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })
