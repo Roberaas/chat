@@ -39,18 +39,16 @@ export async function GET(req: Request) {
       if (parts.length) text = parts.join('')
     }
 
-    // Admin tespiti: username veya bot_profile.name 'admin' içeriyorsa admin
-    const username = m.username || m.bot_profile?.name || ''
-    const isAdmin = username === 'roberto-admin' || username.toLowerCase().includes('admin')
+    // is_bot: true  → admin (bot token ile panel üzerinden gönderilen)
+    // is_bot: false → müşteri (WhatsApp'tan Slack'e iletilen insan mesajı)
+    const isAdmin = !!m.bot_id
 
     return {
       ts: m.ts,
       text,
       user: m.user || m.bot_id || 'unknown',
       is_bot: !!m.bot_id,
-      username,
       is_admin: isAdmin,
-      _debug: { raw_username: m.username, bot_profile: m.bot_profile?.name, subtype: m.subtype },
     }
   })
 
@@ -76,7 +74,6 @@ export async function POST(req: Request) {
       channel,
       thread_ts,
       text,
-      username: 'roberto-admin',
     }),
   })
 
