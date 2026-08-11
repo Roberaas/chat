@@ -74,6 +74,7 @@ export async function POST(req: Request) {
       channel,
       thread_ts,
       text,
+      username: 'roberto-admin',
     }),
   })
 

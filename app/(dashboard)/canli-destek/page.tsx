@@ -80,7 +80,7 @@ export default function CanliDestekPage() {
     setLastMsgTs(prev => {
       const prevTs = prev[thread_ts]
       if (lastTs && prevTs && lastTs !== prevTs) {
-        const newMsgs = filtered.filter((m: SlackMessage) => m.ts > prevTs && m.username !== 'roberto-admin')
+        const newMsgs = filtered.filter((m: SlackMessage) => m.ts > prevTs && !m.is_admin)
         if (newMsgs.length > 0) { notify('💬 Yeni Mesaj', newMsgs[newMsgs.length-1].text.slice(0,60)); setUnread(u => ({ ...u, [thread_ts]: (u[thread_ts]||0)+newMsgs.length })) }
       }
       return lastTs ? { ...prev, [thread_ts]: lastTs } : prev
@@ -94,7 +94,7 @@ export default function CanliDestekPage() {
     loadMessages(selected.slack_thread_ts)
     const t = setInterval(() => loadMessages(selected.slack_thread_ts!, true), 8000)
     return () => clearInterval(t)
-  }, [selected])
+  }, [selected?.slack_thread_ts])
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
   useEffect(() => { if (selected && sessions.length > 0 && !sessions.find(s => s.phone === selected.phone)) { setSelected(null); setMessages([]) } }, [sessions, selected])
