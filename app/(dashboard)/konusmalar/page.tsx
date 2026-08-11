@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { supabase, Session } from '@/lib/supabase'
-import { Search, X, MessageSquare, ShoppingCart, StickyNote, Trash2, Plus, Tag } from 'lucide-react'
-import { formatDistanceToNow, format } from 'date-fns'
+import { Search, X, MessageSquare, StickyNote, Trash2, Plus, ShoppingCart } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
 const INTENT_LABEL: Record<string, string> = {
@@ -11,13 +11,17 @@ const INTENT_LABEL: Record<string, string> = {
   order_status: 'Sipariş Durumu', order_create: 'Sipariş Oluştur', subscription: 'Abonelik',
   human_handover: 'Canlı Destek', complaint: 'Şikayet', brand_info: 'Marka Bilgi',
   usage_question: 'Kullanım Sorusu', menu: 'Menü', smalltalk: 'Sohbet', other: 'Diğer',
-}
-const TONE: Record<string, string> = {
-  greeting: '#7c9059', products: '#a8b885', subscription: '#d97757',
-  human_handover: '#c4633f', complaint: '#a64d2e', order_create: '#c4a154', other: '#928c79',
+  shipping: 'Kargo', canli_devam: 'Canlı Devam',
 }
 type FilterType = 'all' | 'canli' | 'gpt' | 'kvkk' | 'sepet'
 type Not = { id: number; icerik: string; created_at: string }
+
+const S = {
+  page: { padding: '32px 28px', maxWidth: 1280, margin: '0 auto' },
+  card: { background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' as const },
+  th: { padding: '12px 18px', textAlign: 'left' as const, fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#3A3730', fontWeight: 500, background: 'rgba(201,168,76,0.03)' },
+  td: { padding: '14px 18px', fontSize: 12, borderTop: '1px solid rgba(201,168,76,0.05)' },
+}
 
 export default function KonusmalarPage() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -31,23 +35,18 @@ export default function KonusmalarPage() {
   const [etiketler, setEtiketler] = useState<{id:number;etiket:string;renk:string}[]>([])
 
   useEffect(() => { load() }, [filter])
-
-  useEffect(() => {
-    if (selected) loadNotlar(selected.phone)
-    else setNotlar([])
-  }, [selected])
+  useEffect(() => { if (selected) loadNotlar(selected.phone); else setNotlar([]) }, [selected])
 
   async function load() {
     setLoading(true)
     let q = supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500)
     if (filter === 'canli') q = q.eq('bulundugu_menu', 'canli')
-    else if (filter === 'gpt') q = q.eq('bulundugu_menu', 'gpt')
+    else if (filter === 'gpt') q = q.eq('bulundugu_menu', 'bot')
     else if (filter === 'kvkk') q = q.eq('kvkk_onay', false)
     const { data } = await q
     let list = (data || []) as Session[]
     if (filter === 'sepet') list = list.filter(s => s.pending_action && String(s.pending_action).includes('order:'))
-    setSessions(list)
-    setLoading(false)
+    setSessions(list); setLoading(false)
   }
 
   async function loadNotlar(telefon: string) {
@@ -55,21 +54,14 @@ export default function KonusmalarPage() {
       fetch(`/api/musteri-notu?telefon=${telefon}`).then(r => r.json()),
       fetch(`/api/etiket?telefon=${telefon}`).then(r => r.json()),
     ])
-    setNotlar(notRes.notlar || [])
-    setEtiketler(etiketRes.etiketler || [])
+    setNotlar(notRes.notlar || []); setEtiketler(etiketRes.etiketler || [])
   }
 
   async function notEkle() {
     if (!yeniNot.trim() || !selected) return
     setNotEkleniyor(true)
-    await fetch('/api/musteri-notu', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telefon: selected.phone, icerik: yeniNot.trim() })
-    })
-    setYeniNot('')
-    await loadNotlar(selected.phone)
-    setNotEkleniyor(false)
+    await fetch('/api/musteri-notu', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ telefon: selected.phone, icerik: yeniNot.trim() }) })
+    setYeniNot(''); await loadNotlar(selected.phone); setNotEkleniyor(false)
   }
 
   async function notSil(id: number) {
@@ -79,187 +71,216 @@ export default function KonusmalarPage() {
 
   const filtered = sessions.filter(s => !search || s.phone.includes(search) || (s.musteri_yazdigi || '').toLowerCase().includes(search.toLowerCase()))
 
+  const filters = [
+    { v: 'all', l: 'Hepsi' }, { v: 'gpt', l: 'Bot' }, { v: 'canli', l: 'Canlı' },
+    { v: 'kvkk', l: 'KVKK' }, { v: 'sepet', l: 'Sepet' }
+  ]
+
   return (
-    <div className="p-4 md:p-10 max-w-7xl mx-auto">
-      <header className="mb-6 md:mb-10">
-        <p className="text-xs uppercase tracking-[0.3em] text-ink-300 mb-2">{sessions.length} kayıt</p>
-        <h1 className="font-display text-3xl md:text-5xl text-ink-900 tracking-tight">Konuşmalar</h1>
+    <div style={S.page}>
+      {/* Header */}
+      <header style={{ marginBottom: 28 }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
+          {sessions.length} kayıt
+        </p>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: '#F5F0E8', letterSpacing: '-0.03em', lineHeight: 1 }}>
+          Konuşmalar
+        </h1>
+        <div style={{ height: 1, background: 'linear-gradient(90deg, rgba(201,168,76,0.3), transparent)', marginTop: 16 }} />
       </header>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-300" />
-          <input type="text" placeholder="Telefon veya mesaj ara..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white border border-cream-200 rounded-xl text-ink-700 placeholder-ink-300 focus:outline-none focus:border-moss-400 text-sm" />
-          {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-ink-300"><X className="w-3.5 h-3.5" /></button>}
+      {/* Arama + Filtreler */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' as const }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+          <Search size={14} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#3A3730' }} />
+          <input
+            type="text"
+            placeholder="Telefon veya mesaj ara..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="input-premium"
+            style={{ paddingLeft: 40, paddingRight: 40, paddingTop: 11, paddingBottom: 11, fontSize: 13 }}
+          />
+          {search && <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#3A3730', background: 'none', border: 'none', cursor: 'pointer' }}><X size={14} /></button>}
         </div>
-        <div className="flex overflow-x-auto bg-white border border-cream-200 rounded-xl p-1 gap-1 shrink-0">
-          {[{v:'all',l:'Hepsi'},{v:'gpt',l:'Bot'},{v:'canli',l:'Canlı'},{v:'kvkk',l:'KVKK'},{v:'sepet',l:'Sepet'}].map(f => (
-            <button key={f.v} onClick={() => setFilter(f.v as any)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${filter === f.v ? 'bg-ink-900 text-cream-50' : 'text-ink-500 hover:text-ink-700'}`}>
+        <div style={{ display: 'flex', background: '#111009', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, padding: 4, gap: 2 }}>
+          {filters.map(f => (
+            <button key={f.v} onClick={() => setFilter(f.v as any)} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: filter === f.v ? 600 : 400, background: filter === f.v ? 'rgba(201,168,76,0.15)' : 'transparent', color: filter === f.v ? '#E8D5A3' : '#6B6760', border: filter === f.v ? '1px solid rgba(201,168,76,0.2)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap' as const }}>
               {f.l}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Mobil kart */}
-      <div className="md:hidden space-y-2">
-        {loading ? [1,2,3,4,5].map(i => <div key={i} className="h-20 bg-cream-100 rounded-2xl animate-pulse" />) :
-        filtered.map(s => (
-          <div key={s.phone} onClick={() => setSelected(s)} className="bg-white border border-cream-200 rounded-2xl p-4 cursor-pointer hover:border-moss-300 transition-colors">
-            <div className="flex items-start justify-between mb-2">
-              <span className="font-mono text-sm text-ink-900">{s.phone}</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: `${TONE[s.last_intent||'other']}20`, color: TONE[s.last_intent||'other'] }}>
-                {INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}
-              </span>
-            </div>
-            <p className="text-xs text-ink-500 truncate mb-2">{s.musteri_yazdigi || '—'}</p>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {s.bulundugu_menu === 'canli' ? <span className="flex items-center gap-1 text-xs text-ember-600"><span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" />Canlı</span> : <span className="text-xs text-moss-500">Bot</span>}
-                <span className={`text-xs ${s.kvkk_onay ? 'text-moss-500' : 'text-ember-400'}`}>{s.kvkk_onay ? '✓' : '✗'} KVKK</span>
-              </div>
-              <span className="text-xs text-ink-300 font-mono">{formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}</span>
-            </div>
+      {/* Tablo */}
+      <div style={S.card}>
+        {loading ? (
+          <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[1,2,3,4,5].map(i => <div key={i} style={{ height: 44, background: '#181612', borderRadius: 8, animation: 'pulse 1.5s ease-in-out infinite' }} />)}
           </div>
-        ))}
-        {!loading && filtered.length === 0 && <div className="p-12 text-center text-ink-300 font-mono text-sm">sonuç bulunamadı</div>}
-      </div>
-
-      {/* Masaüstü tablo */}
-      <div className="hidden md:block bg-white border border-cream-200 rounded-2xl overflow-hidden">
-        {loading ? <div className="p-4 space-y-3">{[1,2,3,4,5].map(i => <div key={i} className="animate-pulse h-12 bg-cream-100 rounded-xl" />)}</div> : (
-          <table className="w-full">
-            <thead className="bg-cream-50">
-              <tr>{['Telefon','Son Mesaj','Niyet','Durum','KVKK','Güncelleme'].map(h => (
-                <th key={h} className="px-6 py-4 text-left text-[10px] uppercase tracking-[0.2em] text-ink-300">{h}</th>
-              ))}</tr>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Telefon','Son Mesaj','Niyet','Durum','KVKK','Güncelleme'].map(h => (
+                  <th key={h} style={S.th}>{h}</th>
+                ))}
+              </tr>
             </thead>
             <tbody>
               {filtered.map(s => (
-                <tr key={s.phone} onClick={() => setSelected(s)} className="border-t border-cream-100 hover:bg-cream-50 cursor-pointer transition-colors">
-                  <td className="px-6 py-4 font-mono text-sm text-ink-700">{s.phone}</td>
-                  <td className="px-6 py-4 text-sm text-ink-500 max-w-xs truncate">{s.musteri_yazdigi || '—'}</td>
-                  <td className="px-6 py-4"><span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: `${TONE[s.last_intent||'other']}20`, color: TONE[s.last_intent||'other'] }}>{INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}</span></td>
-                  <td className="px-6 py-4">{s.bulundugu_menu === 'canli' ? <span className="flex items-center gap-1.5 text-xs text-ember-600"><span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" />Canlı</span> : <span className="text-xs text-moss-500">Bot</span>}</td>
-                  <td className="px-6 py-4"><span className={`text-xs font-medium ${s.kvkk_onay ? 'text-moss-500' : 'text-ember-400'}`}>{s.kvkk_onay ? '✓ Onaylı' : '✗ Yok'}</span></td>
-                  <td className="px-6 py-4 text-xs text-ink-300 font-mono">{formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}</td>
+                <tr key={s.phone} onClick={() => setSelected(s)} style={{ cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(201,168,76,0.03)'}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                >
+                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#C8C0B0' }}>{s.phone}</td>
+                  <td style={{ ...S.td, color: '#6B6760', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
+                  <td style={S.td}>
+                    <span style={{ display: 'inline-flex', padding: '3px 8px', borderRadius: 4, fontSize: 10, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.12)' }}>
+                      {INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}
+                    </span>
+                  </td>
+                  <td style={S.td}>
+                    {s.bulundugu_menu === 'canli'
+                      ? <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#C4364A', fontSize: 12 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block' }} />Canlı</span>
+                      : <span style={{ color: '#3A3730', fontSize: 12 }}>Bot</span>}
+                  </td>
+                  <td style={S.td}>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: s.kvkk_onay ? '#C9A84C' : '#3A3730' }}>
+                      {s.kvkk_onay ? '✓ Onaylı' : '✗ Yok'}
+                    </span>
+                  </td>
+                  <td style={{ ...S.td, fontFamily: 'JetBrains Mono, monospace', color: '#3A3730', whiteSpace: 'nowrap' }}>
+                    {formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}
+                  </td>
                 </tr>
               ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', fontSize: 11, color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>sonuç bulunamadı</td></tr>
+              )}
             </tbody>
           </table>
         )}
-        {!loading && filtered.length === 0 && <div className="p-12 text-center text-ink-300 font-mono text-sm">sonuç bulunamadı</div>}
       </div>
 
       {/* Profil Drawer */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelected(null)}>
-          <div className="absolute inset-0 bg-ink-900/30 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md bg-cream-50 h-full overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setSelected(null)}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }} />
+          <div style={{ position: 'relative', width: '100%', maxWidth: 420, background: '#0D0B09', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(201,168,76,0.15)' }} onClick={e => e.stopPropagation()}>
 
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-cream-200 z-10 p-4 md:p-6 flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-moss-100 flex items-center justify-center">
-                  <span className="text-base font-display text-moss-700">{selected.phone.slice(-2)}</span>
+            {/* Drawer header */}
+            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(13,11,9,0.95)', backdropFilter: 'blur(12px)', padding: '20px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: '#C9A84C' }}>
+                  {selected.phone.slice(-2)}
                 </div>
                 <div>
-                  <div className="font-mono text-sm text-ink-900">{selected.phone}</div>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${selected.bulundugu_menu === 'canli' ? 'bg-ember-100 text-ember-700' : 'bg-moss-100 text-moss-700'}`}>
-                      {selected.bulundugu_menu === 'canli' ? '🔴 Canlı' : '🤖 Bot'}
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#C8C0B0' }}>{selected.phone}</div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' as const }}>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.2)' : 'rgba(58,55,48,0.3)', color: selected.bulundugu_menu === 'canli' ? '#C4364A' : '#6B6760', border: `1px solid ${selected.bulundugu_menu === 'canli' ? 'rgba(139,38,53,0.3)' : 'rgba(58,55,48,0.2)'}` }}>
+                      {selected.bulundugu_menu === 'canli' ? '⬤ Canlı' : '⬤ Bot'}
                     </span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${selected.kvkk_onay ? 'bg-moss-50 text-moss-600' : 'bg-ember-50 text-ember-600'}`}>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: selected.kvkk_onay ? 'rgba(201,168,76,0.1)' : 'rgba(31,29,23,0.5)', color: selected.kvkk_onay ? '#C9A84C' : '#3A3730', border: `1px solid ${selected.kvkk_onay ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.2)'}` }}>
                       {selected.kvkk_onay ? '✓ KVKK' : '✗ KVKK'}
                     </span>
-                    {etiketler.map(e => (
-                      <span key={e.id} className="text-[10px] px-2 py-0.5 rounded-full font-medium text-white" style={{ background: e.renk }}>
-                        {e.etiket}
-                      </span>
-                    ))}
+                    {etiketler.map(e => <span key={e.id} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, color: '#fff', background: e.renk }}>{e.etiket}</span>)}
                   </div>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cream-100 text-ink-300"><X className="w-4 h-4" /></button>
+              <button onClick={() => setSelected(null)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: 'rgba(58,55,48,0.3)', border: 'none', color: '#6B6760', cursor: 'pointer' }}>
+                <X size={14} />
+              </button>
             </div>
 
-            <div className="p-4 md:p-6 space-y-4">
-
+            <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* Son mesaj */}
               {selected.musteri_yazdigi && (
-                <div className="bg-white border border-cream-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2"><MessageSquare className="w-3.5 h-3.5 text-ink-300" strokeWidth={1.5} /><span className="text-[10px] uppercase tracking-[0.2em] text-ink-300">Son Mesaj</span></div>
-                  <p className="text-sm text-ink-700 italic">"{selected.musteri_yazdigi}"</p>
+                <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <MessageSquare size={12} color="#3A3730" strokeWidth={1.5} />
+                    <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730' }}>Son Mesaj</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#8A8580', fontStyle: 'italic' }}>"{selected.musteri_yazdigi}"</p>
                 </div>
               )}
 
               {/* Detaylar */}
-              <div className="bg-white border border-cream-200 rounded-xl divide-y divide-cream-100">
+              <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, overflow: 'hidden' }}>
                 {[
-                  { label: 'Son Niyet', value: INTENT_LABEL[selected.last_intent||'other'] || '—', emoji: '🎯' },
-                  { label: 'Bekleyen Aksiyon', value: selected.pending_action || '—', emoji: '⏳' },
-                  { label: 'KVKK Tarihi', value: selected.kvkk_onay_tarihi ? new Date(selected.kvkk_onay_tarihi).toLocaleString('tr') : '—', emoji: '📋' },
-                  { label: 'Son Güncelleme', value: new Date(selected.updated_at).toLocaleString('tr'), emoji: '🕐' },
-                ].map(({ label, value, emoji }) => (
-                  <div key={label} className="flex items-start gap-3 px-4 py-3">
-                    <span className="text-base mt-0.5 shrink-0">{emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <dt className="text-[10px] uppercase tracking-[0.15em] text-ink-300 mb-0.5">{label}</dt>
-                      <dd className="text-sm text-ink-700 break-all">{value}</dd>
-                    </div>
+                  { label: 'Son Niyet', value: INTENT_LABEL[selected.last_intent||'other'] || '—' },
+                  { label: 'Bekleyen Aksiyon', value: (selected as any).pending_action || '—' },
+                  { label: 'KVKK Tarihi', value: (selected as any).kvkk_onay_tarihi ? new Date((selected as any).kvkk_onay_tarihi).toLocaleString('tr') : '—' },
+                  { label: 'Son Güncelleme', value: new Date(selected.updated_at).toLocaleString('tr') },
+                ].map(({ label, value }, i) => (
+                  <div key={label} style={{ padding: '12px 16px', borderTop: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                    <dt style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#3A3730', whiteSpace: 'nowrap', marginTop: 1 }}>{label}</dt>
+                    <dd style={{ fontSize: 12, color: '#8A8580', textAlign: 'right', wordBreak: 'break-all' }}>{value}</dd>
                   </div>
                 ))}
               </div>
 
-              {/* 2. Müşteri Notları */}
-              <div className="bg-white border border-cream-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <StickyNote className="w-3.5 h-3.5 text-ink-400" strokeWidth={1.5} />
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-ink-300">Notlar</span>
-                  <span className="text-[10px] bg-cream-100 text-ink-400 px-1.5 py-0.5 rounded-full font-mono">{notlar.length}</span>
+              {/* Notlar */}
+              <div style={{ background: '#181612', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <StickyNote size={12} color="#3A3730" strokeWidth={1.5} />
+                  <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3A3730' }}>Notlar</span>
+                  <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: 'rgba(201,168,76,0.08)', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>{notlar.length}</span>
                 </div>
-                <div className="space-y-2 mb-3 max-h-40 overflow-y-auto">
-                  {notlar.length === 0 ? (
-                    <p className="text-xs text-ink-300 font-mono">henüz not yok</p>
-                  ) : notlar.map(n => (
-                    <div key={n.id} className="flex items-start gap-2 bg-cream-50 border border-cream-200 rounded-lg px-3 py-2">
-                      <p className="text-sm text-ink-700 flex-1">{n.icerik}</p>
-                      <button onClick={() => notSil(n.id)} className="text-ink-300 hover:text-ember-500 transition-colors shrink-0 mt-0.5">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10, maxHeight: 160, overflowY: 'auto' }}>
+                  {notlar.length === 0
+                    ? <p style={{ fontSize: 11, color: '#272420', fontFamily: 'JetBrains Mono, monospace' }}>henüz not yok</p>
+                    : notlar.map(n => (
+                      <div key={n.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#1F1D17', border: '1px solid rgba(201,168,76,0.06)', borderRadius: 8, padding: '8px 12px' }}>
+                        <p style={{ fontSize: 12, color: '#8A8580', flex: 1 }}>{n.icerik}</p>
+                        <button onClick={() => notSil(n.id)} style={{ background: 'none', border: 'none', color: '#3A3730', cursor: 'pointer', padding: 0, marginTop: 1 }}
+                          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#C4364A'}
+                          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#3A3730'}>
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))
+                  }
                 </div>
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: 8 }}>
                   <input
                     type="text"
                     value={yeniNot}
                     onChange={e => setYeniNot(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && notEkle()}
                     placeholder="Not ekle... (Enter)"
-                    className="flex-1 px-3 py-2 bg-cream-50 border border-cream-200 rounded-lg text-sm text-ink-700 placeholder-ink-300 focus:outline-none focus:border-moss-400"
+                    className="input-premium"
+                    style={{ flex: 1, padding: '8px 12px', fontSize: 12 }}
                   />
                   <button onClick={notEkle} disabled={notEkleniyor || !yeniNot.trim()}
-                    className="w-9 h-9 rounded-lg bg-ink-900 text-cream-50 flex items-center justify-center hover:bg-ink-700 transition-colors disabled:opacity-40">
-                    <Plus className="w-4 h-4" />
+                    className="btn-gold"
+                    style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, flexShrink: 0 }}>
+                    <Plus size={14} />
                   </button>
                 </div>
               </div>
 
               {/* Sepet */}
               {selected.pending_action && String(selected.pending_action).includes('order:') && (
-                <div className="bg-moss-50 border border-moss-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2"><ShoppingCart className="w-3.5 h-3.5 text-moss-600" strokeWidth={1.5} /><span className="text-[10px] uppercase tracking-[0.2em] text-moss-600">Aktif Sepet</span></div>
-                  <p className="text-sm text-moss-700 font-mono break-all">{String(selected.pending_action)}</p>
+                <div style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <ShoppingCart size={12} color="#C9A84C" strokeWidth={1.5} />
+                    <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C' }}>Aktif Sepet</span>
+                  </div>
+                  <p style={{ fontSize: 11, color: '#8A8580', fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all' }}>{String(selected.pending_action)}</p>
                 </div>
               )}
 
               {/* Aksiyonlar */}
-              <div className="space-y-2 pt-2">
-                {selected.slack_thread_ts && <a href="/canli-destek" className="w-full flex items-center justify-center gap-2 py-3 bg-ember-600 text-white rounded-xl text-sm font-medium hover:bg-ember-700 transition-colors">💬 Canlı Destek'te Aç →</a>}
-                <button onClick={() => setSelected(null)} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Kapat</button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
+                {selected.slack_thread_ts && (
+                  <a href="/canli-destek" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '11px 0', background: 'rgba(139,38,53,0.15)', border: '1px solid rgba(139,38,53,0.3)', borderRadius: 8, color: '#C4364A', fontSize: 13, fontWeight: 500, textDecoration: 'none' }}>
+                    Canlı Destek'te Aç →
+                  </a>
+                )}
+                <button onClick={() => setSelected(null)} style={{ padding: '11px 0', background: '#1F1D17', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', fontSize: 13, cursor: 'pointer' }}>
+                  Kapat
+                </button>
               </div>
             </div>
           </div>
