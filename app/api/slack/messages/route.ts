@@ -56,14 +56,25 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { thread_ts, text } = await req.json()
+  const { thread_ts, text, phone } = await req.json()
   const token = process.env.SLACK_BOT_TOKEN
   const channel = process.env.SLACK_CHANNEL_ID || 'C09FB0QLDMH'
+  const n8nWebhook = 'https://n8n.robertobravo.com/webhook/slackold'
 
   if (!token || !thread_ts || !text) {
     return NextResponse.json({ ok: false, error: 'Eksik parametre' })
   }
 
+  // 1) n8n webhook → WhatsApp'a ilet
+  try {
+    await fetch(n8nWebhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, text, thread_ts, source: 'admin_panel' }),
+    })
+  } catch (_) {}
+
+  // 2) Slack thread'e de yaz (panel geçmişi için)
   const res = await fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
     headers: {

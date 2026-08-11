@@ -102,7 +102,7 @@ export default function CanliDestekPage() {
   async function sendMessage() {
     if (!reply.trim() || !selected?.slack_thread_ts) return
     setSending(true)
-    const res = await fetch('/api/slack/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply }) })
+    const res = await fetch('/api/slack/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply, phone: selected.phone }) })
     const data = await res.json()
     if (data.ok) { setReply(''); await loadMessages(selected.slack_thread_ts) } else alert('Hata: ' + data.error)
     setSending(false)
