@@ -11,8 +11,10 @@ type SlackMessage = {
   text: string
   user: string
   is_bot: boolean
+  is_admin: boolean
   bot_id?: string
   subtype?: string
+  username?: string
 }
 
 // Slack emoji kodlarını unicode'a çevir
@@ -210,9 +212,8 @@ export default function CanliDestekPage() {
               <div className="text-center text-stone font-mono text-sm py-8">henüz mesaj yok</div>
             ) : (
               messages.map((m) => {
-                // Bot mesajları = müşteriden gelen (WhatsApp'tan iletilen)
-                // İnsan mesajları = admin'den gelen
-                const isCustomer = m.is_bot
+                // is_admin true ise admin yazmış, değilse müşteriden gelen bot mesajı
+                const isCustomer = !m.is_admin
                 return (
                   <div key={m.ts} className={`flex ${isCustomer ? 'justify-start' : 'justify-end'}`}>
                     {isCustomer && (
