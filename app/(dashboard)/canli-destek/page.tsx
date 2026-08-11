@@ -220,17 +220,31 @@ export default function CanliDestekPage() {
                 <p style={{ color: '#4A4540', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>Müşteri mesaj gönderdiğinde burada görünür</p>
               </div>
             ) : messages.map(m => {
-              const isAdmin = m.username === 'roberto-admin'
+              // Temsilci: username roberto-admin VEYA is_bot:false
+              // Müşteri: is_bot:true (n8n WhatsApp'tan iletir)
+              const isAdmin = (m as any).is_admin || m.username === 'roberto-admin' || (!m.is_bot && !!m.user && m.user !== 'unknown')
+              const metin = parseSlackText(m.text)
+              if (!metin) return null
+              const saat = new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })
               return (
-                <div key={m.ts} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0, marginBottom: 2, background: isAdmin ? 'linear-gradient(135deg,#C9A84C,#8B6914)' : '#211E18', color: isAdmin ? '#0E0C0A' : '#7A7468', border: isAdmin ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>
-                    {isAdmin ? 'A' : 'M'}
-                  </div>
-                  <div style={isAdmin ? P.msgBubbleAdmin : P.msgBubbleClient}>
-                    <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{parseSlackText(m.text)}</p>
-                    <p style={{ fontSize: 10, marginTop: 6, fontFamily: 'JetBrains Mono, monospace', opacity: 0.6, textAlign: isAdmin ? 'right' : 'left', margin: '6px 0 0' }}>
-                      {new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
+                <div key={m.ts} style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start', gap: 3 }}>
+                  <span style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', paddingLeft: isAdmin ? 0 : 36, paddingRight: isAdmin ? 36 : 0 }}>
+                    {isAdmin ? 'Temsilci' : 'Müşteri'}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0, background: isAdmin ? 'linear-gradient(135deg,#C9A84C,#8B6914)' : '#2E2B25', color: isAdmin ? '#0E0C0A' : '#9A928A', border: isAdmin ? 'none' : '1px solid rgba(201,168,76,0.15)' }}>
+                      {isAdmin ? 'T' : 'M'}
+                    </div>
+                    <div style={isAdmin ? {
+                      maxWidth: 340, padding: '11px 15px', borderRadius: '16px 16px 4px 16px',
+                      background: 'linear-gradient(135deg, #C9A84C, #A8882A)', color: '#0E0C0A', fontSize: 13, lineHeight: 1.55
+                    } : {
+                      maxWidth: 340, padding: '11px 15px', borderRadius: '16px 16px 16px 4px',
+                      background: '#1A1712', border: '1px solid rgba(201,168,76,0.15)', color: '#EDE8DF', fontSize: 13, lineHeight: 1.55
+                    }}>
+                      <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{metin}</p>
+                      <p style={{ fontSize: 10, marginTop: 5, fontFamily: 'JetBrains Mono, monospace', opacity: 0.55, textAlign: isAdmin ? 'right' : 'left', margin: '5px 0 0' }}>{saat}</p>
+                    </div>
                   </div>
                 </div>
               )
