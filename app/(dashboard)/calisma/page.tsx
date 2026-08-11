@@ -20,14 +20,14 @@ type AramaLog = {
 }
 
 const ONCELIK_COLOR: Record<string, string> = {
-  dusuk: 'bg-cream-100 text-ink-400',
+  dusuk: 'bg-obsidian-4 text-stone-light',
   normal: 'bg-cream-200 text-ink-600',
-  yuksek: 'bg-cream-300 text-ink-700',
-  acil: 'bg-ember-100 text-ember-700',
+  yuksek: 'bg-cream-300 text-cream-dim',
+  acil: 'bg-ruby/10 text-ember-700',
 }
 const SONUC_COLOR: Record<string, string> = {
-  tamamlandi: 'bg-moss-100 text-moss-700',
-  cevapsiz: 'bg-ember-100 text-ember-600',
+  tamamlandi: 'bg-obsidian-4 text-gold',
+  cevapsiz: 'bg-ruby/10 text-ruby-light',
   geri_aranacak: 'bg-cream-200 text-ink-600',
   mesaj_birakildi: 'bg-cream-200 text-ink-600',
 }
@@ -104,12 +104,12 @@ export default function CalismaPage() {
   const acilCount = gorevler.filter(g => g.oncelik === 'acil' && g.durum !== 'tamamlandi').length
 
   return (
-    <div className="p-4 md:p-10 max-w-7xl mx-auto">
+    <div style={{ padding: "32px 28px", maxWidth: 1280, margin: "0 auto" }}>
       <header className="mb-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-ink-300 mb-2">iş takibi</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-stone mb-2">iş takibi</p>
         <div className="flex items-baseline justify-between">
-          <h1 className="font-display text-3xl md:text-5xl text-ink-900 tracking-tight">Çalışma</h1>
-          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-white border border-cream-200 rounded-xl text-ink-400 hover:text-ink-700">
+          <h1 className="font-display text-4xl md:text-5xl text-cream tracking-tight">Çalışma</h1>
+          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -117,23 +117,23 @@ export default function CalismaPage() {
 
       {/* Acil uyarı */}
       {acilCount > 0 && (
-        <div className="mb-4 bg-ember-50 border border-ember-200 rounded-2xl px-4 py-3 flex items-center gap-3">
-          <AlertCircle className="w-4 h-4 text-ember-500 shrink-0" strokeWidth={1.5} />
+        <div className="mb-4 bg-ruby/10 border border-ember-200 rounded-xl px-4 py-3 flex items-center gap-3">
+          <AlertCircle className="w-4 h-4 text-ruby-light shrink-0" strokeWidth={1.5} />
           <span className="text-ember-700 text-sm font-medium">{acilCount} acil görev bekliyor!</span>
-          <button onClick={() => { setTab('gorevler'); setFilter('bekliyor') }} className="ml-auto text-xs text-ember-600 underline">Göster</button>
+          <button onClick={() => { setTab('gorevler'); setFilter('bekliyor') }} className="ml-auto text-xs text-ruby-light underline">Göster</button>
         </div>
       )}
 
       {/* Tab + Yeni buton */}
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
-        <div className="flex bg-white border border-cream-200 rounded-xl p-1 gap-1">
+        <div className="flex bg-obsidian-3 border border-gold-subtle rounded-xl p-1 gap-1">
           {[
             { v: 'gorevler', l: `✅ Görevler${bekleyenCount > 0 ? ` (${bekleyenCount})` : ''}` },
             { v: 'notlar', l: `📝 Ekip Notları` },
             { v: 'aramalar', l: `📞 Arama Logu` },
           ].map(t => (
             <button key={t.v} onClick={() => setTab(t.v as any)}
-              className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all ${tab === t.v ? 'bg-ink-900 text-cream-50' : 'text-ink-500 hover:text-ink-700'}`}>
+              className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all ${tab === t.v ? 'bg-ink-900 text-cream-50' : 'text-stone-light hover:text-cream-dim'}`}>
               {t.l}
             </button>
           ))}
@@ -144,7 +144,7 @@ export default function CalismaPage() {
             if (tab === 'notlar') setNotForm(f => ({ ...f, show: true }))
             if (tab === 'aramalar') setAramaForm(f => ({ ...f, show: true }))
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors"
         >
           <Plus className="w-4 h-4" />
           {tab === 'gorevler' ? 'Görev Ekle' : tab === 'notlar' ? 'Not Ekle' : 'Arama Kaydet'}
@@ -157,39 +157,39 @@ export default function CalismaPage() {
           <div className="flex gap-2 mb-4">
             {[{v:'bekliyor',l:'Bekleyen'},{v:'devam',l:'Devam'},{v:'tamamlandi',l:'Tamamlanan'},{v:'all',l:'Hepsi'}].map(f => (
               <button key={f.v} onClick={() => setFilter(f.v as any)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${filter === f.v ? 'bg-ink-900 text-cream-50' : 'bg-white border border-cream-200 text-ink-500'}`}>
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${filter === f.v ? 'bg-ink-900 text-cream-50' : 'bg-obsidian-3 border border-gold-subtle text-stone-light'}`}>
                 {f.l}
               </button>
             ))}
           </div>
           <div className="space-y-2">
-            {loading ? [1,2,3].map(i => <div key={i} className="h-20 bg-cream-100 rounded-2xl animate-pulse" />) :
+            {loading ? [1,2,3].map(i => <div key={i} className="h-20 bg-obsidian-4 rounded-xl animate-pulse" />) :
             filteredGorevler.map(g => (
-              <div key={g.id} className={`bg-white border rounded-2xl p-4 transition-colors ${g.durum === 'tamamlandi' ? 'border-cream-100 opacity-60' : g.oncelik === 'acil' ? 'border-ember-200' : 'border-cream-200'}`}>
+              <div key={g.id} className={`bg-obsidian-3 border rounded-xl p-4 transition-colors ${g.durum === 'tamamlandi' ? 'border-stone/20 opacity-60' : g.oncelik === 'acil' ? 'border-ember-200' : 'border-gold-subtle'}`}>
                 <div className="flex items-start gap-3">
                   <button onClick={() => gorevDurumGuncelle(g.id, g.durum === 'tamamlandi' ? 'bekliyor' : 'tamamlandi')}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors ${g.durum === 'tamamlandi' ? 'bg-moss-500 border-moss-500 text-white' : 'border-cream-300 hover:border-moss-400'}`}>
                     {g.durum === 'tamamlandi' && <Check className="w-3 h-3" />}
                   </button>
                   <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-medium ${g.durum === 'tamamlandi' ? 'line-through text-ink-400' : 'text-ink-900'}`}>{g.baslik}</div>
-                    {g.aciklama && <div className="text-xs text-ink-400 mt-0.5">{g.aciklama}</div>}
+                    <div className={`text-sm font-medium ${g.durum === 'tamamlandi' ? 'line-through text-stone-light' : 'text-cream'}`}>{g.baslik}</div>
+                    {g.aciklama && <div className="text-xs text-stone-light mt-0.5">{g.aciklama}</div>}
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${ONCELIK_COLOR[g.oncelik]}`}>{g.oncelik}</span>
-                      {g.ilgili_telefon && <span className="text-[10px] text-ink-400 font-mono flex items-center gap-1"><Phone className="w-2.5 h-2.5" />{g.ilgili_telefon}</span>}
-                      {g.ilgili_siparis && <span className="text-[10px] text-ink-400 font-mono">{g.ilgili_siparis}</span>}
-                      {g.bitis_tarihi && <span className={`text-[10px] font-mono flex items-center gap-1 ${new Date(g.bitis_tarihi) < new Date() && g.durum !== 'tamamlandi' ? 'text-ember-600' : 'text-ink-400'}`}><Clock className="w-2.5 h-2.5" />{format(new Date(g.bitis_tarihi), 'd MMM', { locale: tr })}</span>}
-                      <span className="text-[10px] text-ink-300 font-mono">{formatDistanceToNow(new Date(g.created_at), { addSuffix: true, locale: tr })}</span>
+                      {g.ilgili_telefon && <span className="text-[10px] text-stone-light font-mono flex items-center gap-1"><Phone className="w-2.5 h-2.5" />{g.ilgili_telefon}</span>}
+                      {g.ilgili_siparis && <span className="text-[10px] text-stone-light font-mono">{g.ilgili_siparis}</span>}
+                      {g.bitis_tarihi && <span className={`text-[10px] font-mono flex items-center gap-1 ${new Date(g.bitis_tarihi) < new Date() && g.durum !== 'tamamlandi' ? 'text-ruby-light' : 'text-stone-light'}`}><Clock className="w-2.5 h-2.5" />{format(new Date(g.bitis_tarihi), 'd MMM', { locale: tr })}</span>}
+                      <span className="text-[10px] text-stone font-mono">{formatDistanceToNow(new Date(g.created_at), { addSuffix: true, locale: tr })}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {g.durum !== 'tamamlandi' && (
                       <button onClick={() => gorevDurumGuncelle(g.id, g.durum === 'devam' ? 'bekliyor' : 'devam')}
-                        className="text-[10px] px-2 py-1 bg-cream-100 text-ink-500 rounded-lg hover:bg-cream-200 transition-colors">
+                        className="text-[10px] px-2 py-1 bg-obsidian-4 text-stone-light rounded-lg hover:bg-cream-200 transition-colors">
                         {g.durum === 'devam' ? 'Duraklat' : 'Başlat'}
                       </button>
                     )}
-                    <button onClick={() => gorevSil(g.id)} className="w-7 h-7 flex items-center justify-center text-ink-300 hover:text-ember-500 transition-colors">
+                    <button onClick={() => gorevSil(g.id)} className="w-7 h-7 flex items-center justify-center text-stone hover:text-ruby-light transition-colors">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -197,9 +197,9 @@ export default function CalismaPage() {
               </div>
             ))}
             {!loading && filteredGorevler.length === 0 && (
-              <div className="p-12 text-center bg-white border border-cream-200 rounded-2xl">
+              <div className="p-12 text-center bg-obsidian-3 border border-gold-subtle rounded-xl">
                 <Check className="w-10 h-10 mx-auto text-moss-300 mb-3" strokeWidth={1.5} />
-                <p className="text-sm text-ink-500">Bekleyen görev yok</p>
+                <p className="text-sm text-stone-light">Bekleyen görev yok</p>
               </div>
             )}
           </div>
@@ -209,32 +209,32 @@ export default function CalismaPage() {
       {/* EKİP NOTLARI */}
       {tab === 'notlar' && (
         <div className="space-y-3">
-          {loading ? [1,2,3].map(i => <div key={i} className="h-20 bg-cream-100 rounded-2xl animate-pulse" />) :
+          {loading ? [1,2,3].map(i => <div key={i} className="h-20 bg-obsidian-4 rounded-xl animate-pulse" />) :
           notlar.map(n => (
-            <div key={n.id} className="bg-white border border-cream-200 rounded-2xl p-4">
+            <div key={n.id} className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-ink-700 bg-cream-100 px-2 py-0.5 rounded-full">{n.yazan}</span>
-                    <span className="text-[10px] text-ink-300 font-mono">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: tr })}</span>
-                    {n.ilgili_tip !== 'genel' && <span className="text-[10px] bg-moss-100 text-moss-700 px-1.5 py-0.5 rounded-full font-medium">{n.ilgili_tip}</span>}
+                    <span className="text-xs font-medium text-cream-dim bg-obsidian-4 px-2 py-0.5 rounded-full">{n.yazan}</span>
+                    <span className="text-[10px] text-stone font-mono">{formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: tr })}</span>
+                    {n.ilgili_tip !== 'genel' && <span className="text-[10px] bg-obsidian-4 text-gold px-1.5 py-0.5 rounded-full font-medium">{n.ilgili_tip}</span>}
                   </div>
-                  <p className="text-sm text-ink-700">{n.icerik}</p>
+                  <p className="text-sm text-cream-dim">{n.icerik}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    {n.ilgili_telefon && <span className="text-[10px] text-ink-400 font-mono flex items-center gap-1"><Phone className="w-2.5 h-2.5" />{n.ilgili_telefon}</span>}
-                    {n.ilgili_siparis && <span className="text-[10px] text-ink-400 font-mono">{n.ilgili_siparis}</span>}
+                    {n.ilgili_telefon && <span className="text-[10px] text-stone-light font-mono flex items-center gap-1"><Phone className="w-2.5 h-2.5" />{n.ilgili_telefon}</span>}
+                    {n.ilgili_siparis && <span className="text-[10px] text-stone-light font-mono">{n.ilgili_siparis}</span>}
                   </div>
                 </div>
-                <button onClick={() => notSil(n.id)} className="text-ink-300 hover:text-ember-500 transition-colors shrink-0">
+                <button onClick={() => notSil(n.id)} className="text-stone hover:text-ruby-light transition-colors shrink-0">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
           ))}
           {!loading && notlar.length === 0 && (
-            <div className="p-12 text-center bg-white border border-cream-200 rounded-2xl">
+            <div className="p-12 text-center bg-obsidian-3 border border-gold-subtle rounded-xl">
               <MessageSquare className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-              <p className="text-sm text-ink-500">Henüz ekip notu yok</p>
+              <p className="text-sm text-stone-light">Henüz ekip notu yok</p>
             </div>
           )}
         </div>
@@ -242,24 +242,24 @@ export default function CalismaPage() {
 
       {/* ARAMA LOGU */}
       {tab === 'aramalar' && (
-        <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden">
-          {loading ? <div className="p-4 space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 bg-cream-100 rounded-xl animate-pulse" />)}</div> : (
+        <div className="bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden">
+          {loading ? <div className="p-4 space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 bg-obsidian-4 rounded-xl animate-pulse" />)}</div> : (
             <table className="w-full">
-              <thead className="bg-cream-50">
+              <thead className="bg-transparent">
                 <tr>{['Tarih','Müşteri','Telefon','Süre','Sonuç','Notlar',''].map(h => (
-                  <th key={h} className="px-5 py-4 text-left text-[10px] uppercase tracking-[0.2em] text-ink-300">{h}</th>
+                  <th key={h} className="px-5 py-4 text-left text-[10px] uppercase tracking-[0.2em] text-stone">{h}</th>
                 ))}</tr>
               </thead>
               <tbody>
                 {aramalar.map(a => (
-                  <tr key={a.id} className="border-t border-cream-100 hover:bg-cream-50 transition-colors">
-                    <td className="px-5 py-3 text-xs text-ink-400 font-mono">{format(new Date(a.created_at), 'd MMM HH:mm', { locale: tr })}</td>
-                    <td className="px-5 py-3 text-sm text-ink-700">{a.musteri_adi || '—'}</td>
-                    <td className="px-5 py-3 font-mono text-sm text-ink-500">{a.telefon}</td>
-                    <td className="px-5 py-3 text-xs text-ink-500 font-mono">{a.sure_dakika > 0 ? `${a.sure_dakika} dk` : '—'}</td>
-                    <td className="px-5 py-3"><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${SONUC_COLOR[a.sonuc] || 'bg-cream-100 text-ink-500'}`}>{SONUC_LABEL[a.sonuc] || a.sonuc}</span></td>
-                    <td className="px-5 py-3 text-xs text-ink-500 max-w-[200px] truncate">{a.notlar || '—'}</td>
-                    <td className="px-5 py-3 text-xs text-ink-400 font-mono">{a.arayan}</td>
+                  <tr key={a.id} className="border-t border-stone/20 hover:bg-transparent transition-colors">
+                    <td className="px-5 py-3 text-xs text-stone-light font-mono">{format(new Date(a.created_at), 'd MMM HH:mm', { locale: tr })}</td>
+                    <td className="px-5 py-3 text-sm text-cream-dim">{a.musteri_adi || '—'}</td>
+                    <td className="px-5 py-3 font-mono text-sm text-stone-light">{a.telefon}</td>
+                    <td className="px-5 py-3 text-xs text-stone-light font-mono">{a.sure_dakika > 0 ? `${a.sure_dakika} dk` : '—'}</td>
+                    <td className="px-5 py-3"><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${SONUC_COLOR[a.sonuc] || 'bg-obsidian-4 text-stone-light'}`}>{SONUC_LABEL[a.sonuc] || a.sonuc}</span></td>
+                    <td className="px-5 py-3 text-xs text-stone-light max-w-[200px] truncate">{a.notlar || '—'}</td>
+                    <td className="px-5 py-3 text-xs text-stone-light font-mono">{a.arayan}</td>
                   </tr>
                 ))}
               </tbody>
@@ -268,7 +268,7 @@ export default function CalismaPage() {
           {!loading && aramalar.length === 0 && (
             <div className="p-12 text-center">
               <Phone className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-              <p className="text-sm text-ink-500">Henüz arama kaydı yok</p>
+              <p className="text-sm text-stone-light">Henüz arama kaydı yok</p>
             </div>
           )}
         </div>
@@ -305,7 +305,7 @@ export default function CalismaPage() {
                 <input value={gorevForm.ilgili_siparis} onChange={e => setGorevForm(f => ({ ...f, ilgili_siparis: e.target.value }))} placeholder="#MİL1142" className={inputCls} />
               </Field>
             </div>
-            <button onClick={gorevEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Görev Ekle</button>
+            <button onClick={gorevEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">Görev Ekle</button>
           </div>
         </Modal>
       )}
@@ -339,7 +339,7 @@ export default function CalismaPage() {
                 <input value={notForm.ilgili_siparis} onChange={e => setNotForm(f => ({ ...f, ilgili_siparis: e.target.value }))} placeholder="#MİL1142" className={inputCls} />
               </Field>
             </div>
-            <button onClick={notEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Notu Kaydet</button>
+            <button onClick={notEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">Notu Kaydet</button>
           </div>
         </Modal>
       )}
@@ -375,7 +375,7 @@ export default function CalismaPage() {
             <Field label="Arayan">
               <input value={aramaForm.arayan} onChange={e => setAramaForm(f => ({ ...f, arayan: e.target.value }))} placeholder="admin" className={inputCls} />
             </Field>
-            <button onClick={aramaEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Aramayı Kaydet</button>
+            <button onClick={aramaEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">Aramayı Kaydet</button>
           </div>
         </Modal>
       )}
@@ -383,12 +383,12 @@ export default function CalismaPage() {
   )
 }
 
-const inputCls = "w-full px-3 py-2.5 bg-cream-50 border border-cream-200 rounded-xl text-sm text-ink-700 focus:outline-none focus:border-moss-400 transition-colors"
+const inputCls = "w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim transition-colors"
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1.5">{label}</label>
+      <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">{label}</label>
       {children}
     </div>
   )
@@ -398,10 +398,10 @@ function Modal({ title, children, onClose }: { title: string; children: React.Re
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" />
-      <div className="relative bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-obsidian-3 rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-2xl text-ink-900">{title}</h2>
-          <button onClick={onClose} className="text-ink-300 hover:text-ink-700"><X className="w-5 h-5" /></button>
+          <h2 className="font-display text-2xl text-cream">{title}</h2>
+          <button onClick={onClose} className="text-stone hover:text-cream-dim"><X className="w-5 h-5" /></button>
         </div>
         {children}
       </div>

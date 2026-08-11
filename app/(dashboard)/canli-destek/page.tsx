@@ -2,42 +2,28 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase, Session } from '@/lib/supabase'
-import { Headphones, Clock, X, Send, RefreshCw, ChevronRight, CheckCheck, Bell, BellOff } from 'lucide-react'
+import { Headphones, Clock, X, Send, RefreshCw, CheckCheck, Bell, BellOff } from 'lucide-react'
 
-type SlackMessage = {
-  ts: string
-  text: string
-  user: string
-  is_bot: boolean
-  username: string
-}
+type SlackMessage = { ts: string; text: string; user: string; is_bot: boolean; username: string }
 
 function parseSlackText(text: string): string {
   return text
-    .replace(/:large_green_circle:/g, '🟢')
-    .replace(/:envelope_with_arrow:/g, '📩')
-    .replace(/:wave:/g, '👋')
-    .replace(/:white_check_mark:/g, '✅')
-    .replace(/:x:/g, '❌')
-    .replace(/:telephone_receiver:/g, '📞')
-    .replace(/:memo:/g, '📝')
-    .replace(/:package:/g, '📦')
-    .replace(/:truck:/g, '🚚')
-    .replace(/:credit_card:/g, '💳')
-    .replace(/:warning:/g, '⚠️')
-    .replace(/\*([^*]+)\*/g, '$1')
-    .trim()
+    .replace(/:large_green_circle:/g,'🟢').replace(/:envelope_with_arrow:/g,'📩')
+    .replace(/:wave:/g,'👋').replace(/:white_check_mark:/g,'✅').replace(/:x:/g,'❌')
+    .replace(/:package:/g,'📦').replace(/:truck:/g,'🚚').replace(/:warning:/g,'⚠️')
+    .replace(/\*([^*]+)\*/g,'$1').trim()
 }
-
 function isSystemMessage(m: SlackMessage, idx: number): boolean {
   if (idx === 0) return true
-  const text = m.text || ''
-  return (
-    text.includes('Yeni Canlı Destek Talebi') ||
-    text.includes('was added to') ||
-    text.includes('joined the channel') ||
-    (m.is_bot && !m.username && (text.includes('Müşteri:') || text.includes('Telefon:')))
-  )
+  const t = m.text || ''
+  return t.includes('Yeni Canlı Destek') || t.includes('was added to') || t.includes('joined the channel') || (m.is_bot && !m.username && (t.includes('Müşteri:') || t.includes('Telefon:')))
+}
+
+const P = {
+  sidebar: { width: 280, background: '#0D0B09', borderRight: '1px solid rgba(201,168,76,0.1)', display: 'flex', flexDirection: 'column' as const, flexShrink: 0 },
+  sideHeader: { padding: '20px 20px 16px', borderBottom: '1px solid rgba(201,168,76,0.08)' },
+  msgBubbleAdmin: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 4px 16px', background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: '#0A0908', fontSize: 13, lineHeight: 1.5 },
+  msgBubbleClient: { maxWidth: 320, padding: '12px 16px', borderRadius: '16px 16px 16px 4px', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', color: '#C8C0B0', fontSize: 13, lineHeight: 1.5 },
 }
 
 export default function CanliDestekPage() {
@@ -55,7 +41,6 @@ export default function CanliDestekPage() {
   const prevSessionsRef = useRef<string[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Bildirim iznini iste
   async function requestNotif() {
     if (!('Notification' in window)) return
     const perm = await Notification.requestPermission()
@@ -63,90 +48,42 @@ export default function CanliDestekPage() {
   }
 
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      setNotifOn(true)
-    }
-    // Audio element oluştur
+    if ('Notification' in window && Notification.permission === 'granted') setNotifOn(true)
     const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3')
-    audio.volume = 0.5
-    audioRef.current = audio
+    audio.volume = 0.5; audioRef.current = audio
   }, [])
 
   function notify(title: string, body: string) {
-    // Masaüstü bildirim
-    if (notifOn && Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/favicon.ico' })
-    }
-    // Ses
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0
-      audioRef.current.play().catch(() => {
-        // Fallback: AudioContext
-        try {
-          const ctx = new AudioContext()
-          const o = ctx.createOscillator()
-          const g = ctx.createGain()
-          o.connect(g)
-          g.connect(ctx.destination)
-          o.frequency.value = 880
-          g.gain.setValueAtTime(0.4, ctx.currentTime)
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
-          o.start()
-          o.stop(ctx.currentTime + 0.3)
-        } catch {}
-      })
-    }
+    if (notifOn && Notification.permission === 'granted') new Notification(title, { body, icon: '/favicon.ico' })
+    if (audioRef.current) { audioRef.current.currentTime = 0; audioRef.current.play().catch(() => {}) }
   }
 
   const load = useCallback(async () => {
-    const { data } = await supabase
-      .from('wa_sessions_roberto')
-      .select('*')
-      .not('slack_thread_ts', 'is', null)
-      .neq('slack_thread_ts', '')
-      .order('updated_at', { ascending: false })
-
+    const { data } = await supabase.from('wa_sessions_roberto').select('*').not('slack_thread_ts','is',null).neq('slack_thread_ts','').order('updated_at', { ascending: false })
     const list = (data || []) as Session[]
     const newPhones = list.map(s => s.phone)
-    const oldPhones = prevSessionsRef.current
-    const hasNew = newPhones.some(p => !oldPhones.includes(p))
-    if (hasNew && oldPhones.length > 0) {
-      notify('🔔 Yeni Canlı Destek Talebi', 'Yeni bir müşteri canlı desteğe bağlandı')
-    }
+    if (newPhones.some(p => !prevSessionsRef.current.includes(p)) && prevSessionsRef.current.length > 0) notify('🔔 Yeni Talep','Yeni bir müşteri canlı desteğe bağlandı')
     prevSessionsRef.current = newPhones
-    setSessions(list)
-    setLoading(false)
+    setSessions(list); setLoading(false)
   }, [notifOn])
 
-  useEffect(() => {
-    load()
-    const t = setInterval(load, 15000)
-    return () => clearInterval(t)
-  }, [load])
+  useEffect(() => { load(); const t = setInterval(load,15000); return () => clearInterval(t) }, [load])
 
   const loadMessages = useCallback(async (thread_ts: string, silent = false) => {
     if (!silent) setMsgLoading(true)
     const res = await fetch(`/api/slack/messages?thread_ts=${thread_ts}`)
     const data = await res.json()
     const filtered = (data.messages || []).filter((m: SlackMessage, i: number) => !isSystemMessage(m, i))
-
     const lastTs = filtered.length > 0 ? filtered[filtered.length - 1].ts : null
     setLastMsgTs(prev => {
       const prevTs = prev[thread_ts]
       if (lastTs && prevTs && lastTs !== prevTs) {
-        const newMsgs = filtered.filter(
-          (m: SlackMessage) => m.ts > prevTs && m.username !== 'roberto-admin'
-        )
-        if (newMsgs.length > 0) {
-          notify('💬 Yeni Mesaj', newMsgs[newMsgs.length - 1].text.slice(0, 60))
-          setUnread(u => ({ ...u, [thread_ts]: (u[thread_ts] || 0) + newMsgs.length }))
-        }
+        const newMsgs = filtered.filter((m: SlackMessage) => m.ts > prevTs && m.username !== 'roberto-admin')
+        if (newMsgs.length > 0) { notify('💬 Yeni Mesaj', newMsgs[newMsgs.length-1].text.slice(0,60)); setUnread(u => ({ ...u, [thread_ts]: (u[thread_ts]||0)+newMsgs.length })) }
       }
       return lastTs ? { ...prev, [thread_ts]: lastTs } : prev
     })
-
-    setMessages(filtered)
-    if (!silent) setMsgLoading(false)
+    setMessages(filtered); if (!silent) setMsgLoading(false)
   }, [notifOn])
 
   useEffect(() => {
@@ -154,277 +91,179 @@ export default function CanliDestekPage() {
     setUnread(prev => ({ ...prev, [selected.slack_thread_ts!]: 0 }))
     loadMessages(selected.slack_thread_ts)
     const t = setInterval(() => loadMessages(selected.slack_thread_ts!, true), 8000)
-
-    // SLA kaydı
-    fetch('/api/sla', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        telefon: selected.phone,
-        slack_thread_ts: selected.slack_thread_ts,
-        baslangic: new Date().toISOString(),
-        ilk_yanit: new Date().toISOString(),
-        yanit_suresi_dk: 1,
-        durum: 'acik'
-      })
-    }).catch(() => {})
-
     return () => clearInterval(t)
   }, [selected])
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  useEffect(() => {
-    if (selected && sessions.length > 0) {
-      const stillExists = sessions.find(s => s.phone === selected.phone)
-      if (!stillExists) { setSelected(null); setMessages([]) }
-    }
-  }, [sessions, selected])
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  useEffect(() => { if (selected && sessions.length > 0 && !sessions.find(s => s.phone === selected.phone)) { setSelected(null); setMessages([]) } }, [sessions, selected])
 
   async function sendMessage() {
     if (!reply.trim() || !selected?.slack_thread_ts) return
     setSending(true)
-    const res = await fetch('/api/slack/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply }),
-    })
+    const res = await fetch('/api/slack/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply }) })
     const data = await res.json()
-    if (data.ok) {
-      setReply('')
-      await loadMessages(selected.slack_thread_ts)
-    } else {
-      alert('Mesaj gönderilemedi: ' + data.error)
-    }
+    if (data.ok) { setReply(''); await loadMessages(selected.slack_thread_ts) } else alert('Hata: ' + data.error)
     setSending(false)
   }
 
   async function endLiveSupport(phone: string) {
-    if (!confirm(`${phone} numaralı müşteriyi bot moduna döndürmek istiyor musunuz?`)) return
-
-    // SLA kapanış kaydı
-    if (selected?.slack_thread_ts) {
-      const baslangic = new Date(Date.now() - 10 * 60 * 1000)
-      const cozumDk = Math.max(1, Math.round((Date.now() - baslangic.getTime()) / 60000))
-      fetch('/api/sla', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telefon: phone,
-          slack_thread_ts: selected.slack_thread_ts,
-          baslangic: baslangic.toISOString(),
-          ilk_yanit: new Date().toISOString(),
-          kapanis: new Date().toISOString(),
-          yanit_suresi_dk: 1,
-          cozum_suresi_dk: cozumDk,
-          durum: 'kapali'
-        })
-      }).catch(() => {})
-    }
-
-    await supabase
-      .from('wa_sessions_roberto')
-      .update({ bulundugu_menu: 'gpt', slack_thread_ts: '', updated_at: new Date().toISOString() })
-      .eq('phone', phone)
-    setSelected(null)
-    setMessages([])
-    load()
+    if (!confirm(`${phone} numaralı müşteriyi bot moduna döndür?`)) return
+    await supabase.from('wa_sessions_roberto').update({ bulundugu_menu: 'bot', slack_thread_ts: '', updated_at: new Date().toISOString() }).eq('phone', phone)
+    setSelected(null); setMessages([]); load()
   }
 
   const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0)
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sol panel */}
-      <div className="w-80 border-r border-cream-200 flex flex-col bg-white shrink-0">
-        <div className="p-6 border-b border-cream-100">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-xs uppercase tracking-[0.3em] text-ink-300">
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {/* Sidebar */}
+      <div style={P.sidebar}>
+        <div style={P.sideHeader}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <p style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#3A3730', fontFamily: 'JetBrains Mono, monospace' }}>
               {sessions.length} aktif
-              {totalUnread > 0 && <span className="ml-2 bg-ember-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">{totalUnread}</span>}
+              {totalUnread > 0 && <span style={{ marginLeft: 8, background: '#8B2635', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8 }}>{totalUnread}</span>}
             </p>
-            <button
-              onClick={notifOn ? () => setNotifOn(false) : requestNotif}
-              className={`transition-colors ${notifOn ? 'text-moss-500' : 'text-ink-300 hover:text-ink-600'}`}
-              title={notifOn ? 'Bildirimleri kapat' : 'Bildirimleri aç'}
-            >
-              {notifOn ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+            <button onClick={notifOn ? () => setNotifOn(false) : requestNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: notifOn ? '#C9A84C' : '#3A3730' }}>
+              {notifOn ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
           </div>
-          <h1 className="font-display text-2xl text-ink-900">Canlı Destek</h1>
-          <div className="flex items-center gap-1.5 mt-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-ember-500 animate-pulse" />
-            <span className="text-[10px] font-mono text-ink-300">otomatik · 15s</span>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, color: '#F5F0E8' }}>Canlı Destek</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block', animation: 'urgentPulse 1.5s infinite' }} />
+            <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#3A3730' }}>otomatik · 15s</span>
           </div>
           {!notifOn && (
-            <button
-              onClick={requestNotif}
-              className="mt-3 w-full text-xs py-1.5 px-3 bg-cream-100 hover:bg-cream-200 text-ink-500 rounded-lg transition-colors"
-            >
+            <button onClick={requestNotif} style={{ marginTop: 10, width: '100%', padding: '7px 0', background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 8, fontSize: 11, color: '#6B6760', cursor: 'pointer' }}>
               🔔 Bildirimleri etkinleştir
             </button>
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div style={{ flex: 1, overflowY: 'auto' }}>
           {loading ? (
-            <div className="p-4 space-y-3">
-              {[1,2,3].map(i => (
-                <div key={i} className="animate-pulse flex gap-3 p-2">
-                  <div className="w-9 h-9 rounded-full bg-cream-200" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3 bg-cream-200 rounded w-3/4" />
-                    <div className="h-2.5 bg-cream-100 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
+            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[1,2,3].map(i => <div key={i} style={{ height: 72, background: '#181612', borderRadius: 8 }} />)}
             </div>
           ) : sessions.length === 0 ? (
-            <div className="p-8 text-center">
-              <Headphones className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-              <p className="text-sm text-ink-400 font-medium">Kuyruk boş</p>
-              <p className="text-xs text-ink-300 mt-1">Canlı destek talebi yok</p>
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <Headphones size={32} color="#272420" strokeWidth={1} style={{ margin: '0 auto 12px' }} />
+              <p style={{ fontSize: 13, color: '#3A3730' }}>Kuyruk boş</p>
+              <p style={{ fontSize: 11, color: '#272420', marginTop: 4, fontFamily: 'JetBrains Mono, monospace' }}>Canlı destek talebi yok</p>
             </div>
-          ) : (
-            sessions.map((s) => {
-              const waitMinutes = Math.floor((Date.now() - new Date(s.updated_at).getTime()) / 60000)
-              const urgent = waitMinutes > 5
-              const isSelected = selected?.phone === s.phone
-              const sessionUnread = unread[s.slack_thread_ts || ''] || 0
-              return (
-                <button
-                  key={s.phone}
-                  onClick={() => setSelected(s)}
-                  className={`w-full text-left p-4 border-b border-cream-100 hover:bg-cream-50 transition-colors flex items-center gap-3 ${isSelected ? 'bg-cream-100 border-l-2 border-l-moss-500' : ''}`}
-                >
-                  <div className="relative shrink-0">
-                    <div className="w-9 h-9 rounded-full bg-moss-100 flex items-center justify-center">
-                      <span className="text-xs font-medium text-moss-700">WA</span>
-                    </div>
-                    {sessionUnread > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-ember-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
-                        {sessionUnread}
-                      </span>
-                    )}
+          ) : sessions.map(s => {
+            const waitMin = Math.floor((Date.now() - new Date(s.updated_at).getTime()) / 60000)
+            const urgent = waitMin > 5
+            const isSelected = selected?.phone === s.phone
+            const sessionUnread = unread[s.slack_thread_ts || ''] || 0
+            return (
+              <button key={s.phone} onClick={() => setSelected(s)} style={{ width: '100%', textAlign: 'left', padding: '14px 16px', borderBottom: '1px solid rgba(201,168,76,0.05)', background: isSelected ? 'rgba(201,168,76,0.06)' : 'transparent', borderLeft: isSelected ? '2px solid #C9A84C' : '2px solid transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, transition: 'background 0.15s' }}>
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: '#C9A84C' }}>WA</div>
+                  {sessionUnread > 0 && <span style={{ position: 'absolute', top: -2, right: -2, width: 16, height: 16, background: '#8B2635', color: '#fff', fontSize: 9, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{sessionUnread}</span>}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#C8C0B0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.phone}</div>
+                  <div style={{ fontSize: 11, color: '#3A3730', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 3 }}>{s.musteri_yazdigi || '—'}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                    <Clock size={9} color={urgent ? '#C4364A' : '#3A3730'} />
+                    <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: urgent ? '#C4364A' : '#3A3730' }}>{waitMin < 60 ? `${waitMin}dk` : `${Math.floor(waitMin/60)}sa`}</span>
+                    {urgent && <span style={{ fontSize: 9, padding: '1px 5px', background: 'rgba(139,38,53,0.2)', color: '#C4364A', borderRadius: 4 }}>acil</span>}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-mono text-sm text-ink-900 truncate">{s.phone}</div>
-                    <div className="text-xs text-ink-400 truncate mt-0.5">{s.musteri_yazdigi || '—'}</div>
-                    <div className={`text-[10px] font-mono mt-1 flex items-center gap-1 ${urgent ? 'text-ember-500' : 'text-ink-300'}`}>
-                      <Clock className="w-2.5 h-2.5" />
-                      {waitMinutes < 60 ? `${waitMinutes}dk` : `${Math.floor(waitMinutes/60)}sa`}
-                      {urgent && <span className="px-1 py-0.5 bg-ember-100 text-ember-600 rounded text-[9px] font-medium">acil</span>}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-3 h-3 text-ink-300 shrink-0" />
-                </button>
-              )
-            })
-          )}
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       {/* Sağ panel */}
       {selected ? (
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="px-6 py-4 border-b border-cream-200 bg-white flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-moss-100 flex items-center justify-center">
-                  <span className="text-xs font-medium text-moss-700">WA</span>
-                </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-moss-400 rounded-full border-2 border-white" />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          {/* Header */}
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', background: '#0D0B09', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ position: 'relative' }}>
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#C9A84C', fontWeight: 600 }}>WA</div>
+                <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, background: '#C9A84C', borderRadius: '50%', border: '2px solid #0D0B09' }} />
               </div>
               <div>
-                <div className="font-mono text-sm text-ink-900">{selected.phone}</div>
-                <div className="text-xs text-ink-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-moss-400" />
-                  Canlı destek aktif
-                </div>
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: '#C8C0B0' }}>{selected.phone}</div>
+                <div style={{ fontSize: 11, color: '#3A3730', marginTop: 2 }}>Canlı destek aktif</div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => loadMessages(selected.slack_thread_ts!)} className="w-8 h-8 rounded-lg hover:bg-cream-100 text-ink-300 hover:text-ink-700 transition-colors flex items-center justify-center">
-                <RefreshCw className="w-4 h-4" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => loadMessages(selected.slack_thread_ts!)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', cursor: 'pointer' }}>
+                <RefreshCw size={13} />
               </button>
-              <button onClick={() => endLiveSupport(selected.phone)} className="px-3 py-1.5 text-xs bg-ember-50 text-ember-600 border border-ember-200 rounded-lg hover:bg-ember-100 transition-colors font-medium flex items-center gap-1.5">
-                <CheckCheck className="w-3.5 h-3.5" />
-                Sohbeti Bitir
+              <button onClick={() => endLiveSupport(selected.phone)} style={{ padding: '7px 14px', background: 'rgba(139,38,53,0.15)', border: '1px solid rgba(139,38,53,0.3)', borderRadius: 8, color: '#C4364A', fontSize: 12, fontWeight: 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <CheckCheck size={13} /> Sohbeti Bitir
               </button>
-              <button onClick={() => { setSelected(null); setMessages([]) }} className="w-8 h-8 rounded-lg hover:bg-cream-100 text-ink-300 transition-colors flex items-center justify-center">
-                <X className="w-4 h-4" />
+              <button onClick={() => { setSelected(null); setMessages([]) }} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#181612', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, color: '#6B6760', cursor: 'pointer' }}>
+                <X size={13} />
               </button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-cream-50">
+          {/* Mesajlar */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 16, background: '#0A0908' }}>
             {msgLoading ? (
-              <div className="space-y-4">
-                {[1,2,3].map(i => (
-                  <div key={i} className={`flex items-end gap-2 ${i % 2 === 0 ? 'flex-row-reverse' : ''}`}>
-                    <div className="w-7 h-7 rounded-full bg-cream-200 animate-pulse shrink-0" />
-                    <div className={`h-10 rounded-2xl animate-pulse ${i % 2 === 0 ? 'bg-ink-200 w-40' : 'bg-white w-52'}`} />
-                  </div>
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {[1,2,3].map(i => <div key={i} style={{ height: 48, background: '#111009', borderRadius: 12, width: i % 2 === 0 ? 200 : 260, alignSelf: i % 2 === 0 ? 'flex-end' : 'flex-start' }} />)}
               </div>
             ) : messages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-12 h-12 rounded-full bg-cream-200 flex items-center justify-center mx-auto mb-3">
-                  <Headphones className="w-5 h-5 text-ink-300" strokeWidth={1.5} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#111009', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Headphones size={24} color="#272420" strokeWidth={1} />
                 </div>
-                <p className="text-ink-400 text-sm">Henüz mesaj yok</p>
-                <p className="text-ink-300 text-xs mt-1">Müşteri mesaj gönderdiğinde burada görünür</p>
+                <p style={{ color: '#3A3730', fontSize: 13 }}>Henüz mesaj yok</p>
+                <p style={{ color: '#272420', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>Müşteri mesaj gönderdiğinde burada görünür</p>
               </div>
-            ) : (
-              messages.map((m) => {
-                const isAdmin = m.username === 'roberto-admin'
-                return (
-                  <div key={m.ts} className={`flex items-end gap-2 ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mb-1 ${isAdmin ? 'bg-ink-900 text-cream-50' : 'bg-moss-200 text-moss-800'}`}>
-                      {isAdmin ? 'A' : 'M'}
-                    </div>
-                    <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm leading-relaxed ${isAdmin ? 'bg-ink-900 text-cream-50 rounded-br-sm' : 'bg-white border border-cream-200 text-ink-800 rounded-bl-sm shadow-sm'}`}>
-                      <p className="whitespace-pre-wrap">{parseSlackText(m.text)}</p>
-                      <p className={`text-[10px] mt-1.5 font-mono ${isAdmin ? 'text-cream-400 text-right' : 'text-ink-300'}`}>
-                        {new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
+            ) : messages.map(m => {
+              const isAdmin = m.username === 'roberto-admin'
+              return (
+                <div key={m.ts} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, flexDirection: isAdmin ? 'row-reverse' : 'row' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, flexShrink: 0, marginBottom: 2, background: isAdmin ? 'linear-gradient(135deg,#C9A84C,#8B6914)' : '#181612', color: isAdmin ? '#0A0908' : '#6B6760', border: isAdmin ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>
+                    {isAdmin ? 'A' : 'M'}
                   </div>
-                )
-              })
-            )}
+                  <div style={isAdmin ? P.msgBubbleAdmin : P.msgBubbleClient}>
+                    <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{parseSlackText(m.text)}</p>
+                    <p style={{ fontSize: 10, marginTop: 6, fontFamily: 'JetBrains Mono, monospace', opacity: 0.6, textAlign: isAdmin ? 'right' : 'left', margin: '6px 0 0' }}>
+                      {new Date(parseFloat(m.ts) * 1000).toLocaleTimeString('tr', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-4 border-t border-cream-200 bg-white shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-ink-900 flex items-center justify-center text-[10px] font-bold text-cream-50 shrink-0">A</div>
+          {/* Input */}
+          <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(201,168,76,0.08)', background: '#0D0B09', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#0A0908', flexShrink: 0 }}>A</div>
               <input
-                type="text"
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                placeholder="Müşteriye yanıt yaz... (Enter ile gönder)"
-                className="flex-1 px-4 py-3 bg-cream-50 border border-cream-200 rounded-xl text-sm text-ink-700 placeholder-ink-300 focus:outline-none focus:border-ink-400 transition-colors"
-                disabled={sending}
+                type="text" value={reply} onChange={e => setReply(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+                placeholder="Müşteriye yanıt yaz... (Enter)"
+                className="input-premium" disabled={sending}
+                style={{ flex: 1, padding: '11px 16px', fontSize: 13 }}
               />
-              <button onClick={sendMessage} disabled={sending || !reply.trim()} className="w-11 h-11 rounded-xl bg-ink-900 text-cream-50 flex items-center justify-center hover:bg-ink-700 transition-colors disabled:opacity-40 shrink-0">
-                {sending ? <div className="w-4 h-4 border-2 border-cream-400 border-t-transparent rounded-full animate-spin" /> : <Send className="w-4 h-4" />}
+              <button onClick={sendMessage} disabled={sending || !reply.trim()} className="btn-gold" style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, flexShrink: 0 }}>
+                {sending ? <div style={{ width: 14, height: 14, border: '2px solid rgba(0,0,0,0.3)', borderTopColor: '#0A0908', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} /> : <Send size={15} />}
               </button>
             </div>
-            <p className="text-[10px] text-ink-300 font-mono mt-2 ml-11">→ Slack thread → n8n → WhatsApp müşterisine iletilir</p>
+            <p style={{ fontSize: 10, color: '#272420', fontFamily: 'JetBrains Mono, monospace', marginTop: 8, marginLeft: 42 }}>→ Slack thread → n8n → WhatsApp</p>
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center bg-cream-50">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-2xl bg-white border border-cream-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
-              <Headphones className="w-7 h-7 text-ink-300" strokeWidth={1.5} />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0A0908' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ width: 64, height: 64, borderRadius: 16, background: '#111009', border: '1px solid rgba(201,168,76,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <Headphones size={28} color="#272420" strokeWidth={1} />
             </div>
-            <p className="text-ink-600 font-medium">Konuşma seç</p>
-            <p className="text-ink-400 text-sm mt-1">Soldaki listeden bir müşteriyi seç</p>
+            <p style={{ color: '#6B6760', fontSize: 14 }}>Konuşma seç</p>
+            <p style={{ color: '#3A3730', fontSize: 12, marginTop: 6, fontFamily: 'JetBrains Mono, monospace' }}>Soldaki listeden bir müşteriyi seç</p>
           </div>
         </div>
       )}

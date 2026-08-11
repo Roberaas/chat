@@ -163,11 +163,11 @@ export default function TakvimPage() {
     <div className="p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-6 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-300 mb-2">planlama & takip</p>
-          <h1 className="font-display text-3xl md:text-5xl text-ink-900 tracking-tight">Takvim</h1>
+          <p className="text-xs uppercase tracking-[0.3em] text-stone mb-2">planlama & takip</p>
+          <h1 className="font-display text-4xl md:text-5xl text-cream tracking-tight">Takvim</h1>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-white border border-cream-200 rounded-xl text-ink-400 hover:text-ink-700">
+          <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim">
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -178,18 +178,18 @@ export default function TakvimPage() {
         {/* Ay navigasyonu */}
         <div className="flex items-center gap-3">
           <button onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="w-9 h-9 flex items-center justify-center bg-white border border-cream-200 rounded-xl text-ink-400 hover:text-ink-700 hover:border-ink-300 transition-all">
+            className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim hover:border-ink-300 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="font-display text-xl md:text-2xl text-ink-900 min-w-[160px] text-center">
+          <h2 className="font-display text-xl md:text-2xl text-cream min-w-[160px] text-center">
             {format(currentMonth, 'MMMM yyyy', { locale: tr })}
           </h2>
           <button onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="w-9 h-9 flex items-center justify-center bg-white border border-cream-200 rounded-xl text-ink-400 hover:text-ink-700 hover:border-ink-300 transition-all">
+            className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim hover:border-ink-300 transition-all">
             <ChevronRight className="w-4 h-4" />
           </button>
           <button onClick={() => { setCurrentMonth(new Date()); setSelectedDay(new Date()) }}
-            className="px-3 py-2 text-xs font-medium bg-ink-900 text-cream-50 rounded-xl hover:bg-ink-700 transition-colors">
+            className="px-3 py-2 text-xs font-medium bg-ink-900 text-cream-50 rounded-xl hover:bg-stone transition-colors">
             Bugün
           </button>
         </div>
@@ -201,7 +201,7 @@ export default function TakvimPage() {
             const aktif = filter.includes(tur)
             return (
               <button key={tur} onClick={() => setFilter(f => aktif ? f.filter(x => x !== tur) : [...f, tur])}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${aktif ? 'text-white border-transparent' : 'bg-white border-cream-200 text-ink-400'}`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${aktif ? 'text-white border-transparent' : 'bg-obsidian-3 border-gold-subtle text-stone-light'}`}
                 style={aktif ? { background: TUR_RENK[tur] } : {}}>
                 <Icon className="w-3 h-3" strokeWidth={2} />
                 {label}
@@ -217,12 +217,12 @@ export default function TakvimPage() {
           {/* Gün başlıkları */}
           <div className="grid grid-cols-7 mb-2">
             {['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(g => (
-              <div key={g} className="text-center text-[10px] uppercase tracking-[0.2em] text-ink-300 py-2 font-medium">{g}</div>
+              <div key={g} className="text-center text-[10px] uppercase tracking-[0.2em] text-stone py-2 font-medium">{g}</div>
             ))}
           </div>
 
           {/* Günler */}
-          <div className="grid grid-cols-7 gap-px bg-cream-200 rounded-2xl overflow-hidden border border-cream-200">
+          <div className="grid grid-cols-7 gap-px bg-cream-200 rounded-xl overflow-hidden border border-gold-subtle">
             {days.map((d, i) => {
               const dayEvents = getEventsForDay(d)
               const isCurrentMonth = isSameMonth(d, currentMonth)
@@ -233,22 +233,22 @@ export default function TakvimPage() {
               return (
                 <div key={i} onClick={() => setSelectedDay(d)}
                   className={`min-h-[80px] md:min-h-[100px] p-2 cursor-pointer transition-colors group relative
-                    ${!isCurrentMonth ? 'bg-cream-50' : 'bg-white'}
+                    ${!isCurrentMonth ? 'bg-transparent' : 'bg-obsidian-3'}
                     ${isSelected ? 'bg-ink-900' : ''}
                     ${isCuma && isCurrentMonth && !isSelected ? 'bg-moss-50' : ''}
-                    hover:bg-cream-100
+                    hover:bg-obsidian-4
                   `}>
                   {/* Gün numarası */}
                   <div className={`flex items-center justify-between mb-1`}>
                     <span className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full transition-colors
                       ${isTodayDate ? 'bg-ink-900 text-cream-50' : ''}
                       ${isSelected && !isTodayDate ? 'text-cream-50' : ''}
-                      ${!isCurrentMonth ? 'text-ink-300' : isSelected ? 'text-cream-300' : 'text-ink-700'}
+                      ${!isCurrentMonth ? 'text-stone' : isSelected ? 'text-cream-300' : 'text-cream-dim'}
                     `}>
                       {format(d, 'd')}
                     </span>
                     {isCuma && isCurrentMonth && (
-                      <span className={`text-[8px] font-mono uppercase tracking-wider ${isSelected ? 'text-moss-300' : 'text-moss-500'}`}>cuma</span>
+                      <span className={`text-[8px] font-mono uppercase tracking-wider ${isSelected ? 'text-moss-300' : 'text-gold'}`}>cuma</span>
                     )}
                   </div>
 
@@ -261,7 +261,7 @@ export default function TakvimPage() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className={`text-[10px] font-mono px-1 ${isSelected ? 'text-cream-300' : 'text-ink-400'}`}>
+                      <div className={`text-[10px] font-mono px-1 ${isSelected ? 'text-cream-300' : 'text-stone-light'}`}>
                         +{dayEvents.length - 3} daha
                       </div>
                     )}
@@ -275,14 +275,14 @@ export default function TakvimPage() {
         {/* Yan panel - seçili gün detayı */}
         <div className={`w-72 shrink-0 hidden lg:block`}>
           {selectedDay ? (
-            <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden sticky top-24">
+            <div className="bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden sticky top-24">
               {/* Başlık */}
-              <div className="px-5 py-4 border-b border-cream-100 bg-cream-50 flex items-center justify-between">
+              <div className="px-5 py-4 border-b border-stone/20 bg-transparent flex items-center justify-between">
                 <div>
-                  <div className="font-display text-2xl text-ink-900">{format(selectedDay, 'd', { locale: tr })}</div>
-                  <div className="text-xs text-ink-400 font-mono">{format(selectedDay, 'MMMM yyyy, EEEE', { locale: tr })}</div>
+                  <div className="font-display text-2xl text-cream">{format(selectedDay, 'd', { locale: tr })}</div>
+                  <div className="text-xs text-stone-light font-mono">{format(selectedDay, 'MMMM yyyy, EEEE', { locale: tr })}</div>
                 </div>
-                <button onClick={() => setSelectedDay(null)} className="text-ink-300 hover:text-ink-700">
+                <button onClick={() => setSelectedDay(null)} className="text-stone hover:text-cream-dim">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -292,22 +292,22 @@ export default function TakvimPage() {
                 {selectedDayEvents.length === 0 ? (
                   <div className="py-8 text-center">
                     <div className="text-3xl mb-2">📅</div>
-                    <p className="text-sm text-ink-400">Bu gün için etkinlik yok</p>
+                    <p className="text-sm text-stone-light">Bu gün için etkinlik yok</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {selectedDayEvents.map(e => {
                       const Icon = TUR_ICON[e.tur]
                       return (
-                        <div key={e.id} className="p-3 rounded-xl border border-cream-100 hover:border-cream-300 transition-colors">
+                        <div key={e.id} className="p-3 rounded-xl border border-stone/20 hover:border-cream-300 transition-colors">
                           <div className="flex items-start gap-2">
                             <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${e.renk}20` }}>
                               <Icon className="w-3.5 h-3.5" style={{ color: e.renk }} strokeWidth={2} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-xs font-medium text-ink-400 mb-0.5">{TUR_LABEL[e.tur]}</div>
-                              <div className="text-sm font-medium text-ink-900 leading-snug">{e.baslik}</div>
-                              {e.detay && <div className="text-xs text-ink-400 mt-0.5 truncate">{e.detay}</div>}
+                              <div className="text-xs font-medium text-stone-light mb-0.5">{TUR_LABEL[e.tur]}</div>
+                              <div className="text-sm font-medium text-cream leading-snug">{e.baslik}</div>
+                              {e.detay && <div className="text-xs text-stone-light mt-0.5 truncate">{e.detay}</div>}
                               {e.oncelik && e.oncelik !== 'normal' && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block"
                                   style={{ background: `${e.renk}20`, color: e.renk }}>
@@ -326,19 +326,19 @@ export default function TakvimPage() {
               {/* Bu gün özeti */}
               {selectedDayEvents.length > 0 && (
                 <div className="px-4 pb-4">
-                  <div className="bg-cream-50 border border-cream-200 rounded-xl p-3">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-ink-300 mb-2">Özet</div>
+                  <div className="bg-transparent border border-gold-subtle rounded-xl p-3">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-stone mb-2">Özet</div>
                     {Object.entries(TUR_LABEL).map(([tur, label]) => {
                       const count = selectedDayEvents.filter(e => e.tur === tur).length
                       if (count === 0) return null
                       const Icon = TUR_ICON[tur]
                       return (
                         <div key={tur} className="flex items-center justify-between py-1">
-                          <span className="flex items-center gap-1.5 text-xs text-ink-500">
+                          <span className="flex items-center gap-1.5 text-xs text-stone-light">
                             <Icon className="w-3 h-3" style={{ color: TUR_RENK[tur] }} strokeWidth={2} />
                             {label}
                           </span>
-                          <span className="text-xs font-mono font-medium text-ink-700">{count}</span>
+                          <span className="text-xs font-mono font-medium text-cream-dim">{count}</span>
                         </div>
                       )
                     })}
@@ -347,29 +347,29 @@ export default function TakvimPage() {
               )}
             </div>
           ) : (
-            <div className="bg-white border border-cream-200 rounded-2xl p-6 sticky top-24">
+            <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-6 sticky top-24">
               <div className="text-center py-4">
                 <div className="text-4xl mb-3">📅</div>
-                <p className="text-sm text-ink-500 font-medium">Bir gün seçin</p>
-                <p className="text-xs text-ink-300 mt-1">Detayları görmek için takvimde bir güne tıklayın</p>
+                <p className="text-sm text-stone-light font-medium">Bir gün seçin</p>
+                <p className="text-xs text-stone mt-1">Detayları görmek için takvimde bir güne tıklayın</p>
               </div>
 
               {/* Bu ay özeti */}
-              <div className="mt-4 pt-4 border-t border-cream-100">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-ink-300 mb-3">Bu Ay Özeti</div>
+              <div className="mt-4 pt-4 border-t border-stone/20">
+                <div className="text-[10px] uppercase tracking-[0.2em] text-stone mb-3">Bu Ay Özeti</div>
                 {Object.entries(TUR_LABEL).map(([tur, label]) => {
                   const count = filteredEvents.filter(e => isSameMonth(e.tarih, currentMonth) && e.tur === tur).length
                   if (count === 0) return null
                   const Icon = TUR_ICON[tur]
                   return (
                     <div key={tur} className="flex items-center justify-between py-1.5">
-                      <span className="flex items-center gap-2 text-xs text-ink-500">
+                      <span className="flex items-center gap-2 text-xs text-stone-light">
                         <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: `${TUR_RENK[tur]}20` }}>
                           <Icon className="w-3 h-3" style={{ color: TUR_RENK[tur] }} strokeWidth={2} />
                         </div>
                         {label}
                       </span>
-                      <span className="text-xs font-mono font-bold text-ink-700">{count}</span>
+                      <span className="text-xs font-mono font-bold text-cream-dim">{count}</span>
                     </div>
                   )
                 })}
@@ -381,10 +381,10 @@ export default function TakvimPage() {
 
       {/* Mobil: seçili gün etkinlikleri */}
       {selectedDay && selectedDayEvents.length > 0 && (
-        <div className="lg:hidden mt-4 bg-white border border-cream-200 rounded-2xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-cream-100 bg-cream-50 flex items-center justify-between">
-            <div className="text-sm font-medium text-ink-900">{format(selectedDay, 'd MMMM EEEE', { locale: tr })}</div>
-            <button onClick={() => setSelectedDay(null)} className="text-ink-300"><X className="w-4 h-4" /></button>
+        <div className="lg:hidden mt-4 bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-stone/20 bg-transparent flex items-center justify-between">
+            <div className="text-sm font-medium text-cream">{format(selectedDay, 'd MMMM EEEE', { locale: tr })}</div>
+            <button onClick={() => setSelectedDay(null)} className="text-stone"><X className="w-4 h-4" /></button>
           </div>
           <div className="p-3 space-y-2">
             {selectedDayEvents.map(e => {
@@ -395,8 +395,8 @@ export default function TakvimPage() {
                     <Icon className="w-4 h-4" style={{ color: e.renk }} strokeWidth={2} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-ink-900 truncate">{e.baslik}</div>
-                    {e.detay && <div className="text-xs text-ink-400 truncate">{e.detay}</div>}
+                    <div className="text-sm font-medium text-cream truncate">{e.baslik}</div>
+                    {e.detay && <div className="text-xs text-stone-light truncate">{e.detay}</div>}
                   </div>
                 </div>
               )
@@ -406,9 +406,9 @@ export default function TakvimPage() {
       )}
 
       {/* Yaklaşan etkinlikler - alt bar */}
-      <div className="mt-6 bg-white border border-cream-200 rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-cream-100 bg-cream-50">
-          <h2 className="font-display text-lg text-ink-900">Yaklaşan Etkinlikler</h2>
+      <div className="mt-6 bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone/20 bg-transparent">
+          <h2 className="font-display text-lg text-cream">Yaklaşan Etkinlikler</h2>
         </div>
         <div className="divide-y divide-cream-100">
           {filteredEvents
@@ -419,20 +419,20 @@ export default function TakvimPage() {
               const Icon = TUR_ICON[e.tur]
               const gunFarki = Math.ceil((e.tarih.getTime() - today.getTime()) / 86400000)
               return (
-                <div key={e.id} className="px-5 py-3 flex items-center gap-4 hover:bg-cream-50 transition-colors cursor-pointer"
+                <div key={e.id} className="px-5 py-3 flex items-center gap-4 hover:bg-transparent transition-colors cursor-pointer"
                   onClick={() => { setSelectedDay(e.tarih); setCurrentMonth(e.tarih) }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${e.renk}20` }}>
                     <Icon className="w-4 h-4" style={{ color: e.renk }} strokeWidth={2} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-ink-900 truncate">{e.baslik}</div>
-                    <div className="text-xs text-ink-400 font-mono">{format(e.tarih, 'd MMMM yyyy, EEEE', { locale: tr })}</div>
+                    <div className="text-sm font-medium text-cream truncate">{e.baslik}</div>
+                    <div className="text-xs text-stone-light font-mono">{format(e.tarih, 'd MMMM yyyy, EEEE', { locale: tr })}</div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className={`text-xs font-mono font-medium px-2 py-0.5 rounded-full ${
-                      gunFarki === 0 ? 'bg-ember-100 text-ember-700' :
+                      gunFarki === 0 ? 'bg-ruby/10 text-ember-700' :
                       gunFarki <= 2 ? 'bg-cream-200 text-ink-600' :
-                      'bg-cream-100 text-ink-400'
+                      'bg-obsidian-4 text-stone-light'
                     }`}>
                       {gunFarki === 0 ? 'Bugün' : gunFarki === 1 ? 'Yarın' : `${gunFarki} gün`}
                     </div>

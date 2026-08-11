@@ -13,9 +13,9 @@ const INTENT_LABEL: Record<string, string> = {
   human_handover: 'Canlı Destek', complaint: 'Şikayet', brand_info: 'Marka Bilgi',
   usage_question: 'Kullanım Sorusu', menu: 'Menü', smalltalk: 'Sohbet', other: 'Diğer',
 }
-const COLORS = ['#7c9059','#a8b885','#d9c07a','#c4a154','#d97757','#c4633f','#a64d2e','#928c79']
+const COLORS = ['#C9A84C','#A8882A','#8B6914','#6B5210','#C8C0B0','#8A8580','#6B6760','#3A3730']
 const ETIKET_RENKLER = ['#7c9059','#c4633f','#d9c07a','#928c79','#a8b885','#d97757','#3d3a30','#cfd9b4']
-const tooltipStyle = { background: '#fdfcf7', border: '1px solid #e8d9a8', borderRadius: '8px', fontSize: '11px' }
+const tooltipStyle = { background: '#181612', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '8px', fontSize: '11px', color: '#C8C0B0' }
 
 
 export default function RaporlarPage() {
@@ -121,40 +121,40 @@ export default function RaporlarPage() {
     <div className="p-4 md:p-10 max-w-7xl mx-auto">
       <header className="mb-6 flex items-baseline justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-ink-300 mb-2">analiz & takip</p>
-          <h1 className="font-display text-3xl md:text-5xl text-ink-900 tracking-tight">Raporlar</h1>
+          <p className="text-xs uppercase tracking-[0.3em] text-stone mb-2">analiz & takip</p>
+          <h1 className="font-display text-4xl md:text-5xl text-cream tracking-tight">Raporlar</h1>
         </div>
-        <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-white border border-cream-200 rounded-xl text-ink-400 hover:text-ink-700">
+        <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim">
           <RefreshCw className="w-4 h-4" />
         </button>
       </header>
 
       {/* Özet kartlar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <div className="bg-moss-50 border border-moss-200 rounded-2xl p-4 md:p-6">
-          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-moss-600">Bot Başarı</span><Bot className="w-4 h-4 text-moss-500" strokeWidth={1.5} /></div>
-          <div className="font-display text-3xl md:text-4xl text-moss-700">%{botBasariOrani}</div>
-          <p className="text-xs text-moss-500 font-mono mt-1">{botCozdu} konuşma çözüldü</p>
+        <div className="bg-moss-50 border border-moss-200 rounded-xl p-4 md:p-6">
+          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-gold">Bot Başarı</span><Bot className="w-4 h-4 text-gold" strokeWidth={1.5} /></div>
+          <div className="font-display text-4xl md:text-4xl text-gold">%{botBasariOrani}</div>
+          <p className="text-xs text-gold font-mono mt-1">{botCozdu} konuşma çözüldü</p>
         </div>
-        <div className={`border rounded-2xl p-4 md:p-6 ${canliDusdu > 5 ? 'bg-ember-50 border-ember-200' : 'bg-white border-cream-200'}`}>
-          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-ink-400">Canlı Destek</span><Headphones className="w-4 h-4 text-ink-300" strokeWidth={1.5} /></div>
-          <div className="font-display text-3xl md:text-4xl text-ink-900">{canliDusdu}</div>
-          <p className="text-xs text-ink-300 font-mono mt-1">canlıya düştü</p>
+        <div className={`border rounded-xl p-4 md:p-6 ${canliDusdu > 5 ? 'bg-ruby/10 border-ember-200' : 'bg-obsidian-3 border-gold-subtle'}`}>
+          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-stone-light">Canlı Destek</span><Headphones className="w-4 h-4 text-stone" strokeWidth={1.5} /></div>
+          <div className="font-display text-4xl md:text-4xl text-cream">{canliDusdu}</div>
+          <p className="text-xs text-stone font-mono mt-1">canlıya düştü</p>
         </div>
-        <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-ink-400">Ort. Yanıt</span><Clock className="w-4 h-4 text-ink-300" strokeWidth={1.5} /></div>
-          <div className="font-display text-3xl md:text-4xl text-ink-900">{ortYanitSuresi > 0 ? `${Math.round(ortYanitSuresi)}dk` : '—'}</div>
-          <p className="text-xs text-ink-300 font-mono mt-1">canlı destek yanıt</p>
+        <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-stone-light">Ort. Yanıt</span><Clock className="w-4 h-4 text-stone" strokeWidth={1.5} /></div>
+          <div className="font-display text-4xl md:text-4xl text-cream">{ortYanitSuresi > 0 ? `${Math.round(ortYanitSuresi)}dk` : '—'}</div>
+          <p className="text-xs text-stone font-mono mt-1">canlı destek yanıt</p>
         </div>
-        <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-ink-400">En Yoğun</span><Clock className="w-4 h-4 text-ink-300" strokeWidth={1.5} /></div>
-          <div className="font-display text-2xl md:text-3xl text-ink-900">{enYogunSaat?.saat || '—'}</div>
-          <p className="text-xs text-ink-300 font-mono mt-1">{maxSaat} mesaj</p>
+        <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+          <div className="flex items-start justify-between mb-3"><span className="text-[10px] uppercase tracking-[0.2em] text-stone-light">En Yoğun</span><Clock className="w-4 h-4 text-stone" strokeWidth={1.5} /></div>
+          <div className="font-display text-2xl md:text-3xl text-cream">{enYogunSaat?.saat || '—'}</div>
+          <p className="text-xs text-stone font-mono mt-1">{maxSaat} mesaj</p>
         </div>
       </div>
 
       {/* Tablar */}
-      <div className="flex overflow-x-auto gap-1 mb-6 bg-white border border-cream-200 rounded-xl p-1">
+      <div className="flex overflow-x-auto gap-1 mb-6 bg-obsidian-3 border border-gold-subtle rounded-xl p-1">
         {[
           { v: 'bot', l: '🤖 Bot Metrikleri' },
           { v: 'sla', l: '⏱️ SLA Takibi' },
@@ -162,7 +162,7 @@ export default function RaporlarPage() {
           { v: 'rakip', l: '🔍 Rakip Analizi' },
         ].map(t => (
           <button key={t.v} onClick={() => setTab(t.v as any)}
-            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all ${tab === t.v ? 'bg-ink-900 text-cream-50' : 'text-ink-500 hover:text-ink-700'}`}>
+            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all ${tab === t.v ? 'bg-ink-900 text-cream-50' : 'text-stone-light hover:text-cream-dim'}`}>
             {t.l}
           </button>
         ))}
@@ -172,20 +172,20 @@ export default function RaporlarPage() {
       {tab === 'bot' && (
         <div className="space-y-4">
           {sorunluIntentler.length > 0 && (
-            <div className="bg-ember-50 border border-ember-200 rounded-2xl p-4 flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-ember-500 shrink-0 mt-0.5" strokeWidth={1.5} />
+            <div className="bg-ruby/10 border border-ember-200 rounded-xl p-4 flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-ruby-light shrink-0 mt-0.5" strokeWidth={1.5} />
               <div>
                 <p className="text-sm font-medium text-ember-700 mb-1">Bot Sorun Noktaları</p>
                 {sorunluIntentler.map(i => (
-                  <p key={i.intent} className="text-xs text-ember-600">{i.name}: {i.count} kez → canlı desteğe düştü</p>
+                  <p key={i.intent} className="text-xs text-ruby-light">{i.name}: {i.count} kez → canlı desteğe düştü</p>
                 ))}
               </div>
             </div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-              <h2 className="font-display text-xl text-ink-900 mb-4">Intent Dağılımı</h2>
+            <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+              <h2 className="font-display text-xl text-cream mb-4">Intent Dağılımı</h2>
               <div className="space-y-2">
                 {intentData.slice(0,8).map((d, i) => {
                   const total = intentData.reduce((a,b) => a+b.count, 0)
@@ -194,12 +194,12 @@ export default function RaporlarPage() {
                   return (
                     <div key={d.intent}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className={`font-medium flex items-center gap-1 ${isProblematic ? 'text-ember-600' : 'text-ink-700'}`}>
+                        <span className={`font-medium flex items-center gap-1 ${isProblematic ? 'text-ruby-light' : 'text-cream-dim'}`}>
                           {isProblematic && <AlertTriangle className="w-3 h-3" />}{d.name}
                         </span>
-                        <span className="text-ink-400 font-mono">{d.count} · %{pct}</span>
+                        <span className="text-stone-light font-mono">{d.count} · %{pct}</span>
                       </div>
-                      <div className="h-1.5 bg-cream-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-obsidian-4 rounded-full overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: isProblematic ? '#c4633f' : COLORS[i % COLORS.length] }} />
                       </div>
                     </div>
@@ -208,8 +208,8 @@ export default function RaporlarPage() {
               </div>
             </div>
 
-            <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-              <h2 className="font-display text-xl text-ink-900 mb-4">Saatlik Yoğunluk</h2>
+            <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+              <h2 className="font-display text-xl text-cream mb-4">Saatlik Yoğunluk</h2>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={saatData} margin={{ top: 4, right: 4, bottom: 4, left: -25 }}>
                   <XAxis dataKey="saat" tick={{ fontSize: 8, fill: '#928c79' }} axisLine={false} tickLine={false} interval={3} />
@@ -224,8 +224,8 @@ export default function RaporlarPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-              <h2 className="font-display text-lg text-ink-900 mb-3">Bot vs Canlı</h2>
+            <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+              <h2 className="font-display text-lg text-cream mb-3">Bot vs Canlı</h2>
               <ResponsiveContainer width="100%" height={140}>
                 <PieChart>
                   <Pie data={[{name:'Bot',value:botCozdu},{name:'Canlı',value:canliDusdu}]} cx="50%" cy="50%" outerRadius={55} dataKey="value">
@@ -236,11 +236,11 @@ export default function RaporlarPage() {
               </ResponsiveContainer>
               <div className="flex justify-center gap-4 text-xs">
                 <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-moss-500" />Bot %{botBasariOrani}</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-ember-500" />Canlı %{100-botBasariOrani}</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-ruby/100" />Canlı %{100-botBasariOrani}</span>
               </div>
             </div>
-            <div className="md:col-span-2 bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-              <h2 className="font-display text-lg text-ink-900 mb-3">Bot Performans Özeti</h2>
+            <div className="md:col-span-2 bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+              <h2 className="font-display text-lg text-cream mb-3">Bot Performans Özeti</h2>
               <div className="space-y-3">
                 {[
                   { label: 'Toplam Konuşma', value: toplamKonusma, icon: '💬' },
@@ -249,9 +249,9 @@ export default function RaporlarPage() {
                   { label: 'En Sorunlu Intent', value: sorunluIntentler[0] ? `${sorunluIntentler[0].name} (${sorunluIntentler[0].count}x)` : '—', icon: '⚠️' },
                   { label: 'En Yoğun Saat', value: enYogunSaat ? `${enYogunSaat.saat} (${maxSaat} mesaj)` : '—', icon: '⏰' },
                 ].map(({ label, value, icon }) => (
-                  <div key={label} className="flex items-center justify-between py-2 border-b border-cream-100 last:border-0">
-                    <span className="text-sm text-ink-500 flex items-center gap-2"><span>{icon}</span>{label}</span>
-                    <span className="text-sm font-medium text-ink-900 font-mono">{value}</span>
+                  <div key={label} className="flex items-center justify-between py-2 border-b border-stone/20 last:border-0">
+                    <span className="text-sm text-stone-light flex items-center gap-2"><span>{icon}</span>{label}</span>
+                    <span className="text-sm font-medium text-cream font-mono">{value}</span>
                   </div>
                 ))}
               </div>
@@ -265,51 +265,51 @@ export default function RaporlarPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Ort. Yanıt', value: ortYanitSuresi > 0 ? `${Math.round(ortYanitSuresi)} dk` : '—', sub: 'hedef: <5 dk', color: ortYanitSuresi > 10 ? 'bg-ember-50 border-ember-200' : 'bg-moss-50 border-moss-200' },
-              { label: 'Ort. Çözüm', value: ortCozumSuresi > 0 ? `${Math.round(ortCozumSuresi)} dk` : '—', sub: 'hedef: <30 dk', color: 'bg-white border-cream-200' },
-              { label: 'Açık Talepler', value: acikTalepler, sub: 'henüz kapanmadı', color: acikTalepler > 3 ? 'bg-ember-50 border-ember-200' : 'bg-white border-cream-200' },
-              { label: 'SLA İhlali', value: slaIhlal, sub: '>10 dk yanıt', color: slaIhlal > 0 ? 'bg-ember-50 border-ember-200' : 'bg-moss-50 border-moss-200' },
+              { label: 'Ort. Yanıt', value: ortYanitSuresi > 0 ? `${Math.round(ortYanitSuresi)} dk` : '—', sub: 'hedef: <5 dk', color: ortYanitSuresi > 10 ? 'bg-ruby/10 border-ember-200' : 'bg-moss-50 border-moss-200' },
+              { label: 'Ort. Çözüm', value: ortCozumSuresi > 0 ? `${Math.round(ortCozumSuresi)} dk` : '—', sub: 'hedef: <30 dk', color: 'bg-obsidian-3 border-gold-subtle' },
+              { label: 'Açık Talepler', value: acikTalepler, sub: 'henüz kapanmadı', color: acikTalepler > 3 ? 'bg-ruby/10 border-ember-200' : 'bg-obsidian-3 border-gold-subtle' },
+              { label: 'SLA İhlali', value: slaIhlal, sub: '>10 dk yanıt', color: slaIhlal > 0 ? 'bg-ruby/10 border-ember-200' : 'bg-moss-50 border-moss-200' },
             ].map(({ label, value, sub, color }) => (
-              <div key={label} className={`border rounded-2xl p-4 ${color}`}>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-ink-400 mb-2">{label}</p>
-                <div className="font-display text-2xl md:text-3xl text-ink-900">{value}</div>
-                <p className="text-[10px] text-ink-300 font-mono mt-1">{sub}</p>
+              <div key={label} className={`border rounded-xl p-4 ${color}`}>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-stone-light mb-2">{label}</p>
+                <div className="font-display text-2xl md:text-3xl text-cream">{value}</div>
+                <p className="text-[10px] text-stone font-mono mt-1">{sub}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-cream-100 bg-cream-50">
-              <h2 className="font-display text-xl text-ink-900">Canlı Destek Logları</h2>
-              <p className="text-xs text-ink-400 font-mono mt-0.5">Her canlı destek görüşmesinin süresi</p>
+          <div className="bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-stone/20 bg-transparent">
+              <h2 className="font-display text-xl text-cream">Canlı Destek Logları</h2>
+              <p className="text-xs text-stone-light font-mono mt-0.5">Her canlı destek görüşmesinin süresi</p>
             </div>
             {slaLoglar.length === 0 ? (
               <div className="p-12 text-center">
                 <Clock className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-                <p className="text-sm text-ink-500">Henüz SLA kaydı yok</p>
-                <p className="text-xs text-ink-300 mt-1">Canlı destek görüşmeleri burada takip edilecek</p>
+                <p className="text-sm text-stone-light">Henüz SLA kaydı yok</p>
+                <p className="text-xs text-stone mt-1">Canlı destek görüşmeleri burada takip edilecek</p>
               </div>
             ) : (
               <table className="w-full">
                 <thead>
                   <tr>{['Telefon','Başlangıç','İlk Yanıt','Çözüm','Yanıt Süresi','Durum'].map(h => (
-                    <th key={h} className="px-5 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-ink-300">{h}</th>
+                    <th key={h} className="px-5 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-stone">{h}</th>
                   ))}</tr>
                 </thead>
                 <tbody>
                   {slaLoglar.map(l => (
-                    <tr key={l.id} className="border-t border-cream-100 hover:bg-cream-50">
-                      <td className="px-5 py-3 font-mono text-sm text-ink-700">{l.telefon}</td>
-                      <td className="px-5 py-3 text-xs text-ink-500 font-mono">{format(new Date(l.baslangic), 'd MMM HH:mm', { locale: tr })}</td>
-                      <td className="px-5 py-3 text-xs text-ink-500 font-mono">{l.ilk_yanit ? format(new Date(l.ilk_yanit), 'HH:mm') : '—'}</td>
-                      <td className="px-5 py-3 text-xs text-ink-500 font-mono">{l.kapanis ? format(new Date(l.kapanis), 'HH:mm') : '—'}</td>
+                    <tr key={l.id} className="border-t border-stone/20 hover:bg-transparent">
+                      <td className="px-5 py-3 font-mono text-sm text-cream-dim">{l.telefon}</td>
+                      <td className="px-5 py-3 text-xs text-stone-light font-mono">{format(new Date(l.baslangic), 'd MMM HH:mm', { locale: tr })}</td>
+                      <td className="px-5 py-3 text-xs text-stone-light font-mono">{l.ilk_yanit ? format(new Date(l.ilk_yanit), 'HH:mm') : '—'}</td>
+                      <td className="px-5 py-3 text-xs text-stone-light font-mono">{l.kapanis ? format(new Date(l.kapanis), 'HH:mm') : '—'}</td>
                       <td className="px-5 py-3">
-                        <span className={`text-xs font-mono font-medium ${l.yanit_suresi_dk > 10 ? 'text-ember-600' : 'text-moss-600'}`}>
+                        <span className={`text-xs font-mono font-medium ${l.yanit_suresi_dk > 10 ? 'text-ruby-light' : 'text-gold'}`}>
                           {l.yanit_suresi_dk ? `${l.yanit_suresi_dk} dk` : '—'}
                         </span>
                       </td>
                       <td className="px-5 py-3">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${l.durum === 'kapali' ? 'bg-moss-100 text-moss-700' : 'bg-ember-100 text-ember-600'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${l.durum === 'kapali' ? 'bg-obsidian-4 text-gold' : 'bg-ruby/10 text-ruby-light'}`}>
                           {l.durum === 'kapali' ? '✓ Kapandı' : '● Açık'}
                         </span>
                       </td>
@@ -327,11 +327,11 @@ export default function RaporlarPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-display text-2xl text-ink-900">Müşteri Etiketleri</h2>
-              <p className="text-xs text-ink-400 font-mono mt-1">{etiketler.length} etiket · {Object.keys(etiketMap).length} farklı tür</p>
+              <h2 className="font-display text-2xl text-cream">Müşteri Etiketleri</h2>
+              <p className="text-xs text-stone-light font-mono mt-1">{etiketler.length} etiket · {Object.keys(etiketMap).length} farklı tür</p>
             </div>
             <button onClick={() => setEtiketForm(f => ({ ...f, show: true }))}
-              className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">
               <Plus className="w-4 h-4" />Etiket Ekle
             </button>
           </div>
@@ -339,26 +339,26 @@ export default function RaporlarPage() {
           {etiketData.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
               {etiketData.slice(0,8).map((e, i) => (
-                <div key={e.etiket} className="bg-white border border-cream-200 rounded-2xl p-4">
+                <div key={e.etiket} className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4">
                   <div className="w-8 h-8 rounded-lg mb-2 flex items-center justify-center" style={{ background: `${ETIKET_RENKLER[i % ETIKET_RENKLER.length]}20` }}>
                     <Tag className="w-4 h-4" style={{ color: ETIKET_RENKLER[i % ETIKET_RENKLER.length] }} strokeWidth={1.5} />
                   </div>
-                  <div className="font-medium text-ink-900 text-sm">{e.etiket}</div>
-                  <div className="text-xs text-ink-400 font-mono mt-0.5">{e.count} müşteri</div>
+                  <div className="font-medium text-cream text-sm">{e.etiket}</div>
+                  <div className="text-xs text-stone-light font-mono mt-0.5">{e.count} müşteri</div>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="bg-white border border-cream-200 rounded-2xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-cream-100 bg-cream-50">
-              <h2 className="font-display text-lg text-ink-900">Tüm Etiketler</h2>
+          <div className="bg-obsidian-3 border border-gold-subtle rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-stone/20 bg-transparent">
+              <h2 className="font-display text-lg text-cream">Tüm Etiketler</h2>
             </div>
             {etiketler.length === 0 ? (
               <div className="p-12 text-center">
                 <Tag className="w-10 h-10 mx-auto text-cream-300 mb-3" strokeWidth={1.5} />
-                <p className="text-sm text-ink-500">Henüz etiket yok</p>
-                <p className="text-xs text-ink-300 mt-1">"VIP", "alerjisi var", "kapıda ödeme" gibi etiketler ekle</p>
+                <p className="text-sm text-stone-light">Henüz etiket yok</p>
+                <p className="text-xs text-stone mt-1">"VIP", "alerjisi var", "kapıda ödeme" gibi etiketler ekle</p>
               </div>
             ) : (
               <div className="divide-y divide-cream-100">
@@ -366,12 +366,12 @@ export default function RaporlarPage() {
                   <div key={e.id} className="px-5 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="w-3 h-3 rounded-full" style={{ background: e.renk }} />
-                      <span className="text-sm font-medium text-ink-900">{e.etiket}</span>
-                      <span className="font-mono text-xs text-ink-400">{e.telefon}</span>
+                      <span className="text-sm font-medium text-cream">{e.etiket}</span>
+                      <span className="font-mono text-xs text-stone-light">{e.telefon}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-ink-300 font-mono">{format(new Date(e.created_at), 'd MMM', { locale: tr })}</span>
-                      <button onClick={() => etiketSil(e.id)} className="w-7 h-7 flex items-center justify-center text-ink-300 hover:text-ember-500 transition-colors">
+                      <span className="text-xs text-stone font-mono">{format(new Date(e.created_at), 'd MMM', { locale: tr })}</span>
+                      <button onClick={() => etiketSil(e.id)} className="w-7 h-7 flex items-center justify-center text-stone hover:text-ruby-light transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -388,28 +388,28 @@ export default function RaporlarPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-display text-2xl text-ink-900">Rakip Fiyat Analizi</h2>
-              <p className="text-xs text-ink-400 font-mono mt-1"></p>
+              <h2 className="font-display text-2xl text-cream">Rakip Fiyat Analizi</h2>
+              <p className="text-xs text-stone-light font-mono mt-1"></p>
             </div>
             <button onClick={() => setRakipForm(f => ({ ...f, show: true }))}
-              className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">
               <Plus className="w-4 h-4" />Rakip Ekle
             </button>
           </div>
 
           {/* Fiyat karşılaştırma */}
-          <div className="bg-white border border-cream-200 rounded-2xl p-4 md:p-6">
-            <h3 className="font-display text-xl text-ink-900 mb-5">Fiyat Karşılaştırması</h3>
+          <div className="bg-obsidian-3 border border-gold-subtle rounded-xl p-4 md:p-6">
+            <h3 className="font-display text-xl text-cream mb-5">Fiyat Karşılaştırması</h3>
             <div className="space-y-4">
               
               <div className="flex items-center gap-4">
-                <div className="w-24 text-sm font-bold text-moss-700">roberto.</div>
-                <div className="flex-1 h-8 bg-moss-100 rounded-lg relative flex items-center">
+                <div className="w-24 text-sm font-bold text-gold">roberto.</div>
+                <div className="flex-1 h-8 bg-obsidian-4 rounded-lg relative flex items-center">
                   <div className="h-full bg-moss-500 rounded-lg" style={{ width: '100%' }} />
                   <span className="absolute right-3 text-xs font-bold text-white">{0} TL</span>
                 </div>
                 <div className="w-20 text-right">
-                  <span className="text-xs bg-moss-100 text-moss-700 px-2 py-0.5 rounded-full font-medium">bizim fiyat</span>
+                  <span className="text-xs bg-obsidian-4 text-gold px-2 py-0.5 rounded-full font-medium">bizim fiyat</span>
                 </div>
               </div>
               {rakipKarsilastirma.map(r => {
@@ -419,12 +419,12 @@ export default function RaporlarPage() {
                 return (
                   <div key={r.rakip} className="flex items-center gap-4">
                     <div className="w-24 text-sm text-ink-600 font-medium truncate">{r.rakip}</div>
-                    <div className="flex-1 h-8 bg-cream-100 rounded-lg relative flex items-center">
+                    <div className="flex-1 h-8 bg-obsidian-4 rounded-lg relative flex items-center">
                       <div className="h-full rounded-lg" style={{ width: `${pct}%`, background: r.fiyat > 0 ? '#c4633f' : '#7c9059' }} />
-                      <span className="absolute right-3 text-xs font-bold text-ink-700">{r.fiyat} TL</span>
+                      <span className="absolute right-3 text-xs font-bold text-cream-dim">{r.fiyat} TL</span>
                     </div>
                     <div className="w-20 text-right">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 justify-end ${r.fiyat > 0 ? 'text-ember-600' : r.fiyat < 0 ? 'text-moss-600' : 'text-ink-500'}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 justify-end ${r.fiyat > 0 ? 'text-ruby-light' : r.fiyat < 0 ? 'text-gold' : 'text-stone-light'}`}>
                         {r.fiyat > 0 ? <TrendingUp className="w-3 h-3" /> : r.fiyat < 0 ? <TrendingDown className="w-3 h-3" /> : null}
                         {daha}
                       </span>
@@ -446,35 +446,35 @@ export default function RaporlarPage() {
       {etiketForm.show &&  (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEtiketForm(f => ({ ...f, show: false }))}>
           <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="relative bg-obsidian-3 rounded-xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="font-display text-2xl text-ink-900">Etiket Ekle</h2>
-              <button onClick={() => setEtiketForm(f => ({ ...f, show: false }))}><X className="w-5 h-5 text-ink-300" /></button>
+              <h2 className="font-display text-2xl text-cream">Etiket Ekle</h2>
+              <button onClick={() => setEtiketForm(f => ({ ...f, show: false }))}><X className="w-5 h-5 text-stone" /></button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1">Telefon</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1">Telefon</label>
                 <input value={etiketForm.telefon} onChange={e => setEtiketForm(f => ({ ...f, telefon: e.target.value }))} placeholder="905xx..."
-                  className="w-full px-3 py-2.5 bg-cream-50 border border-cream-200 rounded-xl text-sm font-mono text-ink-700 focus:outline-none focus:border-moss-400" />
+                  className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm font-mono text-cream-dim focus:outline-none focus:border-gold-dim" />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1">Etiket</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1">Etiket</label>
                 <input value={etiketForm.etiket} onChange={e => setEtiketForm(f => ({ ...f, etiket: e.target.value }))} placeholder="VIP, alerjisi var, kapıda ödeme..."
-                  className="w-full px-3 py-2.5 bg-cream-50 border border-cream-200 rounded-xl text-sm text-ink-700 focus:outline-none focus:border-moss-400" />
+                  className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim" />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1">Hazır Etiketler</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1">Hazır Etiketler</label>
                 <div className="flex flex-wrap gap-2">
                   {['VIP', 'Alerjisi Var', 'Kapıda Ödeme', 'Düzenli Müşteri', 'Şikayetçi', 'Abonelik Riski'].map(t => (
                     <button key={t} onClick={() => setEtiketForm(f => ({ ...f, etiket: t }))}
-                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${etiketForm.etiket === t ? 'bg-ink-900 text-cream-50 border-ink-900' : 'bg-white border-cream-200 text-ink-500'}`}>
+                      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${etiketForm.etiket === t ? 'bg-ink-900 text-cream-50 border-ink-900' : 'bg-obsidian-3 border-gold-subtle text-stone-light'}`}>
                       {t}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-[0.2em] text-ink-300 block mb-1">Renk</label>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1">Renk</label>
                 <div className="flex gap-2">
                   {ETIKET_RENKLER.map(r => (
                     <button key={r} onClick={() => setEtiketForm(f => ({ ...f, renk: r }))}
@@ -483,7 +483,7 @@ export default function RaporlarPage() {
                   ))}
                 </div>
               </div>
-              <button onClick={etiketEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-ink-700 transition-colors">Kaydet</button>
+              <button onClick={etiketEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">Kaydet</button>
             </div>
           </div>
         </div>
