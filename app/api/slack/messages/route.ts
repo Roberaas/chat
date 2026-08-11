@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   }
 
   const messages = (data.messages || []).map((m: any) => {
-    // n8n blocks'tan gerçek metni çıkar
+    // blocks'tan gerçek metni çıkar
     let text = m.text || ''
     if (m.blocks?.length) {
       const parts: string[] = []
@@ -38,13 +38,19 @@ export async function GET(req: Request) {
       }
       if (parts.length) text = parts.join('')
     }
+
+    // Admin tespiti: username veya bot_profile.name 'admin' içeriyorsa admin
+    const username = m.username || m.bot_profile?.name || ''
+    const isAdmin = username === 'roberto-admin' || username.toLowerCase().includes('admin')
+
     return {
       ts: m.ts,
       text,
       user: m.user || m.bot_id || 'unknown',
       is_bot: !!m.bot_id,
-      username: m.username || '',
-      is_admin: m.username === 'roberto-admin',
+      username,
+      is_admin: isAdmin,
+      _debug: { raw_username: m.username, bot_profile: m.bot_profile?.name, subtype: m.subtype },
     }
   })
 
