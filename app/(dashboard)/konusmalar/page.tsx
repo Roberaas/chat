@@ -199,9 +199,11 @@ export default function KonusmalarPage() {
                 let gecmis: {role:string;content:string}[] = []
                 try {
                   const raw = (selected as any).gecmis
+                  console.log('gecmis raw type:', typeof raw, Array.isArray(raw))
                   if (Array.isArray(raw)) gecmis = raw
                   else if (typeof raw === 'string' && raw.trim()) gecmis = JSON.parse(raw)
-                } catch {}
+                  console.log('gecmis length:', gecmis.length)
+                } catch(e) { console.error('gecmis error:', e) }
                 if (!gecmis.length) return null
                 return (
                   <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
