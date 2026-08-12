@@ -39,10 +39,14 @@ export async function GET(req: Request) {
       if (parts.length) text = parts.join('')
     }
 
-    // username 'roberto-admin' ise admin panelden gönderilmiş
-    // diğer tüm bot mesajlar n8n'den gelen müşteri iletisi
+    // is_admin tespiti:
+    // U0BPH306AKW = panel bot user ID (temsilci mesajları)
+    // U0BP747B46P = müşteri / n8n user ID (müşteri mesajları)
+    // is_bot:false → kesinlikle müşteri
     const username = m.username || ''
-    const isAdmin = username === 'roberto-admin'
+    const userId = m.user || ''
+    const ADMIN_BOT_ID = 'U0BPH306AKW'
+    const isAdmin = userId === ADMIN_BOT_ID || username === 'roberto-admin'
 
     return {
       ts: m.ts,
