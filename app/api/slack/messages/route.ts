@@ -4,7 +4,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const thread_ts = searchParams.get('thread_ts')
   const token = process.env.SLACK_BOT_TOKEN
-  const channel = process.env.SLACK_CHANNEL_ID || 'C09FB0QLDMH'
+  const channel = searchParams.get('channel_id') || process.env.SLACK_CHANNEL_ID || 'C0BP9RDB0JZ'
 
   if (!token || !thread_ts) {
     return NextResponse.json({ messages: [] })
@@ -61,9 +61,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { thread_ts, text, phone } = await req.json()
+  const { thread_ts, text, phone, channel_id: body_channel } = await req.json()
   const token = process.env.SLACK_BOT_TOKEN
-  const channel = process.env.SLACK_CHANNEL_ID || 'C09FB0QLDMH'
+  const channel = body_channel || process.env.SLACK_CHANNEL_ID || 'C0BP9RDB0JZ'
   const n8nWebhook = 'https://n8n.robertobravo.com/webhook/slackold'
 
   if (!token || !thread_ts || !text) {

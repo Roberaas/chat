@@ -71,9 +71,10 @@ export default function CanliDestekPage() {
 
   useEffect(() => { load(); const t = setInterval(load,15000); return () => clearInterval(t) }, [load])
 
-  const loadMessages = useCallback(async (thread_ts: string, silent = false) => {
+  const loadMessages = useCallback(async (thread_ts: string, silent = false, channel_id?: string) => {
     if (!silent) setMsgLoading(true)
-    const res = await fetch(`/api/slack/messages?thread_ts=${thread_ts}`)
+    const ch = channel_id || (selected as any)?.channel_id || ''
+    const res = await fetch(`/api/slack/messages?thread_ts=${thread_ts}${ch ? '&channel_id=' + ch : ''}`)
     const data = await res.json()
     const filtered = (data.messages || []).filter((m: SlackMessage, i: number) => !isSystemMessage(m, i))
     const lastTs = filtered.length > 0 ? filtered[filtered.length - 1].ts : null
@@ -102,7 +103,7 @@ export default function CanliDestekPage() {
   async function sendMessage() {
     if (!reply.trim() || !selected?.slack_thread_ts) return
     setSending(true)
-    const res = await fetch('/api/slack/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply, phone: selected.phone }) })
+    const res = await fetch('/api/slack/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ thread_ts: selected.slack_thread_ts, text: reply, phone: selected.phone, channel_id: (selected as any).channel_id || '' }) })
     const data = await res.json()
     if (data.ok) { setReply(''); await loadMessages(selected.slack_thread_ts) } else alert('Hata: ' + data.error)
     setSending(false)
