@@ -19,7 +19,7 @@ function FiyatKart({ label, d, sym, color, small }: { label: string; d: any; sym
         <span style={{ fontSize: 9, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>
           {satis != null ? `satış ${fmt(satis)}` : ''}
         </span>
-        {degisim != null && (
+        {degisim != null && !isNaN(degisim) && (
           <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? '#C9A84C' : '#C4364A' }}>
             {degisim >= 0 ? '▲' : '▼'} %{Math.abs(degisim).toFixed(2)}
           </span>
