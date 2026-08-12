@@ -197,7 +197,11 @@ export default function KonusmalarPage() {
               {/* Konuşma Geçmişi */}
               {(() => {
                 let gecmis: {role:string;content:string}[] = []
-                try { gecmis = JSON.parse((selected as any).gecmis || '[]') } catch {}
+                try {
+                  const raw = (selected as any).gecmis
+                  if (Array.isArray(raw)) gecmis = raw
+                  else if (typeof raw === 'string' && raw.trim()) gecmis = JSON.parse(raw)
+                } catch {}
                 if (!gecmis.length) return null
                 return (
                   <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
