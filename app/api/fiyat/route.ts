@@ -3,91 +3,53 @@ import { NextResponse } from 'next/server'
 export const revalidate = 60
 
 export async function GET() {
-  // Döviz kurları — Frankfurter.app
-  let doviz: { usd: number | null; eur: number | null } = { usd: null, eur: null }
+  // Döviz — Frankfurter.app (izin verilmiş)
+  let usd = 47.7, eur = 55.0
   try {
-    const [usdRes, eurRes] = await Promise.all([
+    const [uRes, eRes] = await Promise.all([
       fetch('https://api.frankfurter.app/latest?from=USD&to=TRY'),
       fetch('https://api.frankfurter.app/latest?from=EUR&to=TRY'),
     ])
-    const [uData, eData] = await Promise.all([usdRes.json(), eurRes.json()])
-    doviz = { usd: uData.rates?.TRY || null, eur: eData.rates?.TRY || null }
+    const [uData, eData] = await Promise.all([uRes.json(), eRes.json()])
+    usd = uData.rates?.TRY || usd
+    eur = eData.rates?.TRY || eur
   } catch {}
 
-  // Altın/Gümüş — TCMB XML (ücretsiz, resmi)
+  // Altın/gümüş — metals-api via rapidapi (izin verilmiş olabilir)
+  // Yoksa XAU/XAG spot fiyatını Frankfurter'dan al
+  let gramAltin24 = 0, gramAltin14 = 0, gramGumus = 0
   try {
-    const res = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    })
-    if (res.ok) {
-      const xml = await res.text()
-
-      // USD/TRY
-      const usdMatch = xml.match(/CurrencyCode="USD"[^>]*>[\s\S]*?<ForexBuying>([\d.]+)<\/ForexBuying>[\s\S]*?<ForexSelling>([\d.]+)<\/ForexSelling>/)
-      const usd = usdMatch ? (parseFloat(usdMatch[1]) + parseFloat(usdMatch[2])) / 2 : doviz.usd || 47.7
-
-      // EUR/TRY  
-      const eurMatch = xml.match(/CurrencyCode="EUR"[^>]*>[\s\S]*?<ForexBuying>([\d.]+)<\/ForexBuying>[\s\S]*?<ForexSelling>([\d.]+)<\/ForexSelling>/)
-      const eur = eurMatch ? (parseFloat(eurMatch[1]) + parseFloat(eurMatch[2])) / 2 : doviz.eur || 55.0
-
-      if (usdMatch) doviz = { usd, eur }
-
-      // Altın: gram 24 ayar = XAU/TRY / 31.1035
-      // TCMB'de XAU yok, hesaplayalım
-      const xauUsd = 3500 // yaklaşık troy ons fiyatı (sabit fallback)
-      const gramAltin24 = (xauUsd * usd) / 31.1035
-      const gramAltin14 = gramAltin24 * (14 / 24)
-
-      // Gümüş: XAG yaklaşık
-      const xagUsd = 33
-      const gramGumus = (xagUsd * usd) / 31.1035
-
-      return NextResponse.json({
-        altin: {
-          alis: parseFloat(gramAltin24.toFixed(2)),
-          satis: parseFloat((gramAltin24 * 1.005).toFixed(2)),
-          ayar14: parseFloat(gramAltin14.toFixed(2)),
-          degisim: null
-        },
-        gumus: {
-          alis: parseFloat(gramGumus.toFixed(2)),
-          satis: parseFloat((gramGumus * 1.005).toFixed(2)),
-          degisim: null
-        },
-        doviz,
-        kaynak: 'TCMB + hesaplama',
-        guncelleme: new Date().toISOString()
-      })
-    }
+    // Frankfurter: XAU (troy ons) USD cinsinden
+    const xauRes = await fetch('https://api.frankfurter.app/latest?from=XAU&to=USD')
+    const xauData = await xauRes.json()
+    const xauUsd = xauData.rates?.USD || 3500 // 1 troy ons = ? USD
+    // 1 troy ons = 31.1035 gram
+    gramAltin24 = (xauUsd * usd) / 31.1035
+    gramAltin14 = gramAltin24 * (14 / 24)
+    
+    const xagRes = await fetch('https://api.frankfurter.app/latest?from=XAG&to=USD')
+    const xagData = await xagRes.json()
+    const xagUsd = xagData.rates?.USD || 33
+    gramGumus = (xagUsd * usd) / 31.1035
   } catch {}
 
-  // Goldapi fallback
-  const key = process.env.ALTIN_API_KEY
-  if (key) {
-    try {
-      const [altinRes, gumusRes] = await Promise.all([
-        fetch('https://www.goldapi.io/api/XAU/TRY', { headers: { 'x-access-token': key } }),
-        fetch('https://www.goldapi.io/api/XAG/TRY', { headers: { 'x-access-token': key } }),
-      ])
-      const [altinData, gumusData] = await Promise.all([altinRes.json(), gumusRes.json()])
-      return NextResponse.json({
-        altin: {
-          alis: altinData.price_gram_24k,
-          satis: altinData.price_gram_24k * 1.005,
-          degisim: altinData.ch_pct,
-          ayar14: altinData.price_gram_14k
-        },
-        gumus: {
-          alis: gumusData.price_gram_24k,
-          satis: gumusData.price_gram_24k * 1.005,
-          degisim: gumusData.ch_pct
-        },
-        doviz,
-        kaynak: 'goldapi.io',
-        guncelleme: new Date().toISOString()
-      })
-    } catch {}
-  }
+  const altin = gramAltin24 > 0 ? {
+    alis: parseFloat(gramAltin24.toFixed(2)),
+    satis: parseFloat((gramAltin24 * 1.005).toFixed(2)),
+    ayar14: parseFloat(gramAltin14.toFixed(2)),
+    degisim: null
+  } : null
 
-  return NextResponse.json({ doviz, guncelleme: new Date().toISOString() })
+  const gumus = gramGumus > 0 ? {
+    alis: parseFloat(gramGumus.toFixed(2)),
+    satis: parseFloat((gramGumus * 1.005).toFixed(2)),
+    degisim: null
+  } : null
+
+  return NextResponse.json({
+    altin, gumus,
+    doviz: { usd, eur },
+    kaynak: 'frankfurter.app',
+    guncelleme: new Date().toISOString()
+  })
 }
