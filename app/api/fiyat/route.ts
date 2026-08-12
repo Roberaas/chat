@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export const revalidate = 60
 
 export async function GET() {
-  // Döviz kurları — Frankfurter.app (ücretsiz)
+  // Döviz kurları
   let doviz: { usd: number | null; eur: number | null } = { usd: null, eur: null }
   try {
     const [usdRes, eurRes] = await Promise.all([
@@ -45,5 +45,6 @@ export async function GET() {
     } catch {}
   }
 
-  return NextResponse.json({ hata: 'Fiyat alınamadı', doviz, guncelleme: new Date().toISOString() }, { status: 200 })
+  // Altın/gümüş yok ama döviz var — sadece döviz döndür
+  return NextResponse.json({ doviz, guncelleme: new Date().toISOString() })
 }

@@ -36,7 +36,7 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [sadikMusteriler, setSadikMusteriler] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [fiyatlar, setFiyatlar] = useState<{ altin: any; gumus: any; guncelleme: string } | null>(null)
+  const [fiyatlar, setFiyatlar] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -196,7 +196,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Altın & Gümüş Fiyatları + Döviz */}
-      {fiyatlar && (
+      {(fiyatlar?.doviz || fiyatlar?.altin) && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
           {[
             { label: '14 Ayar Altın', fiyat: (fiyatlar as any).altin?.ayar14 || (fiyatlar as any).altin?.alis, satis: (fiyatlar as any).altin?.satis, degisim: (fiyatlar as any).altin?.degisim, color: '#C9A84C', sym: '✦', birim: '₺/gr' },
