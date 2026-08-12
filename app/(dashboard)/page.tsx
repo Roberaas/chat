@@ -195,12 +195,14 @@ export default function DashboardPage() {
         <div style={{ height: 1, background: 'linear-gradient(90deg, rgba(201,168,76,0.3), transparent)', marginTop: 16 }} />
       </header>
 
-      {/* Altın & Gümüş Fiyatları */}
+      {/* Altın & Gümüş Fiyatları + Döviz */}
       {fiyatlar && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
           {[
-            { label: '14 Ayar Altın', fiyat: fiyatlar.altin?.ayar14 || fiyatlar.altin?.alis, satis: fiyatlar.altin?.satis, degisim: fiyatlar.altin?.degisim, color: '#C9A84C', sym: '✦' },
-            { label: '925 Gümüş (gr)', fiyat: fiyatlar.gumus?.alis, satis: fiyatlar.gumus?.satis, degisim: fiyatlar.gumus?.degisim, color: '#9A928A', sym: '◆' },
+            { label: '14 Ayar Altın', fiyat: (fiyatlar as any).altin?.ayar14 || (fiyatlar as any).altin?.alis, satis: (fiyatlar as any).altin?.satis, degisim: (fiyatlar as any).altin?.degisim, color: '#C9A84C', sym: '✦', birim: '₺/gr' },
+            { label: '925 Gümüş (gr)', fiyat: (fiyatlar as any).gumus?.alis, satis: (fiyatlar as any).gumus?.satis, degisim: (fiyatlar as any).gumus?.degisim, color: '#9A928A', sym: '◆', birim: '₺/gr' },
+            { label: 'Dolar (USD)', fiyat: (fiyatlar as any).doviz?.usd, satis: null, degisim: null, color: '#7A9A6A', sym: '$', birim: '₺' },
+            { label: 'Euro (EUR)', fiyat: (fiyatlar as any).doviz?.eur, satis: null, degisim: null, color: '#6A7A9A', sym: '€', birim: '₺' },
           ].map((item) => (
             <div key={item.label} style={{ background: '#1A1712', border: `1px solid rgba(${item.color === '#C9A84C' ? '201,168,76' : '138,133,128'},0.15)`, borderRadius: 12, padding: '16px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
