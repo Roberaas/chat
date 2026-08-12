@@ -194,16 +194,39 @@ export default function KonusmalarPage() {
             </div>
 
             <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* Son mesaj */}
-              {selected.musteri_yazdigi && (
-                <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                    <MessageSquare size={12} color="#5A5550" strokeWidth={1.5} />
-                    <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Son Mesaj</span>
+              {/* Konuşma Geçmişi */}
+              {(() => {
+                let gecmis: {role:string;content:string}[] = []
+                try { gecmis = JSON.parse((selected as any).gecmis || '[]') } catch {}
+                if (!gecmis.length) return null
+                return (
+                  <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                      <MessageSquare size={12} color="#5A5550" strokeWidth={1.5} />
+                      <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Konuşma Geçmişi</span>
+                      <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: 'rgba(201,168,76,0.08)', color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>{gecmis.length}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 400, overflowY: 'auto' }}>
+                      {gecmis.map((m, i) => {
+                        const isBot = m.role === 'assistant'
+                        return (
+                          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: isBot ? 'flex-start' : 'flex-end', gap: 2 }}>
+                            <span style={{ fontSize: 9, color: '#5A5550', letterSpacing: '0.1em' }}>{isBot ? 'Roberto' : 'Müşteri'}</span>
+                            <div style={{
+                              maxWidth: '85%', padding: '8px 12px', borderRadius: isBot ? '4px 12px 12px 12px' : '12px 4px 12px 12px',
+                              background: isBot ? '#1A1712' : 'linear-gradient(135deg,#C9A84C,#8B6914)',
+                              border: isBot ? '1px solid rgba(201,168,76,0.1)' : 'none',
+                              color: isBot ? '#9A928A' : '#0E0C0A', fontSize: 12, lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word'
+                            }}>
+                              {m.content}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
-                  <p style={{ fontSize: 13, color: '#9A928A', fontStyle: 'italic' }}>"{selected.musteri_yazdigi}"</p>
-                </div>
-              )}
+                )
+              })()}
 
               {/* Detaylar */}
               <div style={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 10, overflow: 'hidden' }}>
