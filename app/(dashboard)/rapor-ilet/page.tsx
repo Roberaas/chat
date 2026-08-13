@@ -8,8 +8,10 @@ export default function RaporIletPage() {
   const [form, setForm] = useState({
     trendyol_adet: '',
     trendyol_tutar: '',
-    site_adet: '',
-    site_tutar: '',
+    site_rb_adet: '',
+    site_rb_tutar: '',
+    site_935_adet: '',
+    site_935_tutar: '',
     durum: '',
     mail_to: 'mert@robertobravo.com',
   })
@@ -17,8 +19,8 @@ export default function RaporIletPage() {
   const [result, setResult] = useState<'ok' | 'err' | null>(null)
   const [preview, setPreview] = useState(false)
 
-  const total_adet = (parseInt(form.trendyol_adet) || 0) + (parseInt(form.site_adet) || 0)
-  const total_tutar = (parseFloat(form.trendyol_tutar) || 0) + (parseFloat(form.site_tutar) || 0)
+  const total_adet = (parseInt(form.trendyol_adet) || 0) + (parseInt(form.site_rb_adet) || 0) + (parseInt(form.site_935_adet) || 0)
+  const total_tutar = (parseFloat(form.trendyol_tutar) || 0) + (parseFloat(form.site_rb_tutar) || 0) + (parseFloat(form.site_935_tutar) || 0)
   const fmt = (n: number) => n.toLocaleString('tr-TR')
 
   async function send() {
@@ -68,20 +70,32 @@ export default function RaporIletPage() {
           </div>
         </div>
 
-        {/* Site */}
+        {/* Site RB */}
         <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <Globe size={14} color="#9A928A" strokeWidth={1.5} />
             <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#9A928A' }}>robertobravo.com</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {inp('Satış Adedi', 'site_adet', '0', '#')}
-            {inp('Ciro', 'site_tutar', '0.00', '₺')}
+            {inp('Satış Adedi', 'site_rb_adet', '0', '#')}
+            {inp('Ciro', 'site_rb_tutar', '0.00', '₺')}
+          </div>
+        </div>
+
+        {/* Site 935 */}
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Globe size={14} color="#7A8A9A" strokeWidth={1.5} />
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A8A9A' }}>935byrobertobravo.com</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {inp('Satış Adedi', 'site_935_adet', '0', '#')}
+            {inp('Ciro', 'site_935_tutar', '0.00', '₺')}
           </div>
         </div>
 
         {/* Toplam */}
-        {(form.trendyol_adet || form.site_adet || form.trendyol_tutar || form.site_tutar) ? (
+        {(form.trendyol_adet || form.site_rb_adet || form.site_935_adet || form.trendyol_tutar || form.site_rb_tutar || form.site_935_tutar) ? (
           <div style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 12, padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 10, color: '#7A7468', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Toplam</span>
             <div style={{ display: 'flex', gap: 24 }}>

@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
 export async function POST(req: Request) {
-  const { trendyol_adet, trendyol_tutar, site_adet, site_tutar, durum, mail_to, tarih, tarih_iso } = await req.json()
+  const { trendyol_adet, trendyol_tutar, site_rb_adet, site_rb_tutar, site_935_adet, site_935_tutar, durum, mail_to, tarih } = await req.json()
 
-  const total_adet = (parseInt(trendyol_adet) || 0) + (parseInt(site_adet) || 0)
-  const total_tutar = (parseFloat(trendyol_tutar) || 0) + (parseFloat(site_tutar) || 0)
+  const total_adet = (parseInt(trendyol_adet) || 0) + (parseInt(site_rb_adet) || 0) + (parseInt(site_935_adet) || 0)
+  const total_tutar = (parseFloat(trendyol_tutar) || 0) + (parseFloat(site_rb_tutar) || 0) + (parseFloat(site_935_tutar) || 0)
 
   const fmt = (n: number) => n.toLocaleString('tr-TR')
 
