@@ -48,10 +48,20 @@ export default function RaporIletPage() {
   )
 
   return (
-    <div style={{ display: 'flex', gap: 32, padding: '40px 32px', maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '24px 16px', maxWidth: 1400, margin: '0 auto' }}
+      className="rapor-layout">
+      <style>{`
+        @media (min-width: 900px) {
+          .rapor-layout { flex-direction: row !important; padding: 40px 32px !important; gap: 32px !important; }
+        }
+        @media (max-width: 899px) {
+          .rapor-preview { width: 100% !important; }
+          .rapor-form { flex: none !important; width: 100% !important; }
+        }
+      `}</style>
 
       {/* SOL: Form */}
-      <div style={{ flex: '0 0 480px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div className="rapor-form" style={{ flex: '0 0 480px', display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div style={{ marginBottom: 20 }}>
           <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 10 }}>Günlük Rapor</p>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 300, color: '#EDE8DF', lineHeight: 1.1, marginBottom: 6 }}>Rapor İlet</h1>
@@ -141,7 +151,7 @@ export default function RaporIletPage() {
 
       {/* SAĞ: Önizleme */}
       {preview && (
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="rapor-preview" style={{ flex: 1, minWidth: 0 }}>
           <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Eye size={12} color="#5A5550" />
             <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Mail Önizleme</span>
