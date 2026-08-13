@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { LayoutDashboard, MessagesSquare, Headphones, BarChart3, LogOut, X, Users, CheckSquare, CalendarDays, UserCog } from 'lucide-react'
+import { LayoutDashboard, MessagesSquare, Headphones, BarChart3, LogOut, X, Users, CheckSquare, CalendarDays, UserCog, FileText } from 'lucide-react'
 
 export default function Sidebar({ onClose }: { onClose?: () => void; dark?: boolean }) {
   const pathname = usePathname()
