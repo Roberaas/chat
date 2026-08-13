@@ -149,6 +149,157 @@ export default function RaporIletPage() {
         {result === 'err' && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: 'rgba(168,76,76,0.08)', border: '1px solid rgba(168,76,76,0.2)', borderRadius: 8, color: '#C98A8A', fontSize: 13 }}><AlertCircle size={14} /> Gönderilemedi. Tekrar deneyin.</div>}
       </div>
 
+      t'
+
+import { useState } from 'react'
+import { Send, TrendingUp, Globe, FileText, CheckCircle, AlertCircle, Eye } from 'lucide-react'
+
+export default function RaporIletPage() {
+  const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const [form, setForm] = useState({
+    trendyol_adet: '',
+    trendyol_tutar: '',
+    site_rb_adet: '',
+    site_rb_tutar: '',
+    site_935_adet: '',
+    site_935_tutar: '',
+    durum: '',
+    mail_to: 'mert@robertobravo.com',
+  })
+  const [sending, setSending] = useState(false)
+  const [result, setResult] = useState<'ok' | 'err' | null>(null)
+  const [preview, setPreview] = useState(false)
+
+  const total_adet = (parseInt(form.trendyol_adet) || 0) + (parseInt(form.site_rb_adet) || 0) + (parseInt(form.site_935_adet) || 0)
+  const total_tutar = (parseFloat(form.trendyol_tutar) || 0) + (parseFloat(form.site_rb_tutar) || 0) + (parseFloat(form.site_935_tutar) || 0)
+  const fmt = (n: number) => n.toLocaleString('tr-TR')
+
+  async function send() {
+    setSending(true); setResult(null)
+    try {
+      const res = await fetch('/api/rapor-ilet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, tarih: today })
+      })
+      setResult((await res.json()).ok ? 'ok' : 'err')
+    } catch { setResult('err') }
+    setSending(false)
+  }
+
+  const inp = (label: string, key: keyof typeof form, placeholder: string, prefix?: string) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>{label}</label>
+      <div style={{ display: 'flex', alignItems: 'center', background: '#1A1712', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 8, overflow: 'hidden' }}>
+        {prefix && <span style={{ padding: '0 12px', fontSize: 13, color: '#5A5550', borderRight: '1px solid rgba(201,168,76,0.08)' }}>{prefix}</span>}
+        <input type={prefix === '₺' ? 'number' : 'text'} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder}
+          style={{ flex: 1, background: 'none', border: 'none', outline: 'none', padding: '12px 14px', fontSize: 13, color: '#EDE8DF', fontFamily: 'inherit' }} />
+      </div>
+    </div>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '24px 16px', maxWidth: 1400, margin: '0 auto' }}
+      className="rapor-layout">
+      <style>{`
+        @media (min-width: 900px) {
+          .rapor-layout { flex-direction: row !important; padding: 40px 32px !important; gap: 32px !important; }
+        }
+        @media (max-width: 899px) {
+          .rapor-preview { width: 100% !important; }
+          .rapor-form { flex: none !important; width: 100% !important; }
+        }
+      `}</style>
+
+      {/* SOL: Form */}
+      <div className="rapor-form" style={{ flex: '0 0 480px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 10 }}>Günlük Rapor</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 300, color: '#EDE8DF', lineHeight: 1.1, marginBottom: 6 }}>Rapor İlet</h1>
+          <p style={{ fontSize: 13, color: '#5A5550' }}>{today}</p>
+        </div>
+
+        {/* Trendyol */}
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <TrendingUp size={14} color="#C9A84C" strokeWidth={1.5} />
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C' }}>Trendyol</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {inp('Satış Adedi', 'trendyol_adet', '0', '#')}
+            {inp('Ciro', 'trendyol_tutar', '0.00', '₺')}
+          </div>
+        </div>
+
+        {/* Site RB */}
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Globe size={14} color="#9A928A" strokeWidth={1.5} />
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#9A928A' }}>robertobravo.com</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {inp('Satış Adedi', 'site_rb_adet', '0', '#')}
+            {inp('Ciro', 'site_rb_tutar', '0.00', '₺')}
+          </div>
+        </div>
+
+        {/* Site 935 */}
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Globe size={14} color="#7A8A9A" strokeWidth={1.5} />
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A8A9A' }}>935byrobertobravo.com</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {inp('Satış Adedi', 'site_935_adet', '0', '#')}
+            {inp('Ciro', 'site_935_tutar', '0.00', '₺')}
+          </div>
+        </div>
+
+        {/* Toplam */}
+        {(form.trendyol_adet || form.site_rb_adet || form.site_935_adet || form.trendyol_tutar || form.site_rb_tutar || form.site_935_tutar) ? (
+          <div style={{ background: 'rgba(201,168,76,0.04)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 12, padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 10, color: '#7A7468', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Toplam</span>
+            <div style={{ display: 'flex', gap: 24 }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#C9A84C', fontWeight: 300 }}>{total_adet}</div>
+                <div style={{ fontSize: 9, color: '#5A5550', textTransform: 'uppercase', letterSpacing: '0.1em' }}>adet</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#C9A84C', fontWeight: 300 }}>{fmt(total_tutar)} ₺</div>
+                <div style={{ fontSize: 9, color: '#5A5550', textTransform: 'uppercase', letterSpacing: '0.1em' }}>ciro</div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Durum */}
+        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <FileText size={14} color="#7A7468" strokeWidth={1.5} />
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A7468' }}>Durum Notu</span>
+          </div>
+          <textarea value={form.durum} onChange={e => setForm(f => ({ ...f, durum: e.target.value }))} placeholder="Günün özeti, dikkat çeken noktalar..." rows={3}
+            style={{ width: '100%', background: 'rgba(201,168,76,0.03)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#EDE8DF', fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box', lineHeight: 1.6 }} />
+        </div>
+
+        {/* Mail */}
+        {inp('Alıcı E-posta', 'mail_to', 'mail@domain.com')}
+
+        {/* Butonlar */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={() => setPreview(p => !p)} style={{ flex: '0 0 auto', padding: '14px 18px', background: '#1A1712', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 10, color: '#C9A84C', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Eye size={14} /> {preview ? 'Gizle' : 'Önizle'}
+          </button>
+          <button onClick={send} disabled={sending} style={{ flex: 1, padding: '14px 24px', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', border: 'none', borderRadius: 10, color: '#0E0C0A', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: sending ? 0.7 : 1 }}>
+            {sending ? <div style={{ width: 14, height: 14, border: '2px solid rgba(0,0,0,0.3)', borderTopColor: '#0E0C0A', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} /> : <Send size={13} />}
+            {sending ? 'Gönderiliyor...' : 'Raporu Gönder'}
+          </button>
+        </div>
+
+        {result === 'ok' && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: 'rgba(76,168,100,0.08)', border: '1px solid rgba(76,168,100,0.2)', borderRadius: 8, color: '#7AC98A', fontSize: 13 }}><CheckCircle size={14} /> Rapor başarıyla gönderildi.</div>}
+        {result === 'err' && <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: 'rgba(168,76,76,0.08)', border: '1px solid rgba(168,76,76,0.2)', borderRadius: 8, color: '#C98A8A', fontSize: 13 }}><AlertCircle size={14} /> Gönderilemedi. Tekrar deneyin.</div>}
+      </div>
+
       {/* SAĞ: Önizleme */}
       {preview && (
         <div className="rapor-preview" style={{ flex: 1, minWidth: 0 }}>
