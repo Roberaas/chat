@@ -185,12 +185,20 @@ export default function RaporIletPage() {
                   <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.trendyol_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
                 </div>
               </div>
-              {/* Site */}
+              {/* Site RB */}
               <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
                 <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#9A928A' }}>robertobravo.com</p>
                 <div style={{ display: 'flex', gap: 32 }}>
                   <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{form.site_rb_adet || '—'} <span style={{ fontSize: 11, color: '#7A7468' }}>adet</span></p></div>
                   <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.site_rb_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
+                </div>
+              </div>
+              {/* Site 935 */}
+              <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
+                <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A8A9A' }}>935byrobertobravo.com</p>
+                <div style={{ display: 'flex', gap: 32 }}>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{form.site_935_adet || '—'} <span style={{ fontSize: 11, color: '#7A7468' }}>adet</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.site_935_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
                 </div>
               </div>
               {/* Durum */}
