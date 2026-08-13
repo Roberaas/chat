@@ -80,6 +80,23 @@ export async function POST(req: Request) {
         </table>
       </td></tr>
 
+      <!-- Site 935 -->
+      <tr><td style="padding:28px 48px;background:#120F0C;border-bottom:1px solid rgba(201,168,76,0.06);">
+        <p style="margin:0 0 16px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A8A9A;">935byrobertobravo.com</p>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="50%">
+              <p style="margin:0;font-size:11px;color:#5A5550;">Satış Adedi</p>
+              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${site_935_adet || '0'} <span style="font-size:13px;color:#7A7468;">adet</span></p>
+            </td>
+            <td width="50%">
+              <p style="margin:0;font-size:11px;color:#5A5550;">Ciro</p>
+              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${fmt(parseFloat(site_935_tutar) || 0)} <span style="font-size:13px;color:#7A7468;">TL</span></p>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
       ${durum ? `<!-- Durum -->
       <tr><td style="padding:28px 48px;background:#120F0C;border-bottom:1px solid rgba(201,168,76,0.06);">
         <p style="margin:0 0 12px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7468;">Durum Notu</p>
