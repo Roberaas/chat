@@ -154,73 +154,73 @@ export default function RaporIletPage() {
         <div className="rapor-preview" style={{ flex: 1, minWidth: 0 }}>
           <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
             <Eye size={12} color="#5A5550" />
-            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>Mail Önizleme</span>
+            <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A7570' }}>Mail Önizleme</span>
           </div>
-          <div style={{ background: '#0A0805', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(201,168,76,0.1)' }}>
+          <div style={{ background: '#F8F5F0', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(139,105,20,0.15)' }}>
             {/* Tarayıcı bar simülasyonu */}
-            <div style={{ background: '#1A1712', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
+            <div style={{ background: '#EDE8E0', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid rgba(139,105,20,0.12)' }}>
               <div style={{ display: 'flex', gap: 5 }}>
                 {['#C4364A','#C9A84C','#7AC98A'].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c, opacity: 0.6 }} />)}
               </div>
-              <div style={{ flex: 1, background: '#211E18', borderRadius: 4, padding: '4px 10px', fontSize: 10, color: '#5A5550' }}>
+              <div style={{ flex: 1, background: '#E4DFD8', borderRadius: 4, padding: '4px 10px', fontSize: 10, color: '#7A7570' }}>
                 Roberto Bravo — Günlük Rapor · {today}
               </div>
             </div>
             {/* Mail içeriği */}
             <div style={{ padding: 0, fontFamily: 'Georgia, serif' }}>
               {/* Header */}
-              <div style={{ padding: '40px 40px 28px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.15)' }}>
-                <p style={{ margin: '0 0 6px', fontSize: 9, letterSpacing: '4px', textTransform: 'uppercase', color: '#5A5550' }}>Roberto Bravo</p>
-                <h1 style={{ margin: '0 0 4px', fontSize: 30, fontWeight: 300, color: '#EDE8DF' }}>Günlük Rapor</h1>
-                <p style={{ margin: 0, fontSize: 12, color: '#7A7468' }}>{today}</p>
+              <div style={{ padding: '40px 40px 28px', background: '#FFFFFF', borderBottom: '1px solid rgba(139,105,20,0.2)' }}>
+                <p style={{ margin: '0 0 6px', fontSize: 9, letterSpacing: '4px', textTransform: 'uppercase', color: '#7A7570' }}>Roberto Bravo</p>
+                <h1 style={{ margin: '0 0 4px', fontSize: 30, fontWeight: 300, color: '#1A1410' }}>Günlük Rapor</h1>
+                <p style={{ margin: 0, fontSize: 12, color: '#6A6460' }}>{today}</p>
               </div>
               {/* Toplam */}
-              <div style={{ padding: '28px 40px', background: 'linear-gradient(135deg,#1A1610,#120F0C)', borderBottom: '1px solid rgba(201,168,76,0.1)', display: 'flex', gap: 32 }}>
+              <div style={{ padding: '28px 40px', background: '#F4EFE8', borderBottom: '1px solid rgba(139,105,20,0.15)', display: 'flex', gap: 32 }}>
                 <div>
-                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#5A5550' }}>Toplam Satış</p>
+                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Toplam Satış</p>
                   <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#C9A84C', lineHeight: 1 }}>{total_adet}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#5A5550' }}>adet</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>adet</p>
                 </div>
-                <div style={{ borderLeft: '1px solid rgba(201,168,76,0.1)', paddingLeft: 32 }}>
-                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#5A5550' }}>Toplam Ciro</p>
+                <div style={{ borderLeft: '1px solid rgba(139,105,20,0.15)', paddingLeft: 32 }}>
+                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Toplam Ciro</p>
                   <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#C9A84C', lineHeight: 1 }}>{fmt(total_tutar)}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#5A5550' }}>TL</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>TL</p>
                 </div>
               </div>
               {/* Trendyol */}
-              <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
+              <div style={{ padding: '24px 40px', background: '#FFFFFF', borderBottom: '1px solid rgba(139,105,20,0.1)' }}>
                 <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#C9A84C' }}>Trendyol</p>
                 <div style={{ display: 'flex', gap: 32 }}>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{form.trendyol_adet || '—'} <span style={{ fontSize: 11, color: '#7A7468' }}>adet</span></p></div>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.trendyol_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{form.trendyol_adet || '—'} <span style={{ fontSize: 11, color: '#6A6460' }}>adet</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{fmt(parseFloat(form.trendyol_tutar) || 0)} <span style={{ fontSize: 11, color: '#6A6460' }}>TL</span></p></div>
                 </div>
               </div>
               {/* Site RB */}
-              <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
-                <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#9A928A' }}>robertobravo.com</p>
+              <div style={{ padding: '24px 40px', background: '#FFFFFF', borderBottom: '1px solid rgba(139,105,20,0.1)' }}>
+                <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#4A4540' }}>robertobravo.com</p>
                 <div style={{ display: 'flex', gap: 32 }}>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{form.site_rb_adet || '—'} <span style={{ fontSize: 11, color: '#7A7468' }}>adet</span></p></div>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.site_rb_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{form.site_rb_adet || '—'} <span style={{ fontSize: 11, color: '#6A6460' }}>adet</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{fmt(parseFloat(form.site_rb_tutar) || 0)} <span style={{ fontSize: 11, color: '#6A6460' }}>TL</span></p></div>
                 </div>
               </div>
               {/* Site 935 */}
-              <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
+              <div style={{ padding: '24px 40px', background: '#FFFFFF', borderBottom: '1px solid rgba(139,105,20,0.1)' }}>
                 <p style={{ margin: '0 0 12px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A8A9A' }}>935byrobertobravo.com</p>
                 <div style={{ display: 'flex', gap: 32 }}>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{form.site_935_adet || '—'} <span style={{ fontSize: 11, color: '#7A7468' }}>adet</span></p></div>
-                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#5A5550' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#EDE8DF' }}>{fmt(parseFloat(form.site_935_tutar) || 0)} <span style={{ fontSize: 11, color: '#7A7468' }}>TL</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Satış Adedi</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{form.site_935_adet || '—'} <span style={{ fontSize: 11, color: '#6A6460' }}>adet</span></p></div>
+                  <div><p style={{ margin: '0 0 2px', fontSize: 10, color: '#7A7570' }}>Ciro</p><p style={{ margin: 0, fontSize: 20, fontWeight: 300, color: '#1A1410' }}>{fmt(parseFloat(form.site_935_tutar) || 0)} <span style={{ fontSize: 11, color: '#6A6460' }}>TL</span></p></div>
                 </div>
               </div>
               {/* Durum */}
               {form.durum && (
-                <div style={{ padding: '24px 40px', background: '#120F0C', borderBottom: '1px solid rgba(201,168,76,0.06)' }}>
-                  <p style={{ margin: '0 0 10px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7468' }}>Durum Notu</p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#9A928A', lineHeight: 1.7 }}>{form.durum}</p>
+                <div style={{ padding: '24px 40px', background: '#FFFFFF', borderBottom: '1px solid rgba(139,105,20,0.1)' }}>
+                  <p style={{ margin: '0 0 10px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#6A6460' }}>Durum Notu</p>
+                  <p style={{ margin: 0, fontSize: 12, color: '#4A4540', lineHeight: 1.7 }}>{form.durum}</p>
                 </div>
               )}
               {/* Footer */}
-              <div style={{ padding: '20px 40px', background: '#0E0C0A' }}>
-                <p style={{ margin: 0, fontSize: 9, color: '#3A3530', letterSpacing: '2px', textTransform: 'uppercase' }}>Roberto Bravo — {today}</p>
+              <div style={{ padding: '20px 40px', background: '#1A1410' }}>
+                <p style={{ margin: 0, fontSize: 9, color: '#9A9590', letterSpacing: '2px', textTransform: 'uppercase' }}>Roberto Bravo — {today}</p>
               </div>
             </div>
           </div>
