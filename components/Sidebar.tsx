@@ -45,7 +45,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
     { href: '/calisma', label: 'Çalışma', icon: CheckSquare },
     { href: '/takvim', label: 'Takvim', icon: CalendarDays },
     { href: '/kullanicilar', label: 'Kullanıcılar', icon: UserCog },
-    { href: '/rapor-ilet', label: 'Rapor İlet' },
+    { href: '/rapor-ilet', label: 'Rapor İlet', icon: FileText },
     { href: '/raporlar', label: 'Raporlar', icon: BarChart3 },
   ]
 
