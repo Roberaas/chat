@@ -70,11 +70,11 @@ export async function POST(req: Request) {
           <tr>
             <td width="50%">
               <p style="margin:0;font-size:11px;color:#5A5550;">Satış Adedi</p>
-              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${site_adet || '0'} <span style="font-size:13px;color:#7A7468;">adet</span></p>
+              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${site_rb_adet || '0'} <span style="font-size:13px;color:#7A7468;">adet</span></p>
             </td>
             <td width="50%">
               <p style="margin:0;font-size:11px;color:#5A5550;">Ciro</p>
-              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${fmt(parseFloat(site_tutar) || 0)} <span style="font-size:13px;color:#7A7468;">TL</span></p>
+              <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#EDE8DF;">${fmt(parseFloat(site_rb_tutar) || 0)} <span style="font-size:13px;color:#7A7468;">TL</span></p>
             </td>
           </tr>
         </table>
