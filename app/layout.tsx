@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
+  manifest: '/manifest.json',
   title: 'Roberto · Admin',
   description: 'Roberto Bravo WhatsApp Bot Admin Paneli',
 }
