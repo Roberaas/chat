@@ -2,12 +2,16 @@ import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
 export async function POST(req: Request) {
-  const { trendyol_adet, trendyol_tutar, site_rb_adet, site_rb_tutar, site_935_adet, site_935_tutar, durum, mail_to, tarih } = await req.json()
+  const {
+    trendyol_adet, trendyol_tutar, site_rb_adet, site_rb_tutar, site_935_adet, site_935_tutar,
+    durum, mail_to, tarih, ay_label,
+    ay_trendyol_adet, ay_trendyol_tutar, ay_rb_adet, ay_rb_tutar, ay_935_adet, ay_935_tutar,
+    ay_toplam_adet, ay_toplam_tutar
+  } = await req.json()
 
   const total_adet = (parseInt(trendyol_adet) || 0) + (parseInt(site_rb_adet) || 0) + (parseInt(site_935_adet) || 0)
   const total_tutar = (parseFloat(trendyol_tutar) || 0) + (parseFloat(site_rb_tutar) || 0) + (parseFloat(site_935_tutar) || 0)
-
-  const fmt = (n: number) => n.toLocaleString('tr-TR')
+  const fmt = (n: number) => Number(n).toLocaleString('tr-TR')
 
   const html = `<!DOCTYPE html>
 <html lang="tr">
@@ -28,18 +32,38 @@ export async function POST(req: Request) {
         <p style="margin:0;font-size:13px;color:#6A6460;">${tarih}</p>
       </td></tr>
 
-      <!-- Toplam -->
+      <!-- Aylık Kümülatif -->
       <tr><td style="padding:32px 48px;background:linear-gradient(135deg,#1A1610,#120F0C);border-bottom:1px solid rgba(201,168,76,0.1);">
+        <p style="margin:0 0 18px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#C9A84C;">${ay_label || ''} — Aylık Toplam (Bugün Dahil)</p>
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="50%" style="padding-right:16px;">
               <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Toplam Satış</p>
-              <p style="margin:0;font-size:48px;font-weight:300;color:#8B6914;line-height:1;">${total_adet}</p>
+              <p style="margin:0;font-size:48px;font-weight:300;color:#C9A84C;line-height:1;">${ay_toplam_adet || total_adet}</p>
               <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">adet</p>
             </td>
             <td width="50%" style="padding-left:16px;border-left:1px solid rgba(201,168,76,0.1);">
               <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Toplam Ciro</p>
-              <p style="margin:0;font-size:48px;font-weight:300;color:#8B6914;line-height:1;">${fmt(total_tutar)}</p>
+              <p style="margin:0;font-size:48px;font-weight:300;color:#C9A84C;line-height:1;">${fmt(ay_toplam_tutar || total_tutar)}</p>
+              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL</p>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
+
+      <!-- Bugün -->
+      <tr><td style="padding:28px 48px;background:#F4EFE8;border-bottom:1px solid rgba(139,105,20,0.15);">
+        <p style="margin:0 0 14px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#8B6914;">Bugün</p>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="50%">
+              <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Satış</p>
+              <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${total_adet}</p>
+              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">adet</p>
+            </td>
+            <td width="50%" style="padding-left:16px;border-left:1px solid rgba(139,105,20,0.15);">
+              <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Ciro</p>
+              <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${fmt(total_tutar)}</p>
               <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL</p>
             </td>
           </tr>
@@ -52,31 +76,37 @@ export async function POST(req: Request) {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Satış Adedi</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Satış</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${trendyol_adet || '0'} <span style="font-size:13px;color:#6A6460;">adet</span></p>
             </td>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Ciro</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Ciro</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${fmt(parseFloat(trendyol_tutar) || 0)} <span style="font-size:13px;color:#6A6460;">TL</span></p>
             </td>
           </tr>
+          <tr><td colspan="2" style="padding-top:10px;">
+            <p style="margin:0;font-size:10px;color:#9A9590;">Aylık: ${ay_trendyol_adet || 0} adet / ${fmt(ay_trendyol_tutar || 0)} TL</p>
+          </td></tr>
         </table>
       </td></tr>
 
-      <!-- Site -->
+      <!-- Site RB -->
       <tr><td style="padding:28px 48px;background:#FFFFFF;border-bottom:1px solid rgba(201,168,76,0.06);">
         <p style="margin:0 0 16px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#4A4540;">robertobravo.com</p>
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Satış Adedi</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Satış</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${site_rb_adet || '0'} <span style="font-size:13px;color:#6A6460;">adet</span></p>
             </td>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Ciro</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Ciro</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${fmt(parseFloat(site_rb_tutar) || 0)} <span style="font-size:13px;color:#6A6460;">TL</span></p>
             </td>
           </tr>
+          <tr><td colspan="2" style="padding-top:10px;">
+            <p style="margin:0;font-size:10px;color:#9A9590;">Aylık: ${ay_rb_adet || 0} adet / ${fmt(ay_rb_tutar || 0)} TL</p>
+          </td></tr>
         </table>
       </td></tr>
 
@@ -86,14 +116,17 @@ export async function POST(req: Request) {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Satış Adedi</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Satış</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${site_935_adet || '0'} <span style="font-size:13px;color:#6A6460;">adet</span></p>
             </td>
             <td width="50%">
-              <p style="margin:0;font-size:11px;color:#7A7570;">Ciro</p>
+              <p style="margin:0;font-size:11px;color:#7A7570;">Bugün Ciro</p>
               <p style="margin:4px 0 0;font-size:24px;font-weight:300;color:#1A1410;">${fmt(parseFloat(site_935_tutar) || 0)} <span style="font-size:13px;color:#6A6460;">TL</span></p>
             </td>
           </tr>
+          <tr><td colspan="2" style="padding-top:10px;">
+            <p style="margin:0;font-size:10px;color:#9A9590;">Aylık: ${ay_935_adet || 0} adet / ${fmt(ay_935_tutar || 0)} TL</p>
+          </td></tr>
         </table>
       </td></tr>
 
