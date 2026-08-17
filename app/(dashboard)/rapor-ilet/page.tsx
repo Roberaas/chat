@@ -119,7 +119,7 @@ export default function RaporIletPage() {
       <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550' }}>{label}</label>
       <div style={{ display: 'flex', alignItems: 'center', background: '#1A1712', border: '1px solid rgba(201,168,76,0.12)', borderRadius: 8, overflow: 'hidden' }}>
         {prefix && <span style={{ padding: '0 12px', fontSize: 13, color: '#5A5550', borderRight: '1px solid rgba(201,168,76,0.08)' }}>{prefix}</span>}
-        <input type="number" value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder}
+        <input type={prefix ? "number" : "text"} value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={placeholder}
           style={{ flex: 1, background: 'none', border: 'none', outline: 'none', padding: '12px 14px', fontSize: 13, color: '#EDE8DF', fontFamily: 'inherit' }} />
       </div>
     </div>
