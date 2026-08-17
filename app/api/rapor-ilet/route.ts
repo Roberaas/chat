@@ -45,7 +45,7 @@ export async function POST(req: Request) {
             <td width="50%" style="padding-left:16px;border-left:1px solid rgba(201,168,76,0.1);">
               <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Toplam Ciro</p>
               <p style="margin:0;font-size:48px;font-weight:300;color:#C9A84C;line-height:1;">${fmt(ay_toplam_tutar || total_tutar)}</p>
-              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL</p>
+              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL (KDV Dahil)</p>
             </td>
           </tr>
         </table>
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
             <td width="50%" style="padding-left:16px;border-left:1px solid rgba(139,105,20,0.15);">
               <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#7A7570;">Ciro</p>
               <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${fmt(total_tutar)}</p>
-              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL</p>
+              <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL (KDV Dahil)</p>
             </td>
           </tr>
         </table>
