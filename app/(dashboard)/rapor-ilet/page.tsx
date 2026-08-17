@@ -294,6 +294,7 @@ export default function RaporIletPage() {
                   <div>
                     <p style={{ margin: '0 0 2px', fontSize: 9, color: '#7A7570' }}>Toplam Ciro</p>
                     <p style={{ margin: 0, fontSize: 36, fontWeight: 300, color: '#C9A84C', lineHeight: 1 }}>{fmt(ayKumulatifTutar)} <span style={{ fontSize: 12, color: '#7A7570' }}>₺</span></p>
+                    <p style={{ margin: '4px 0 0', fontSize: 9, color: '#9A9590', letterSpacing: '0.1em' }}>KDV DAHİL</p>
                   </div>
                 </div>
               </div>
@@ -307,7 +308,7 @@ export default function RaporIletPage() {
                 <div style={{ borderLeft: '1px solid rgba(139,105,20,0.15)', paddingLeft: 32 }}>
                   <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Bugün Ciro</p>
                   <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#1A1410', lineHeight: 1 }}>{fmt(total_tutar)}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>TL</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>TL (KDV Dahil)</p>
                 </div>
               </div>
               {/* Trendyol */}
