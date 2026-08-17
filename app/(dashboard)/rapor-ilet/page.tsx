@@ -165,6 +165,7 @@ export default function RaporIletPage() {
               <div>
                 <p style={{ margin: '0 0 2px', fontSize: 9, color: '#7A7468', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Toplam Ciro</p>
                 <p style={{ margin: 0, fontFamily: 'Cormorant Garamond, serif', fontSize: 30, fontWeight: 300, color: '#C9A84C' }}>{fmt(ayKumulatifTutar)} <span style={{ fontSize: 12, color: '#7A7468' }}>₺</span></p>
+                <p style={{ margin: '2px 0 0', fontSize: 9, color: '#5A5550', letterSpacing: '0.1em' }}>KDV DAHİL</p>
               </div>
             </div>
           )}
@@ -217,7 +218,7 @@ export default function RaporIletPage() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, color: '#C9A84C', fontWeight: 300 }}>{fmt(total_tutar)} ₺</div>
-                <div style={{ fontSize: 9, color: '#5A5550', textTransform: 'uppercase', letterSpacing: '0.1em' }}>ciro</div>
+                <div style={{ fontSize: 9, color: '#5A5550', textTransform: 'uppercase', letterSpacing: '0.1em' }}>ciro (KDV Dahil)</div>
               </div>
             </div>
           </div>
