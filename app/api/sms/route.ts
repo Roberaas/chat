@@ -7,7 +7,7 @@ const NETGSM_MSGHEADER = 'RobertoBravo'
 export async function POST(req: Request) {
   const { mesaj, tel } = await req.json()
   // tel yoksa Mert'in numarasına gönder (operasyonel bildirim)
-  const gsm = tel || '905XXXXXXXXX' // Mert'in numarası girilmeli
+  const gsm = tel || process.env.MERT_GSM || '905392993103'
 
   const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${NETGSM_USERCODE}&password=${NETGSM_PASSWORD}&gsmno=${gsm}&message=${encodeURIComponent(mesaj)}&msgheader=${NETGSM_MSGHEADER}`
 
