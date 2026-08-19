@@ -46,7 +46,24 @@ export default function CanliDestekPage() {
   async function requestNotif() {
     if (!('Notification' in window)) return
     const perm = await Notification.requestPermission()
-    setNotifOn(perm === 'granted')
+    if (perm !== 'granted') return
+    setNotifOn(true)
+    try {
+      if (!('serviceWorker' in navigator)) return
+      const reg = await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+      const existing = await reg.pushManager.getSubscription()
+      if (existing) return
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: 'BK_8RwwHc67ARkhbheF3XoFgTrB4dpJU_9shn1h-awpesvM-fMJgUaXzR1SmHieqxFhLHnLOX1i3fs6-4XhcPRo'
+      })
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub })
+      })
+    } catch (e) { console.error('Push subscribe hatası:', e) }
   }
 
   useEffect(() => {
