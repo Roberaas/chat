@@ -90,6 +90,14 @@ export default function CanliDestekPage() {
   const load = useCallback(async () => {
     const { data } = await supabase.from('wa_sessions_roberto').select('*').not('slack_thread_ts','is',null).neq('slack_thread_ts','').order('updated_at', { ascending: false })
     const list = (data || []) as Session[]
+
+    // human_handover: bildirim gönderilmemiş olanlar
+    const handoverList = list.filter((s: any) => s.last_intent === 'human_handover' && !s.bildirim_gonderildi)
+    for (const s of handoverList) {
+      notify('🔔 Canlı Destek Talebi', `${(s as any).musteri_adi || s.phone} canlı destek istiyor`)
+      await supabase.from('wa_sessions_roberto').update({ bildirim_gonderildi: true }).eq('phone', s.phone)
+    }
+
     const newPhones = list.map(s => s.phone)
     if (newPhones.some(p => !prevSessionsRef.current.includes(p)) && prevSessionsRef.current.length > 0) notify('🔔 Yeni Talep','Yeni bir müşteri canlı desteğe bağlandı')
     prevSessionsRef.current = newPhones
