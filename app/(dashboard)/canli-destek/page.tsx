@@ -80,11 +80,7 @@ export default function CanliDestekPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, body, url: '/dashboard/canli-destek', tag: `canli-destek-${Date.now()}` })
     }).catch(() => {})
-    fetch('/api/sms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mesaj: `${title}: ${body} - chat.robertobravo.com` })
-    }).catch(() => {})
+
   }
 
   const load = useCallback(async () => {
