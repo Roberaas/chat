@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 const NETGSM_USERCODE = '8503027762'
 const NETGSM_PASSWORD = 'A1.95T3v'
-const NETGSM_MSGHEADER = 'RobertoBravo'
+const NETGSM_MSGHEADER = 'ROBERTOBRVO'
 
 export async function POST(req: Request) {
   const { mesaj, tel } = await req.json()
