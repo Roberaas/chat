@@ -84,10 +84,10 @@ export default function RaporIletPage() {
   const fmt = (n: number) => n.toLocaleString('tr-TR')
 
   // Aylık net — aylik = bugün HARİÇ önceki günler, forma bugün eklenir
-  const ay_brut_adet  = aylik.trendyol_adet  + aylik.site_rb_adet  + aylik.site_935_adet  + brut_adet
-  const ay_brut_tutar = aylik.trendyol_tutar + aylik.site_rb_tutar + aylik.site_935_tutar + brut_tutar
-  const ay_iade_adet  = (aylik.iade_trendyol_adet||0)  + (aylik.iade_rb_adet||0)  + (aylik.iade_935_adet||0)  + iade_adet
-  const ay_iade_tutar = (aylik.iade_trendyol_tutar||0) + (aylik.iade_rb_tutar||0) + (aylik.iade_935_tutar||0) + iade_tutar
+  const ay_brut_adet  = (parseInt(String(aylik.trendyol_adet))||0)  + (parseInt(String(aylik.site_rb_adet))||0)  + (parseInt(String(aylik.site_935_adet))||0)  + brut_adet
+  const ay_brut_tutar = (parseFloat(String(aylik.trendyol_tutar))||0) + (parseFloat(String(aylik.site_rb_tutar))||0) + (parseFloat(String(aylik.site_935_tutar))||0) + brut_tutar
+  const ay_iade_adet  = (parseInt(String(aylik.iade_trendyol_adet))||0)  + (parseInt(String(aylik.iade_rb_adet))||0)  + (parseInt(String(aylik.iade_935_adet))||0)  + iade_adet
+  const ay_iade_tutar = (parseFloat(String(aylik.iade_trendyol_tutar))||0) + (parseFloat(String(aylik.iade_rb_tutar))||0) + (parseFloat(String(aylik.iade_935_tutar))||0) + iade_tutar
   const ay_net_adet   = ay_brut_adet  - ay_iade_adet
   const ay_net_tutar  = ay_brut_tutar - ay_iade_tutar
 
