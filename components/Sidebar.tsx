@@ -50,20 +50,20 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
   ]
 
   return (
-    <aside style={{ background: '#120F0C', borderRight: '1px solid rgba(201,168,76,0.1)' }} className="w-60 h-full flex flex-col">
+    <aside style={{ background: 'var(--bg-sidebar)', borderRight: '1px solid rgba(201,168,76,0.1)' }} className="w-60 h-full flex flex-col">
       {/* Logo */}
       <div className="px-6 py-6" style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#EDE8DF' }}>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
               roberto<span style={{ color: '#C9A84C' }}>.</span>
             </div>
-            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: '#7A7468', marginTop: 2, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'var(--text-muted)', marginTop: 2, textTransform: 'uppercase' }}>
               admin panel
             </div>
           </div>
           {onClose && (
-            <button onClick={onClose} className="lg:hidden" style={{ color: '#7A7468' }}>
+            <button onClick={onClose} className="lg:hidden" style={{ color: 'var(--text-muted)' }}>
               <X size={16} />
             </button>
           )}
@@ -72,14 +72,14 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
 
       {/* User */}
       {mevcutKullanici && (
-        <div className="px-4 py-3 mx-3 mt-3 rounded-lg" style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.1)' }}>
+        <div className="px-4 py-3 mx-3 mt-3 rounded-lg" style={{ background: 'rgba(139,105,20,0.08)', border: '1px solid rgba(201,168,76,0.1)' }}>
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: '#0A0908' }}>
               {mevcutKullanici.ad.slice(0,1).toUpperCase()}
             </div>
             <div>
               <div style={{ fontSize: 12, fontWeight: 500, color: '#E8D5A3' }}>{mevcutKullanici.ad}</div>
-              <div style={{ fontSize: 10, color: '#7A7468', fontFamily: 'JetBrains Mono, monospace' }}>{mevcutKullanici.rol}</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{mevcutKullanici.rol}</div>
             </div>
           </div>
         </div>
@@ -102,11 +102,11 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
                     border: '1px solid rgba(201,168,76,0.18)',
                     color: '#E8D5A3',
                   } : {
-                    color: '#7A7468',
+                    color: 'var(--text-muted)',
                     border: '1px solid transparent',
                   }}
                   onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#C8C0B0' }}
-                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#7A7468' }}
+                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}
                 >
                   <Icon size={15} strokeWidth={1.75} />
                   <span style={{ fontSize: 13, fontWeight: active ? 500 : 400, flex: 1 }}>{item.label}</span>
@@ -114,7 +114,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={
                       (item as any).urgent
                         ? { background: '#8B2635', color: '#fff', animation: 'urgentPulse 1.5s ease-in-out infinite' }
-                        : { background: 'rgba(201,168,76,0.15)', color: '#C9A84C' }
+                        : { background: 'rgba(139,105,20,0.15)', color: '#C9A84C' }
                     }>
                       {(item as any).badge}
                     </span>

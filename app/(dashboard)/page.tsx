@@ -23,7 +23,7 @@ function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d:
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
         <span style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-          {satis != null ? `satış ${fmtTL(satis)}` : ''}
+          {satis != null && !small ? `satış ${fmtTL(satis)}` : ''}
         </span>
         {degisim != null && !isNaN(degisim) && (
           <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? 'var(--gold)' : '#C4364A' }}>
@@ -182,11 +182,11 @@ export default function DashboardPage() {
   if (loading) return (
     <div style={{ padding: '40px 32px', maxWidth: 1280, margin: '0 auto' }}>
       <div style={{ marginBottom: 32 }}>
-        <div style={{ height: 12, width: 160, background: '#211E18', borderRadius: 6, marginBottom: 12 }} />
-        <div style={{ height: 40, width: 240, background: '#1A1712', borderRadius: 8 }} />
+        <div style={{ height: 12, width: 160, background: 'var(--bg-card2)', borderRadius: 6, marginBottom: 12 }} />
+        <div style={{ height: 40, width: 240, background: 'var(--bg-card)', borderRadius: 8 }} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-        {[1,2,3,4].map(i => <div key={i} style={{ height: 110, background: '#1A1712', borderRadius: 12, border: '1px solid rgba(201,168,76,0.06)' }} />)}
+        {[1,2,3,4].map(i => <div key={i} style={{ height: 110, background: 'var(--bg-card)', borderRadius: 12, border: '1px solid rgba(201,168,76,0.06)' }} />)}
       </div>
     </div>
   )
@@ -220,7 +220,7 @@ export default function DashboardPage() {
           {format(new Date(), "d MMMM yyyy", { locale: tr })}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: '#EDE8DF', letterSpacing: '-0.03em', lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}>
             Genel Bakış
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>
@@ -251,7 +251,7 @@ export default function DashboardPage() {
           <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Diğer Madenler</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
-              { label: 'Gümüş (gr)', d: fiyatlar.gumus,  sym: '◆', color: '#7A7468', usdRate: true },
+              { label: 'Gümüş (gr)', d: fiyatlar.gumus,  sym: '◆', color: 'var(--text-muted)', usdRate: true },
               { label: 'Platin (gr)', d: fiyatlar.platin, sym: '◈', color: '#5A6A7A', usdRate: true },
             ].map(item => (
               <FiyatKart key={item.label} label={item.label} d={item.d} sym={item.sym} color={item.color} usdRate={(item as any).usdRate ? fiyatlar.doviz?.usd?.alis : undefined} />
@@ -290,10 +290,10 @@ export default function DashboardPage() {
           { label: 'Yeni Müşteri', value: stats!.yeniMusteri, sub: 'bu hafta ilk kez', trend: null },
           { label: 'Tekrar Yazan', value: stats!.tekrar, sub: 'geri dönen', trend: null },
         ].map(({ label, value, sub, trend }) => (
-          <div key={label} style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 12, padding: '16px 18px' }}>
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 12, padding: '16px 18px' }}>
             <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 10 }}>{label}</p>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: '#EDE8DF', lineHeight: 1, letterSpacing: '-0.02em' }}>{value}</span>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.02em' }}>{value}</span>
               {trend !== null && (
                 <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', marginBottom: 3, color: trend > 0 ? '#C9A84C' : trend < 0 ? '#C4364A' : '#5A5550' }}>
                   {trend > 0 ? '▲' : trend < 0 ? '▼' : '—'} %{Math.abs(trend)}
@@ -307,15 +307,15 @@ export default function DashboardPage() {
 
       {/* Öneriler */}
       {oneriler.length > 0 && (
-        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '20px 24px', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <Lightbulb size={14} color="#C9A84C" strokeWidth={1.5} />
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, color: '#EDE8DF' }}>Öneriler</span>
+            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, color: 'var(--text-primary)' }}>Öneriler</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {oneriler.map((o, i) => (
-              <a key={i} href={o.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, border: `1px solid ${o.renk === 'ruby' ? 'rgba(139,38,53,0.3)' : o.renk === 'gold' ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.3)'}`, background: o.renk === 'ruby' ? 'rgba(139,38,53,0.08)' : o.renk === 'gold' ? 'rgba(201,168,76,0.06)' : 'rgba(31,29,23,0.5)', textDecoration: 'none', transition: 'opacity 0.2s' }}>
-                <span style={{ color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#C9A84C' : '#7A7468', fontSize: 12 }}>{o.icon}</span>
+              <a key={i} href={o.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, border: `1px solid ${o.renk === 'ruby' ? 'rgba(139,38,53,0.3)' : o.renk === 'gold' ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.3)'}`, background: o.renk === 'ruby' ? 'rgba(139,38,53,0.08)' : o.renk === 'gold' ? 'rgba(139,105,20,0.08)' : 'rgba(31,29,23,0.5)', textDecoration: 'none', transition: 'opacity 0.2s' }}>
+                <span style={{ color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#C9A84C' : 'var(--text-muted)', fontSize: 12 }}>{o.icon}</span>
                 <span style={{ fontSize: 13, color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#E8D5A3' : '#9A928A', flex: 1 }}>{o.mesaj}</span>
                 <span style={{ color: '#5A5550', fontSize: 12 }}>→</span>
               </a>
@@ -326,9 +326,9 @@ export default function DashboardPage() {
 
       {/* Grafikler */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 20 }} className="lg:grid-cols-3">
-        <div style={{ gridColumn: 'span 2', background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
+        <div style={{ gridColumn: 'span 2', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: '#EDE8DF' }}>Son 24 Saat</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: 'var(--text-primary)' }}>Son 24 Saat</h2>
             <span style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
               <TrendingUp size={11} /> saatlik trafik
             </span>
@@ -337,7 +337,7 @@ export default function DashboardPage() {
             <BarChart data={stats!.son24Saat} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
               <XAxis dataKey="saat" tick={{ fontSize: 9, fill: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }} axisLine={false} tickLine={false} interval={3} />
               <YAxis tick={{ fontSize: 9, fill: '#5A5550' }} axisLine={false} tickLine={false} />
-              <Tooltip cursor={{ fill: 'rgba(201,168,76,0.04)' }} contentStyle={{ background: '#211E18', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 8, fontSize: 11, color: '#B8B0A0' }} />
+              <Tooltip cursor={{ fill: 'rgba(139,105,20,0.05)' }} contentStyle={{ background: 'var(--bg-card2)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 8, fontSize: 11, color: 'var(--text-body)' }} />
               <Bar dataKey="sayi" radius={[3,3,0,0]}>
                 {stats!.son24Saat.map((e,i) => <Cell key={i} fill={e.sayi === Math.max(...stats!.son24Saat.map(h=>h.sayi)) && e.sayi > 0 ? '#C9A84C' : '#2E2B25'} />)}
               </Bar>
@@ -345,8 +345,8 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: '#EDE8DF', marginBottom: 24 }}>Niyet Dağılımı</h2>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: 'var(--text-primary)', marginBottom: 24 }}>Niyet Dağılımı</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {stats!.intentDagilimi.slice(0,6).map(item => {
               const total = stats!.intentDagilimi.reduce((a,b) => a+b.count, 0)
@@ -369,17 +369,17 @@ export default function DashboardPage() {
 
       {/* Alt: Sadık müşteriler + Son konuşmalar */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }} className="lg:grid-cols-3">
-        <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <Star size={13} color="#C9A84C" strokeWidth={1.5} />
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: '#EDE8DF' }}>En Sadık Müşteriler</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: 'var(--text-primary)' }}>En Sadık Müşteriler</h2>
           </div>
           <div>
             {sadikMusteriler.map((s, i) => (
               <div key={s.phone} style={{ padding: '12px 20px', borderBottom: '1px solid rgba(201,168,76,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0, background: i === 0 ? 'linear-gradient(135deg, #C9A84C, #8B6914)' : '#272320', color: i === 0 ? '#0E0C0A' : '#7A7468', border: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>{i+1}</div>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0, background: i === 0 ? 'linear-gradient(135deg, #C9A84C, #8B6914)' : '#272320', color: i === 0 ? 'var(--bg-base)' : 'var(--text-muted)', border: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>{i+1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B8B0A0' }}>{s.phone}</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-body)' }}>{s.phone}</div>
                   <div style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
                     {formatDistanceToNow(new Date(s.ilkGorulme), { addSuffix: true, locale: tr })}
                   </div>
@@ -391,9 +391,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div style={{ gridColumn: 'span 2', background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
+        <div style={{ gridColumn: 'span 2', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, overflow: 'hidden' }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: '#EDE8DF' }}>Son Konuşmalar</h2>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, color: 'var(--text-primary)' }}>Son Konuşmalar</h2>
             <a href="/konusmalar" style={{ fontSize: 11, color: '#C9A84C', textDecoration: 'none' }}>Hepsini Gör →</a>
           </div>
           <div style={{ overflowX: 'auto' }}>
@@ -408,10 +408,10 @@ export default function DashboardPage() {
               <tbody>
                 {sessions.map(s => (
                   <tr key={s.phone} style={{ borderTop: '1px solid rgba(201,168,76,0.05)', cursor: 'pointer' }} onClick={() => router.push('/konusmalar')}>
-                    <td style={{ padding: '12px 16px', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#B8B0A0' }}>{s.phone}</td>
-                    <td style={{ padding: '12px 16px', fontSize: 12, color: '#7A7468', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
+                    <td style={{ padding: '12px 16px', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-body)' }}>{s.phone}</td>
+                    <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-muted)', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.musteri_yazdigi || '—'}</td>
                     <td style={{ padding: '12px 16px' }}>
-                      <span style={{ display: 'inline-flex', padding: '3px 8px', borderRadius: 4, fontSize: 10, color: '#C9A84C', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.12)' }}>
+                      <span style={{ display: 'inline-flex', padding: '3px 8px', borderRadius: 4, fontSize: 10, color: '#C9A84C', background: 'rgba(139,105,20,0.08)', border: '1px solid rgba(201,168,76,0.12)' }}>
                         {INTENT_LABEL[s.last_intent||'other'] || 'Diğer'}
                       </span>
                     </td>
@@ -420,7 +420,7 @@ export default function DashboardPage() {
                         ? <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#C4364A' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block' }} />Canlı</span>
                         : <span style={{ fontSize: 11, color: '#5A5550' }}>Bot</span>}
                     </td>
-                    <td style={{ padding: '12px 16px', fontSize: 10, color: '#7A7468', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '12px 16px', fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
                       {formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}
                     </td>
                   </tr>
