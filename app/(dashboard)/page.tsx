@@ -216,14 +216,14 @@ export default function DashboardPage() {
 
       {/* Header */}
       <header style={{ marginBottom: 32 }}>
-        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8, fontFamily: 'JetBrains Mono, monospace' }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8, fontFamily: 'JetBrains Mono, monospace' }}>
           {format(new Date(), "d MMMM yyyy", { locale: tr })}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 300, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1 }}>
             Genel Bakış
           </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#C9A84C', display: 'inline-block', animation: 'pulse-gold 2s infinite' }} />
             canlı
           </div>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
       {fiyatlar && (
         <div style={{ marginBottom: 24 }}>
           {/* Altın */}
-          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Altın</div>
+          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Altın</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
               { label: 'Gram Altın',  d: fiyatlar.altin?.gram,   sym: '✦', color: '#8B6914', usdRate: true },
@@ -248,7 +248,7 @@ export default function DashboardPage() {
             ))}
           </div>
           {/* Gümüş & Platin */}
-          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Diğer Madenler</div>
+          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Diğer Madenler</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
               { label: 'Gümüş (gr)', d: fiyatlar.gumus,  sym: '◆', color: 'var(--text-muted)', usdRate: true },
@@ -258,7 +258,7 @@ export default function DashboardPage() {
             ))}
           </div>
           {/* Döviz */}
-          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Döviz</div>
+          <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Döviz</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
             {[
               { label: 'USD',  d: fiyatlar.doviz?.usd, sym: '$',  color: '#7A9A6A' },
@@ -291,16 +291,16 @@ export default function DashboardPage() {
           { label: 'Tekrar Yazan', value: stats!.tekrar, sub: 'geri dönen', trend: null },
         ].map(({ label, value, sub, trend }) => (
           <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.08)', borderRadius: 12, padding: '16px 18px' }}>
-            <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 10 }}>{label}</p>
+            <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 10 }}>{label}</p>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.02em' }}>{value}</span>
               {trend !== null && (
-                <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', marginBottom: 3, color: trend > 0 ? '#C9A84C' : trend < 0 ? '#C4364A' : '#5A5550' }}>
+                <span style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', marginBottom: 3, color: trend > 0 ? '#C9A84C' : trend < 0 ? '#C4364A' : 'var(--text-muted)' }}>
                   {trend > 0 ? '▲' : trend < 0 ? '▼' : '—'} %{Math.abs(trend)}
                 </span>
               )}
             </div>
-            <p style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', marginTop: 6 }}>{sub}</p>
+            <p style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 6 }}>{sub}</p>
           </div>
         ))}
       </div>
@@ -316,8 +316,8 @@ export default function DashboardPage() {
             {oneriler.map((o, i) => (
               <a key={i} href={o.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 8, border: `1px solid ${o.renk === 'ruby' ? 'rgba(139,38,53,0.3)' : o.renk === 'gold' ? 'rgba(201,168,76,0.2)' : 'rgba(58,55,48,0.3)'}`, background: o.renk === 'ruby' ? 'rgba(139,38,53,0.08)' : o.renk === 'gold' ? 'rgba(139,105,20,0.08)' : 'rgba(31,29,23,0.5)', textDecoration: 'none', transition: 'opacity 0.2s' }}>
                 <span style={{ color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#C9A84C' : 'var(--text-muted)', fontSize: 12 }}>{o.icon}</span>
-                <span style={{ fontSize: 13, color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#E8D5A3' : '#9A928A', flex: 1 }}>{o.mesaj}</span>
-                <span style={{ color: '#5A5550', fontSize: 12 }}>→</span>
+                <span style={{ fontSize: 13, color: o.renk === 'ruby' ? '#C4364A' : o.renk === 'gold' ? '#E8D5A3' : 'var(--text-muted)', flex: 1 }}>{o.mesaj}</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>→</span>
               </a>
             ))}
           </div>
@@ -329,14 +329,14 @@ export default function DashboardPage() {
         <div style={{ gridColumn: 'span 2', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 12, padding: '24px 28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, color: 'var(--text-primary)' }}>Son 24 Saat</h2>
-            <span style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'center', gap: 6 }}>
               <TrendingUp size={11} /> saatlik trafik
             </span>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={stats!.son24Saat} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
-              <XAxis dataKey="saat" tick={{ fontSize: 9, fill: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }} axisLine={false} tickLine={false} interval={3} />
-              <YAxis tick={{ fontSize: 9, fill: '#5A5550' }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="saat" tick={{ fontSize: 9, fill: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }} axisLine={false} tickLine={false} interval={3} />
+              <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
               <Tooltip cursor={{ fill: 'rgba(139,105,20,0.05)' }} contentStyle={{ background: 'var(--bg-card2)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: 8, fontSize: 11, color: 'var(--text-body)' }} />
               <Bar dataKey="sayi" radius={[3,3,0,0]}>
                 {stats!.son24Saat.map((e,i) => <Cell key={i} fill={e.sayi === Math.max(...stats!.son24Saat.map(h=>h.sayi)) && e.sayi > 0 ? '#C9A84C' : '#2E2B25'} />)}
@@ -354,10 +354,10 @@ export default function DashboardPage() {
               return (
                 <div key={item.intent}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: 12, color: '#9A928A' }}>{INTENT_LABEL[item.intent] || item.intent}</span>
-                    <span style={{ fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>{item.count}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{INTENT_LABEL[item.intent] || item.intent}</span>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{item.count}</span>
                   </div>
-                  <div style={{ height: 2, background: '#272320', borderRadius: 1 }}>
+                  <div style={{ height: 2, background: 'var(--bg-card2)', borderRadius: 1 }}>
                     <div style={{ height: '100%', borderRadius: 1, background: 'linear-gradient(90deg, #C9A84C, #8B6914)', width: `${pct}%`, transition: 'width 0.8s ease' }} />
                   </div>
                 </div>
@@ -377,17 +377,17 @@ export default function DashboardPage() {
           <div>
             {sadikMusteriler.map((s, i) => (
               <div key={s.phone} style={{ padding: '12px 20px', borderBottom: '1px solid rgba(201,168,76,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0, background: i === 0 ? 'linear-gradient(135deg, #C9A84C, #8B6914)' : '#272320', color: i === 0 ? 'var(--bg-base)' : 'var(--text-muted)', border: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>{i+1}</div>
+                <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, flexShrink: 0, background: i === 0 ? 'linear-gradient(135deg, #C9A84C, #8B6914)' : 'var(--bg-card2)', color: i === 0 ? 'var(--bg-base)' : 'var(--text-muted)', border: i === 0 ? 'none' : '1px solid rgba(201,168,76,0.1)' }}>{i+1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-body)' }}>{s.phone}</div>
-                  <div style={{ fontSize: 10, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
                     {formatDistanceToNow(new Date(s.ilkGorulme), { addSuffix: true, locale: tr })}
                   </div>
                 </div>
                 {s.kvkk && <span style={{ fontSize: 10, color: '#C9A84C', fontFamily: 'JetBrains Mono, monospace' }}>✓</span>}
               </div>
             ))}
-            {sadikMusteriler.length === 0 && <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>henüz veri yok</div>}
+            {sadikMusteriler.length === 0 && <div style={{ padding: '32px 20px', textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>henüz veri yok</div>}
           </div>
         </div>
 
@@ -401,7 +401,7 @@ export default function DashboardPage() {
               <thead>
                 <tr style={{ background: 'rgba(201,168,76,0.03)' }}>
                   {['Müşteri','Son Mesaj','Niyet','Durum','Zaman'].map(h => (
-                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#5A5550', fontWeight: 500 }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -418,14 +418,14 @@ export default function DashboardPage() {
                     <td style={{ padding: '12px 16px' }}>
                       {s.bulundugu_menu === 'canli'
                         ? <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#C4364A' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#C4364A', display: 'inline-block' }} />Canlı</span>
-                        : <span style={{ fontSize: 11, color: '#5A5550' }}>Bot</span>}
+                        : <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Bot</span>}
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', whiteSpace: 'nowrap' }}>
                       {formatDistanceToNow(new Date(s.updated_at), { addSuffix: true, locale: tr })}
                     </td>
                   </tr>
                 ))}
-                {sessions.length === 0 && <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', fontSize: 11, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>henüz konuşma yok</td></tr>}
+                {sessions.length === 0 && <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>henüz konuşma yok</td></tr>}
               </tbody>
             </table>
           </div>
