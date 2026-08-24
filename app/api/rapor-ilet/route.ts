@@ -92,25 +92,26 @@ export async function POST(req: Request) {
     </tr></table>
   </td></tr>
 
-  <!-- Bugün Net -->
+  <!-- Bugün -->
   <tr><td style="padding:28px 48px;background:#F4EFE8;border-bottom:1px solid rgba(139,105,20,0.15);">
     <p style="margin:0 0 14px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#8B6914;">Bugün</p>
     <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      ${ia(brut_adet) > 0 ? `
       <td width="${hasIade ? '34%' : '50%'}">
-        <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7A7570;">Net Satış</p>
-        <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${net_adet || 0}</p>
+        <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7A7570;">Brüt Satış</p>
+        <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${brut_adet}</p>
         <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">adet</p>
       </td>
       <td width="${hasIade ? '33%' : '50%'}" style="padding-left:16px;border-left:1px solid rgba(139,105,20,0.15);">
-        <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7A7570;">Net Ciro</p>
-        <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${fmt(net_tutar || 0)}</p>
+        <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7A7570;">Brüt Ciro</p>
+        <p style="margin:0;font-size:40px;font-weight:300;color:#1A1410;line-height:1;">${fmt(brut_tutar)}</p>
         <p style="margin:4px 0 0;font-size:11px;color:#7A7570;">TL (KDV Dahil)</p>
-      </td>
+      </td>` : ''}
       ${hasIade ? `
-      <td width="33%" style="padding-left:16px;border-left:1px solid rgba(168,48,64,0.2);">
+      <td width="${ia(brut_adet) > 0 ? '33%' : '100%'}" style="${ia(brut_adet) > 0 ? 'padding-left:16px;border-left:1px solid rgba(168,48,64,0.2);' : ''}">
         <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C4364A;">İade</p>
         <p style="margin:0;font-size:40px;font-weight:300;color:#C4364A;line-height:1;">${iade_adet}</p>
-        <p style="margin:4px 0 0;font-size:11px;color:#C4364A;">${fmt(iade_tutar || 0)} TL</p>
+        <p style="margin:4px 0 0;font-size:11px;color:#C4364A;">${fmt(iade_tutar)} TL</p>
       </td>` : ''}
     </tr></table>
   </td></tr>

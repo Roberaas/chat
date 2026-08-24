@@ -381,19 +381,23 @@ export default function RaporIletPage() {
               </div>
               {/* Bugün */}
               <div style={{ padding: '24px 40px', background: '#F4EFE8', borderBottom: '1px solid rgba(139,105,20,0.15)', display: 'flex', gap: 32 }}>
-                <div>
-                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Bugün Net</p>
-                  <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#1A1410', lineHeight: 1 }}>{net_adet}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>adet</p>
-                </div>
-                <div style={{ borderLeft: '1px solid rgba(139,105,20,0.15)', paddingLeft: 32 }}>
-                  <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Bugün Net Ciro</p>
-                  <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#1A1410', lineHeight: 1 }}>{fmt(net_tutar)}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>TL (KDV Dahil)</p>
-                </div>
+                {brut_adet > 0 && (
+                  <div>
+                    <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Brüt Satış</p>
+                    <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#1A1410', lineHeight: 1 }}>{brut_adet}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>adet</p>
+                  </div>
+                )}
+                {brut_tutar > 0 && (
+                  <div style={{ borderLeft: brut_adet > 0 ? '1px solid rgba(139,105,20,0.15)' : 'none', paddingLeft: brut_adet > 0 ? 32 : 0 }}>
+                    <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#7A7570' }}>Brüt Ciro</p>
+                    <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#1A1410', lineHeight: 1 }}>{fmt(brut_tutar)}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 10, color: '#7A7570' }}>TL (KDV Dahil)</p>
+                  </div>
+                )}
                 {iade_adet > 0 && (
                   <div style={{ borderLeft: '1px solid rgba(168,48,64,0.2)', paddingLeft: 32 }}>
-                    <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#C4364A' }}>Bugün İade</p>
+                    <p style={{ margin: '0 0 2px', fontSize: 8, letterSpacing: '3px', textTransform: 'uppercase', color: '#C4364A' }}>İade</p>
                     <p style={{ margin: 0, fontSize: 40, fontWeight: 300, color: '#C4364A', lineHeight: 1 }}>{iade_adet}</p>
                     <p style={{ margin: '2px 0 0', fontSize: 10, color: '#C4364A' }}>{fmt(iade_tutar)} TL</p>
                   </div>
