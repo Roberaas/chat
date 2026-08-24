@@ -5,8 +5,11 @@ function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d:
   const alis = d.alis ?? d
   const satis = d.satis
   const degisim = d.degisim
-  const fmtTL = (n: number | null) => n != null ? n.toLocaleString('tr-TR', { maximumFractionDigits: n < 10 ? 4 : 0 }) + ' ₺' : '—'
-  const fmtUSD = (n: number | null) => n != null && usdRate ? '$' + (n / usdRate).toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
+  const fmtUSD = (n: number | null, rate?: number) => {
+    if (n == null) return '—'
+    if (rate) return '$' + (n / rate).toLocaleString('en-US', { maximumFractionDigits: 2 })
+    return '$' + n.toLocaleString('en-US', { maximumFractionDigits: n < 10 ? 4 : 2 })
+  }
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-gold)', borderRadius: 10, padding: small ? '10px 14px' : '14px 18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -14,16 +17,11 @@ function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d:
         <span style={{ color, fontSize: small ? 12 : 14 }}>{sym}</span>
       </div>
       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: small ? 20 : 26, fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1 }}>
-        {fmtTL(alis)}
+        {fmtUSD(alis, usdRate)}
       </div>
-      {usdRate && alis != null && (
-        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
-          {fmtUSD(alis)}
-        </div>
-      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
         <span style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-          {satis != null && !small ? `satış ${fmtTL(satis)}` : ''}
+          {satis != null && !small && usdRate ? `satış ${fmtUSD(satis, usdRate)}` : satis != null && !small ? `satış ${fmtUSD(satis)}` : ''}
         </span>
         {degisim != null && !isNaN(degisim) && (
           <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? 'var(--gold)' : '#C4364A' }}>
