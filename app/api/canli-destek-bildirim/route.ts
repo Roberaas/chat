@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 
 // n8n bu endpoint'i çağırır: müşteri canlı destek istediğinde
