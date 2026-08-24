@@ -128,9 +128,9 @@ export default function MusterilerPage() {
   }
 
   const SEGMENT_COLOR: Record<string, string> = {
-    vip: 'bg-[#1A1712] text-cream-50',
+    vip: 'bg-[var(--bg-card)] text-cream-50',
     aktif: 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]',
-    yeni: 'bg-[#211E18] text-[#7A7468]',
+    yeni: 'bg-[var(--bg-card2)] text-[#7A7468]',
     kayip: 'bg-[rgba(139,38,53,0.1)] text-[#D04858]',
   }
   const SEGMENT_LABEL: Record<string, string> = { vip: '👑 VIP', aktif: '✓ Aktif', yeni: '🆕 Yeni', kayip: '⚠ Kayıp' }
@@ -145,7 +145,7 @@ export default function MusterilerPage() {
       {/* Segment kartlar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { key: 'vip', label: 'VIP', value: segmentStats.vip, icon: Crown, color: 'bg-[#1A1712] border-ink-700 text-cream-50', sub: '3+ sipariş veya abone' },
+          { key: 'vip', label: 'VIP', value: segmentStats.vip, icon: Crown, color: 'bg-[var(--bg-card)] border-ink-700 text-cream-50', sub: '3+ sipariş veya abone' },
           { key: 'aktif', label: 'Aktif', value: segmentStats.aktif, icon: TrendingUp, color: 'bg-[rgba(201,168,76,0.06)] border-[rgba(201,168,76,0.15)] text-[#C9A84C]', sub: 'Son 30 günde aktif' },
           { key: 'yeni', label: 'Yeni', value: segmentStats.yeni, icon: Users, color: 'bg-white border-[rgba(201,168,76,0.15)] text-[#EDE8DF]', sub: '30-90 gün' },
           { key: 'kayip', label: 'Kayıp', value: segmentStats.kayip, icon: Users, color: 'bg-[rgba(139,38,53,0.1)] border-[rgba(139,38,53,0.25)] text-ember-700', sub: '90+ gün önce aktif' },
@@ -209,7 +209,7 @@ export default function MusterilerPage() {
                   <td className="px-5 py-4 font-mono text-sm text-[#B8B0A0]">{c.totalSpent > 0 ? `${c.totalSpent.toLocaleString('tr')} TL` : '—'}</td>
                   <td className="px-5 py-4">
                     {c.abonelik ? (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.abonelik.durum === 'abone' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[#211E18] text-[#7A7468]'}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.abonelik.durum === 'abone' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[var(--bg-card2)] text-[#7A7468]'}`}>
                         {c.abonelik.durum === 'abone' ? `✓ ${c.abonelik.haftalik_adet} adet` : 'Bekliyor'}
                       </span>
                     ) : <span className="text-[#5A5550] text-xs">—</span>}
@@ -229,7 +229,7 @@ export default function MusterilerPage() {
       {/* Müşteri 360° Profil */}
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelected(null)}>
-          <div className="absolute inset-0 bg-[#1A1712]/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-[var(--bg-card)]/40 backdrop-blur-sm" />
           <div className="relative w-full max-w-md  h-full overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
 
             <div className="sticky top-0 bg-white border-b border-[rgba(201,168,76,0.15)] z-10 p-5">
@@ -341,7 +341,7 @@ export default function MusterilerPage() {
                         </div>
                         <div className="text-right">
                           <div className="font-mono text-sm text-[#B8B0A0]">{parseFloat(o.total_price).toLocaleString('tr')} TL</div>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${o.financial_status === 'paid' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[#211E18] text-[#7A7468]'}`}>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${o.financial_status === 'paid' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[var(--bg-card2)] text-[#7A7468]'}`}>
                             {o.financial_status === 'paid' ? 'Ödendi' : o.financial_status}
                           </span>
                         </div>

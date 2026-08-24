@@ -56,7 +56,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
         <div className="flex items-center justify-between">
           <div>
             <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              roberto<span style={{ color: '#C9A84C' }}>.</span>
+              roberto<span style={{ color: 'var(--gold-light)' }}>.</span>
             </div>
             <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'var(--text-muted)', marginTop: 2, textTransform: 'uppercase' }}>
               admin panel
@@ -74,7 +74,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
       {mevcutKullanici && (
         <div className="px-4 py-3 mx-3 mt-3 rounded-lg" style={{ background: 'rgba(139,105,20,0.08)', border: '1px solid rgba(201,168,76,0.1)' }}>
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: '#0A0908' }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: 'var(--bg-base)' }}>
               {mevcutKullanici.ad.slice(0,1).toUpperCase()}
             </div>
             <div>
@@ -114,12 +114,12 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={
                       (item as any).urgent
                         ? { background: '#8B2635', color: '#fff', animation: 'urgentPulse 1.5s ease-in-out infinite' }
-                        : { background: 'rgba(139,105,20,0.15)', color: '#C9A84C' }
+                        : { background: 'rgba(139,105,20,0.15)', color: 'var(--gold-light)' }
                     }>
                       {(item as any).badge}
                     </span>
                   ) : active ? (
-                    <span className="w-1 h-1 rounded-full" style={{ background: '#C9A84C' }} />
+                    <span className="w-1 h-1 rounded-full" style={{ background: 'var(--gold-light)' }} />
                   ) : null}
                 </Link>
               </li>

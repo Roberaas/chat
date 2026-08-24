@@ -158,7 +158,7 @@ export default function CanliDestekPage() {
               {sessions.length} aktif
               {totalUnread > 0 && <span style={{ marginLeft: 8, background: '#8B2635', color: '#fff', fontSize: 9, padding: '1px 5px', borderRadius: 8 }}>{totalUnread}</span>}
             </p>
-            <button onClick={notifOn ? () => setNotifOn(false) : requestNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: notifOn ? '#C9A84C' : '#5A5550' }}>
+            <button onClick={notifOn ? () => setNotifOn(false) : requestNotif} style={{ background: 'none', border: 'none', cursor: 'pointer', color: notifOn ? 'var(--gold-light)' : '#5A5550' }}>
               {notifOn ? <Bell size={14} /> : <BellOff size={14} />}
             </button>
           </div>
@@ -193,7 +193,7 @@ export default function CanliDestekPage() {
             return (
               <button key={s.phone} onClick={() => setSelected(s)} style={{ width: '100%', textAlign: 'left', padding: '14px 16px', borderBottom: '1px solid rgba(201,168,76,0.05)', background: isSelected ? 'rgba(139,105,20,0.08)' : 'transparent', borderLeft: isSelected ? '2px solid #C9A84C' : '2px solid transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, transition: 'background 0.15s' }}>
                 <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(139,105,20,0.12)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: '#C9A84C' }}>WA</div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(139,105,20,0.12)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600, color: 'var(--gold-light)' }}>WA</div>
                   {sessionUnread > 0 && <span style={{ position: 'absolute', top: -2, right: -2, width: 16, height: 16, background: '#8B2635', color: '#fff', fontSize: 9, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>{sessionUnread}</span>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -218,8 +218,8 @@ export default function CanliDestekPage() {
           <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', background: 'var(--bg-sidebar)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ position: 'relative' }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(139,105,20,0.12)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#C9A84C', fontWeight: 600 }}>WA</div>
-                <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, background: '#C9A84C', borderRadius: '50%', border: '2px solid #120F0C' }} />
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'rgba(139,105,20,0.12)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--gold-light)', fontWeight: 600 }}>WA</div>
+                <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, background: 'var(--gold-light)', borderRadius: '50%', border: '2px solid var(--bg-card)' }} />
               </div>
               <div>
                 <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: 'var(--text-body)' }}>{selected.phone}</div>
