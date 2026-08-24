@@ -92,6 +92,7 @@ export default function RaporIletPage() {
   const ay_iade_tutar = (parseFloat(String(aylik.iade_trendyol_tutar))||0) + (parseFloat(String(aylik.iade_rb_tutar))||0) + (parseFloat(String(aylik.iade_935_tutar))||0) + iade_tutar
   const ay_net_adet   = ay_brut_adet  - ay_iade_adet
   const ay_net_tutar  = ay_brut_tutar - ay_iade_tutar
+  console.log('[hesap] ay_iade_adet:', ay_iade_adet, 'ay_iade_tutar:', ay_iade_tutar, 'aylik.iade_935_adet:', aylik.iade_935_adet, 'form.iade_935_adet:', form.iade_935_adet)
 
   async function saveToDb() {
     setSaving(true); setSaveResult(null)
