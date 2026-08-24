@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Send, TrendingUp, Globe, FileText, CheckCircle, AlertCircle, Eye, Save, BarChart2, RotateCcw } from 'lucide-react'
 
 export default function RaporIletPage() {
-  const todayISO = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' }) // YYYY-MM-DD TR timezone
+  const _now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }))
+  const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`
   const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
   const ayLabel = new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })
 
@@ -46,6 +47,7 @@ export default function RaporIletPage() {
       try {
         const res = await fetch(`/api/rapor-ilet/data?tarih=${todayISO}`)
         const data = await res.json()
+        console.log('[rapor-ilet] tarih:', todayISO, 'aylik:', data.aylik)
         if (data.bugun) {
           setForm(f => ({
             ...f,
