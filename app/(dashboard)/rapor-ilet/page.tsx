@@ -16,7 +16,7 @@ export default function RaporIletPage() {
     iade_rb_adet: '', iade_rb_tutar: '',
     iade_935_adet: '', iade_935_tutar: '',
     durum: '',
-    mail_to: 'mert@robertobravo.com',
+    mail_to: 'kerem@robertobravo.com',
   }
 
   const [form, setForm] = useState(emptyForm)
