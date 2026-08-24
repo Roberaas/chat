@@ -2,8 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-
 
 export async function POST(req: Request) {
   const supabase = createClient(
@@ -35,9 +33,14 @@ export async function POST(req: Request) {
   await supabase.from('otp_codes').update({ used: true }).eq('kullanici_id', user.id)
   await supabase.from('kullanicilar').update({ son_giris: new Date().toISOString() }).eq('id', user.id)
 
-  const cookieStore = await cookies()
   const session = Buffer.from(JSON.stringify({ id: user.id, ad: user.ad, rol: user.rol, kullanici_adi })).toString('base64')
-  cookieStore.set('rb_session', session, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 * 30 })
-
-  return NextResponse.json({ ok: true })
+  
+  const res = NextResponse.json({ ok: true })
+  res.cookies.set('rb_session', session, {
+    httpOnly: true,
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30,
+    sameSite: 'lax'
+  })
+  return res
 }
