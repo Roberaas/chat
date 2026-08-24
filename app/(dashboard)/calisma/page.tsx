@@ -42,7 +42,7 @@ export default function CalismaPage() {
   const [notlar, setNotlar] = useState<EkipNotu[]>([])
   const [aramalar, setAramalar] = useState<AramaLog[]>([])
   const [loading, setLoading] = useState(true)
-  const [gorevForm, setGorevForm] = useState({ show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '' })
+  const [gorevForm, setGorevForm] = useState({ show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '', sms_saati: '', sms_telefon: '905392993103' })
   const [notForm, setNotForm] = useState({ show: false, icerik: '', yazan: 'admin', ilgili_telefon: '', ilgili_siparis: '', ilgili_tip: 'genel' })
   const [aramaForm, setAramaForm] = useState({ show: false, telefon: '', musteri_adi: '', sure_dakika: '', notlar: '', sonuc: 'tamamlandi', arayan: 'admin' })
   const [filter, setFilter] = useState<'all' | 'bekliyor' | 'devam' | 'tamamlandi'>('bekliyor')
@@ -64,8 +64,9 @@ export default function CalismaPage() {
 
   async function gorevEkle() {
     if (!gorevForm.baslik.trim()) return
-    await fetch('/api/gorev', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(gorevForm) })
-    setGorevForm({ show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '' })
+    const { show, ...data } = gorevForm
+    await fetch('/api/gorev', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    setGorevForm({ show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '', sms_saati: '', sms_telefon: '905392993103' })
     load()
   }
 
@@ -295,6 +296,14 @@ export default function CalismaPage() {
               </Field>
               <Field label="Bitiş Tarihi">
                 <input type="date" value={gorevForm.bitis_tarihi} onChange={e => setGorevForm(f => ({ ...f, bitis_tarihi: e.target.value }))} className={inputCls} />
+              </Field>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="SMS Saati (opsiyonel)">
+                <input type="time" value={gorevForm.sms_saati} onChange={e => setGorevForm(f => ({ ...f, sms_saati: e.target.value }))} className={inputCls} />
+              </Field>
+              <Field label="SMS Telefon">
+                <input value={gorevForm.sms_telefon} onChange={e => setGorevForm(f => ({ ...f, sms_telefon: e.target.value }))} placeholder="905xx..." className={inputCls} />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">

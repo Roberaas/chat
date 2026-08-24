@@ -46,6 +46,22 @@ export default function TakvimPage() {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null)
   const [view, setView] = useState<'ay' | 'hafta'>('ay')
   const [filter, setFilter] = useState<string[]>(['teslimat', 'gorev', 'arama', 'siparis', 'abonelik'])
+  const [ekleForm, setEkleForm] = useState({ show: false, baslik: '', aciklama: '', tarih: '', sms_saati: '', sms_telefon: '905392993103', oncelik: 'normal' })
+  const [kayitLoading, setKayitLoading] = useState(false)
+
+  async function etkinlikEkle() {
+    if (!ekleForm.baslik.trim() || !ekleForm.tarih) return
+    setKayitLoading(true)
+    const { show, ...data } = ekleForm
+    await fetch('/api/gorev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, bitis_tarihi: data.tarih, durum: 'bekliyor' })
+    })
+    setEkleForm({ show: false, baslik: '', aciklama: '', tarih: '', sms_saati: '', sms_telefon: '905392993103', oncelik: 'normal' })
+    setKayitLoading(false)
+    load()
+  }
 
   useEffect(() => { load() }, [])
 
@@ -169,6 +185,9 @@ export default function TakvimPage() {
         <div className="flex items-center gap-2">
           <button onClick={load} className="w-9 h-9 flex items-center justify-center bg-obsidian-3 border border-gold-subtle rounded-xl text-stone-light hover:text-cream-dim">
             <RefreshCw className="w-4 h-4" />
+          </button>
+          <button onClick={() => setEkleForm(f => ({ ...f, show: true }))} className="flex items-center gap-2 px-4 py-2 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">
+            <Plus className="w-4 h-4" /> Etkinlik Ekle
           </button>
         </div>
       </header>
@@ -442,6 +461,59 @@ export default function TakvimPage() {
             })}
         </div>
       </div>
+      {/* ETKİNLİK EKLE MODAL */}
+      {ekleForm.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEkleForm(f => ({ ...f, show: false }))}>
+          <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" />
+          <div className="relative bg-obsidian-3 rounded-xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-display text-2xl text-cream">Etkinlik Ekle</h2>
+              <button onClick={() => setEkleForm(f => ({ ...f, show: false }))} className="text-stone hover:text-cream-dim"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">Başlık *</label>
+                <input value={ekleForm.baslik} onChange={e => setEkleForm(f => ({ ...f, baslik: e.target.value }))} placeholder="Etkinliği tanımla..." className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim" />
+              </div>
+              <div>
+                <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">Açıklama</label>
+                <textarea value={ekleForm.aciklama} onChange={e => setEkleForm(f => ({ ...f, aciklama: e.target.value }))} rows={2} placeholder="Detay..." className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">Tarih *</label>
+                  <input type="date" value={ekleForm.tarih} onChange={e => setEkleForm(f => ({ ...f, tarih: e.target.value }))} className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">Öncelik</label>
+                  <select value={ekleForm.oncelik} onChange={e => setEkleForm(f => ({ ...f, oncelik: e.target.value }))} className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim">
+                    <option value="dusuk">Düşük</option>
+                    <option value="normal">Normal</option>
+                    <option value="yuksek">Yüksek</option>
+                    <option value="acil">🔴 Acil</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">SMS Saati</label>
+                  <input type="time" value={ekleForm.sms_saati} onChange={e => setEkleForm(f => ({ ...f, sms_saati: e.target.value }))} className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-stone block mb-1.5">SMS Telefon</label>
+                  <input value={ekleForm.sms_telefon} onChange={e => setEkleForm(f => ({ ...f, sms_telefon: e.target.value }))} placeholder="905xx..." className="w-full px-3 py-2.5 bg-transparent border border-gold-subtle rounded-xl text-sm text-cream-dim focus:outline-none focus:border-gold-dim" />
+                </div>
+              </div>
+              {ekleForm.sms_saati && (
+                <p className="text-[10px] text-gold font-mono">✦ Görev kaydedildiğinde SMS gönderilecek → {ekleForm.sms_telefon}</p>
+              )}
+              <button onClick={etkinlikEkle} disabled={kayitLoading} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors disabled:opacity-50">
+                {kayitLoading ? 'Kaydediliyor...' : 'Etkinlik Kaydet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
