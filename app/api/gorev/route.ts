@@ -11,34 +11,18 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { show, sms_saati, sms_telefon, ...gorevData } = body
+  const { show, ...gorevData } = body
 
-  // Temiz insert — form state alanlarını çıkar
-  const { error, data } = await db().from('gorevler').insert(gorevData).select().single()
-  if (error) return NextResponse.json({ ok: false, error: error.message })
-
-  // SMS gönder
-  if (sms_saati && sms_telefon) {
-    const [saat, dakika] = sms_saati.split(':').map(Number)
-    const simdi = new Date()
-    const hedef = new Date()
-    hedef.setHours(saat, dakika, 0, 0)
-
-    const gecikmeMs = hedef.getTime() - simdi.getTime()
-
-    if (gecikmeMs > 0) {
-      // Zamanlanmış — n8n webhook veya basit setTimeout (serverless'ta çalışmaz, anında gönder)
-      // Serverless ortamda setTimeout güvenilir değil, direkt şimdi gönder
-    }
-
-    // Direkt gönder (Vercel serverless — setTimeout çalışmaz)
-    const mesaj = `[Roberto Bravo] Görev: ${gorevData.baslik}${gorevData.aciklama ? ' — ' + gorevData.aciklama : ''}${gorevData.bitis_tarihi ? ' | Bitiş: ' + gorevData.bitis_tarihi : ''}`
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://chat.robertobravo.com'}/api/sms`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mesaj, tel: sms_telefon })
-    }).catch(() => {})
+  // sms_saati string → time formatına çevir (HH:MM)
+  const payload = {
+    ...gorevData,
+    sms_saati: gorevData.sms_saati || null,
+    sms_telefon: gorevData.sms_telefon || '905392993103',
+    sms_gonderildi: false,
   }
+
+  const { error } = await db().from('gorevler').insert(payload)
+  if (error) return NextResponse.json({ ok: false, error: error.message })
 
   return NextResponse.json({ ok: true })
 }
