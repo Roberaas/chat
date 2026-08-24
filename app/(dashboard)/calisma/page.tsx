@@ -306,14 +306,9 @@ export default function CalismaPage() {
                 <input value={gorevForm.sms_telefon} onChange={e => setGorevForm(f => ({ ...f, sms_telefon: e.target.value }))} placeholder="905xx..." className={inputCls} />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="İlgili Telefon">
-                <input value={gorevForm.ilgili_telefon} onChange={e => setGorevForm(f => ({ ...f, ilgili_telefon: e.target.value }))} placeholder="905xx..." className={inputCls} />
-              </Field>
-              <Field label="İlgili Sipariş">
-                <input value={gorevForm.ilgili_siparis} onChange={e => setGorevForm(f => ({ ...f, ilgili_siparis: e.target.value }))} placeholder="#MİL1142" className={inputCls} />
-              </Field>
-            </div>
+            <Field label="İlgili Telefon">
+              <input value={gorevForm.ilgili_telefon} onChange={e => setGorevForm(f => ({ ...f, ilgili_telefon: e.target.value }))} placeholder="905xx..." className={inputCls} />
+            </Field>
             <button onClick={gorevEkle} className="w-full py-3 bg-ink-900 text-cream-50 rounded-xl text-sm font-medium hover:bg-stone transition-colors">Görev Ekle</button>
           </div>
         </Modal>
