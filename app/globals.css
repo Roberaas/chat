@@ -3,27 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --gold: #C9A84C;
-  --gold-light: #E8D5A3;
-  --gold-dark: #8B6914;
+  --gold: #8B6914;
+  --gold-light: #C9A84C;
+  --gold-dark: #6B4F0A;
   --gold-dim: #A8882A;
 
-  /* Zemin katmanları — belirgin ton farkları */
-  --bg-base:    #0E0C0A;   /* sayfa zemini */
-  --bg-card:    #1A1712;   /* kart */
-  --bg-card2:   #211E18;   /* iç kart / hover */
-  --bg-sidebar: #120F0C;   /* sidebar */
+  /* Zemin katmanları — beyaz tema */
+  --bg-base:    #F5F3EF;   /* sayfa zemini */
+  --bg-card:    #FFFFFF;   /* kart */
+  --bg-card2:   #F0EDE8;   /* iç kart / hover */
+  --bg-sidebar: #FAFAF8;   /* sidebar */
 
   /* Kenarlıklar */
-  --border-gold: rgba(201,168,76,0.18);
-  --border-dim:  rgba(201,168,76,0.08);
-  --border-sub:  rgba(255,255,255,0.06);
+  --border-gold: rgba(139,105,20,0.18);
+  --border-dim:  rgba(139,105,20,0.1);
+  --border-sub:  rgba(0,0,0,0.06);
 
-  /* Metin — yeterli kontrast */
-  --text-primary:  #EDE8DF;   /* başlık, önemli */
-  --text-body:     #B8B0A0;   /* gövde metni */
+  /* Metin — koyu renkler */
+  --text-primary:  #1A1410;   /* başlık, önemli */
+  --text-body:     #3A3530;   /* gövde metni */
   --text-muted:    #7A7468;   /* yardımcı, label */
-  --text-faint:    #4A4540;   /* çok soluk / disabled */
+  --text-faint:    #A8A39E;   /* çok soluk / disabled */
 
   --ruby:       #A83040;
   --ruby-light: #D04858;
@@ -46,8 +46,8 @@ html, body {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: #2E2B25; border-radius: 2px; }
+::-webkit-scrollbar-track { background: #E8E5E0; }
+::-webkit-scrollbar-thumb { background: #C0BCB5; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
 
 /* ── Premium card ── */

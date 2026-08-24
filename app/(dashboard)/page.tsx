@@ -1,26 +1,32 @@
 'use client'
 
-function FiyatKart({ label, d, sym, color, small }: { label: string; d: any; sym: string; color: string; small?: boolean }) {
+function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d: any; sym: string; color: string; small?: boolean; usdRate?: number }) {
   if (!d) return null
   const alis = d.alis ?? d
   const satis = d.satis
   const degisim = d.degisim
-  const fmt = (n: number | null) => n != null ? n.toLocaleString('tr-TR', { maximumFractionDigits: n < 10 ? 4 : 0 }) + ' ₺' : '—'
+  const fmtTL = (n: number | null) => n != null ? n.toLocaleString('tr-TR', { maximumFractionDigits: n < 10 ? 4 : 0 }) + ' ₺' : '—'
+  const fmtUSD = (n: number | null) => n != null && usdRate ? '$' + (n / usdRate).toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
   return (
-    <div style={{ background: '#1A1712', border: '1px solid rgba(201,168,76,0.1)', borderRadius: 10, padding: small ? '10px 14px' : '14px 18px' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-gold)', borderRadius: 10, padding: small ? '10px 14px' : '14px 18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <span style={{ fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#5A5550' }}>{label}</span>
+        <span style={{ fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{label}</span>
         <span style={{ color, fontSize: small ? 12 : 14 }}>{sym}</span>
       </div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: small ? 20 : 26, fontWeight: 300, color: '#EDE8DF', lineHeight: 1 }}>
-        {fmt(alis)}
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: small ? 20 : 26, fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1 }}>
+        {fmtTL(alis)}
       </div>
+      {usdRate && alis != null && (
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
+          {fmtUSD(alis)}
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-        <span style={{ fontSize: 9, color: '#5A5550', fontFamily: 'JetBrains Mono, monospace' }}>
-          {satis != null ? `satış ${fmt(satis)}` : ''}
+        <span style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+          {satis != null ? `satış ${fmtTL(satis)}` : ''}
         </span>
         {degisim != null && !isNaN(degisim) && (
-          <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? '#C9A84C' : '#C4364A' }}>
+          <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? 'var(--gold)' : '#C4364A' }}>
             {degisim >= 0 ? '▲' : '▼'} %{Math.abs(degisim).toFixed(2)}
           </span>
         )}
@@ -232,23 +238,23 @@ export default function DashboardPage() {
           <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Altın</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
-              { label: 'Gram Altın',  d: fiyatlar.altin?.gram,   sym: '✦', color: '#C9A84C' },
-              { label: '14 Ayar',     d: fiyatlar.altin?.ayar14, sym: '✦', color: '#C9A84C' },
-              { label: 'Çeyrek',      d: fiyatlar.altin?.ceyrek, sym: '✦', color: '#B8942A' },
-              { label: 'Yarım',       d: fiyatlar.altin?.yarim,  sym: '✦', color: '#B8942A' },
-              { label: 'Tam',         d: fiyatlar.altin?.tam,    sym: '✦', color: '#A07820' },
+              { label: 'Gram Altın',  d: fiyatlar.altin?.gram,   sym: '✦', color: '#8B6914', usdRate: true },
+              { label: '14 Ayar',     d: fiyatlar.altin?.ayar14, sym: '✦', color: '#8B6914', usdRate: true },
+              { label: 'Çeyrek',      d: fiyatlar.altin?.ceyrek, sym: '✦', color: '#A07820', usdRate: true },
+              { label: 'Yarım',       d: fiyatlar.altin?.yarim,  sym: '✦', color: '#A07820', usdRate: true },
+              { label: 'Tam',         d: fiyatlar.altin?.tam,    sym: '✦', color: '#8B6810', usdRate: true },
             ].map(item => (
-              <FiyatKart key={item.label} label={item.label} d={item.d} sym={item.sym} color={item.color} />
+              <FiyatKart key={item.label} label={item.label} d={item.d} sym={item.sym} color={item.color} usdRate={(item as any).usdRate ? fiyatlar.doviz?.usd?.alis : undefined} />
             ))}
           </div>
           {/* Gümüş & Platin */}
           <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#5A5550', marginBottom: 8 }}>Diğer Madenler</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
-              { label: 'Gümüş (gr)', d: fiyatlar.gumus,  sym: '◆', color: '#9A928A' },
-              { label: 'Platin (gr)', d: fiyatlar.platin, sym: '◈', color: '#7A8A9A' },
+              { label: 'Gümüş (gr)', d: fiyatlar.gumus,  sym: '◆', color: '#7A7468', usdRate: true },
+              { label: 'Platin (gr)', d: fiyatlar.platin, sym: '◈', color: '#5A6A7A', usdRate: true },
             ].map(item => (
-              <FiyatKart key={item.label} label={item.label} d={item.d} sym={item.sym} color={item.color} />
+              <FiyatKart key={item.label} label={item.label} d={item.d} sym={item.sym} color={item.color} usdRate={(item as any).usdRate ? fiyatlar.doviz?.usd?.alis : undefined} />
             ))}
           </div>
           {/* Döviz */}
