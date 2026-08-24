@@ -11,25 +11,30 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { show, ...gorevData } = body
-
-  // sms_saati string → time formatına çevir (HH:MM)
-  const payload = {
-    ...gorevData,
-    sms_saati: gorevData.sms_saati || null,
-    sms_telefon: gorevData.sms_telefon || '905392993103',
-    sms_gonderildi: false,
+  // Form state artıkları ve boş string → null dönüşümü
+  const payload: Record<string, any> = {
+    baslik:          body.baslik?.trim() || null,
+    aciklama:        body.aciklama?.trim() || null,
+    oncelik:         body.oncelik || 'normal',
+    durum:           body.durum || 'bekliyor',
+    ilgili_telefon:  body.ilgili_telefon?.trim() || null,
+    ilgili_siparis:  body.ilgili_siparis?.trim() || null,
+    bitis_tarihi:    body.bitis_tarihi || null,        // boş string → null (date tipi)
+    sms_saati:       body.sms_saati || null,           // boş string → null (time tipi)
+    sms_telefon:     body.sms_telefon || '905392993103',
+    sms_gonderildi:  false,
   }
 
   const { error } = await db().from('gorevler').insert(payload)
   if (error) return NextResponse.json({ ok: false, error: error.message })
-
   return NextResponse.json({ ok: true })
 }
 
 export async function PATCH(req: Request) {
   const { id, ...updates } = await req.json()
-  const { error } = await db().from('gorevler').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id)
+  const { error } = await db().from('gorevler')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', id)
   return NextResponse.json({ ok: !error })
 }
 

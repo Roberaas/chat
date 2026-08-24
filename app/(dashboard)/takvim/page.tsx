@@ -52,11 +52,18 @@ export default function TakvimPage() {
   async function etkinlikEkle() {
     if (!ekleForm.baslik.trim() || !ekleForm.tarih) return
     setKayitLoading(true)
-    const { show, ...data } = ekleForm
     await fetch('/api/gorev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, bitis_tarihi: data.tarih, durum: 'bekliyor' })
+      body: JSON.stringify({
+        baslik: ekleForm.baslik,
+        aciklama: ekleForm.aciklama || null,
+        bitis_tarihi: ekleForm.tarih || null,
+        oncelik: ekleForm.oncelik,
+        sms_saati: ekleForm.sms_saati || null,
+        sms_telefon: ekleForm.sms_telefon || '905392993103',
+        durum: 'bekliyor',
+      })
     })
     setEkleForm({ show: false, baslik: '', aciklama: '', tarih: '', sms_saati: '', sms_telefon: '905392993103', oncelik: 'normal' })
     setKayitLoading(false)
