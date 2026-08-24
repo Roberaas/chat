@@ -163,28 +163,27 @@ export default function RaporIletPage() {
     </div>
   )
 
+  const iadeInp = (labelTxt: string, key: keyof typeof form, prefix: string, mode: string) => (
+    <div>
+      <label style={{ ...labelStyle, color: '#A83040' }}>{labelTxt}</label>
+      <div style={wrapStyle(true)}>
+        <span style={prefixStyle(true)}>{prefix}</span>
+        <input
+          type="text"
+          inputMode={mode as any}
+          defaultValue={form[key] as string}
+          onBlur={e => setForm(p => ({ ...p, [key]: e.target.value }))}
+          placeholder={prefix === '#' ? '0' : '0.00'}
+          style={{ ...inputStyle, color: '#A83040' }}
+        />
+      </div>
+    </div>
+  )
+
   const IadeField = ({ label, adetKey, tutarKey }: { label: string; adetKey: keyof typeof form; tutarKey: keyof typeof form }) => (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-      <div>
-        <label style={{ ...labelStyle, color: '#A83040' }}>{label} Adet</label>
-        <div style={wrapStyle(true)}>
-          <span style={prefixStyle(true)}>#</span>
-          <input
-            type="text" inputMode="numeric" value={form[adetKey]}
-            onChange={e => setForm(p => ({ ...p, [adetKey]: e.target.value }))}
-            placeholder="0" style={{ ...inputStyle, color: '#A83040' }} />
-        </div>
-      </div>
-      <div>
-        <label style={{ ...labelStyle, color: '#A83040' }}>{label} Tutar</label>
-        <div style={wrapStyle(true)}>
-          <span style={prefixStyle(true)}>₺</span>
-          <input
-            type="text" inputMode="decimal" value={form[tutarKey]}
-            onChange={e => setForm(p => ({ ...p, [tutarKey]: e.target.value }))}
-            placeholder="0.00" style={{ ...inputStyle, color: '#A83040' }} />
-        </div>
-      </div>
+      {iadeInp(label + ' Adet', adetKey, '#', 'numeric')}
+      {iadeInp(label + ' Tutar', tutarKey, '₺', 'decimal')}
     </div>
   )
 
