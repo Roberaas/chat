@@ -169,14 +169,20 @@ export default function RaporIletPage() {
         <label style={{ ...labelStyle, color: '#A83040' }}>{label} Adet</label>
         <div style={wrapStyle(true)}>
           <span style={prefixStyle(true)}>#</span>
-          <input type="number" value={form[adetKey]} onChange={f(adetKey)} placeholder="0" style={{ ...inputStyle, color: '#A83040' }} />
+          <input
+            type="text" inputMode="numeric" value={form[adetKey]}
+            onChange={e => setForm(p => ({ ...p, [adetKey]: e.target.value }))}
+            placeholder="0" style={{ ...inputStyle, color: '#A83040' }} />
         </div>
       </div>
       <div>
         <label style={{ ...labelStyle, color: '#A83040' }}>{label} Tutar</label>
         <div style={wrapStyle(true)}>
           <span style={prefixStyle(true)}>₺</span>
-          <input type="number" value={form[tutarKey]} onChange={f(tutarKey)} placeholder="0.00" style={{ ...inputStyle, color: '#A83040' }} />
+          <input
+            type="text" inputMode="decimal" value={form[tutarKey]}
+            onChange={e => setForm(p => ({ ...p, [tutarKey]: e.target.value }))}
+            placeholder="0.00" style={{ ...inputStyle, color: '#A83040' }} />
         </div>
       </div>
     </div>
