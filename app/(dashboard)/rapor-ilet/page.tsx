@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Send, TrendingUp, Globe, FileText, CheckCircle, AlertCircle, Eye, Save, BarChart2, RotateCcw } from 'lucide-react'
 
 export default function RaporIletPage() {
-  const todayISO = new Date().toISOString().split('T')[0]
+  const todayISO = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' }) // YYYY-MM-DD TR timezone
   const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
   const ayLabel = new Date().toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' })
 
@@ -27,6 +27,18 @@ export default function RaporIletPage() {
   const [result, setResult] = useState<'ok' | 'err' | null>(null)
   const [preview, setPreview] = useState(false)
   const [loadingAylik, setLoadingAylik] = useState(true)
+
+  // localStorage otomatik kayıt
+  useEffect(() => {
+    const saved = localStorage.getItem('rapor-form-' + todayISO)
+    if (saved) {
+      try { setForm(f => ({ ...f, ...JSON.parse(saved) })) } catch {}
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('rapor-form-' + todayISO, JSON.stringify(form))
+  }, [form])
 
   useEffect(() => {
     async function loadData() {
