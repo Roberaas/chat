@@ -8,7 +8,7 @@ const ROL_YETKILER: Record<string, string[]> = {
 }
 
 export function middleware(request: NextRequest) {
-  const auth = request.cookies.get('roberto-auth') || request.cookies.get('roberto-admin-auth')
+  const auth = request.cookies.get('rb_session') || request.cookies.get('roberto-auth') || request.cookies.get('roberto-admin-auth')
   const pathname = request.nextUrl.pathname
   const isLoginPage = pathname === '/login'
 
