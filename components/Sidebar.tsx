@@ -32,6 +32,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
   }, [])
 
   async function logout() {
+    onClose?.()
     await fetch('/api/auth', { method: 'DELETE' })
     router.push('/login')
     router.refresh()
