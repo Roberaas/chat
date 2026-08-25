@@ -167,7 +167,7 @@ export default function KonusmalarPage() {
       {selected && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setSelected(null)}>
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }} />
-          <div style={{ position: 'relative', width: '100%', maxWidth: 420, background: 'var(--bg-sidebar)', height: '100%', overflowY: 'auto', borderLeft: '1px solid rgba(201,168,76,0.15)' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'fixed', right: 0, top: 0, bottom: 0, width: '100%', maxWidth: 420, background: 'var(--bg-sidebar)', height: '100vh', overflowY: 'auto', borderLeft: '1px solid rgba(201,168,76,0.15)', zIndex: 50 }} onClick={e => e.stopPropagation()}>
 
             {/* Drawer header */}
             <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(13,11,9,0.95)', backdropFilter: 'blur(12px)', padding: '20px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
