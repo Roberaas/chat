@@ -131,3 +131,148 @@ html, body {
 .stagger > *:nth-child(6) { animation-delay: 0.30s; }
 .stagger > *:nth-child(7) { animation-delay: 0.35s; }
 .stagger > *:nth-child(8) { animation-delay: 0.40s; }
+
+/* ═══════════════════════════════════════
+   MOBİL UYUMLU — Global responsive
+   ═══════════════════════════════════════ */
+
+/* Genel sayfa padding */
+@media (max-width: 768px) {
+  /* Sayfa içeriği */
+  main > div,
+  main > section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Grid'ler tek sütuna düşsün */
+  [style*="grid-template-columns: repeat(2"],
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns: repeat(4"],
+  [style*="grid-template-columns: repeat(5"],
+  [style*="grid-template-columns: repeat(6"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Flex row → column */
+  .mobile-col {
+    flex-direction: column !important;
+  }
+
+  /* Font boyutları */
+  [style*="font-size: 48px"],
+  [style*="font-size: 42px"],
+  [style*="font-size: 36px"] {
+    font-size: 28px !important;
+  }
+
+  /* Tablo scroll */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Canlı destek — chat paneli tam ekran */
+  .canli-destek-layout {
+    flex-direction: column !important;
+  }
+
+  .canli-destek-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* 2'li grid'ler de tek sütun */
+  [style*="gridTemplateColumns: 'repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Padding küçült */
+  [style*="padding: '40px"] {
+    padding: 16px !important;
+  }
+
+  [style*="padding: '32px"] {
+    padding: 16px !important;
+  }
+}
+
+/* ─── Sayfa içi padding ─── */
+.page-content {
+  padding: 40px 32px;
+}
+@media (max-width: 768px) {
+  .page-content {
+    padding: 20px 16px;
+  }
+}
+
+/* ─── Fiyat kartı grid ─── */
+.fiyat-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.fiyat-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.fiyat-grid-6 {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+@media (max-width: 900px) {
+  .fiyat-grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .fiyat-grid-6 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .fiyat-grid-5 { grid-template-columns: repeat(2, 1fr); }
+  .fiyat-grid-2 { grid-template-columns: 1fr; }
+  .fiyat-grid-6 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── Stat kartları ─── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .stat-grid { grid-template-columns: 1fr; } }
+
+/* ─── Canlı destek ─── */
+.canli-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+@media (max-width: 768px) {
+  .canli-layout { flex-direction: column; height: auto; }
+  .canli-sidebar { width: 100% !important; height: 200px !important; overflow-y: auto; border-right: none !important; border-bottom: 1px solid var(--border-dim); }
+  .canli-panel { flex: 1; min-height: 60vh; }
+}
+
+/* ─── Konuşmalar / Müşteriler tablo ─── */
+.data-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Rapor İlet ─── */
+.rapor-layout {
+  display: flex;
+  gap: 32px;
+  padding: 40px 32px;
+}
+@media (max-width: 900px) {
+  .rapor-layout { flex-direction: column; padding: 20px 16px; gap: 24px; }
+  .rapor-form { width: 100% !important; flex: none !important; }
+  .rapor-preview { width: 100% !important; }
+}

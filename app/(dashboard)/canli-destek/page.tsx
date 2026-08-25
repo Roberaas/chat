@@ -149,7 +149,7 @@ export default function CanliDestekPage() {
   const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0)
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div className="canli-layout" style={{ height: '100vh', overflow: 'hidden' }}>
       {/* Sidebar */}
       <div style={P.sidebar}>
         <div style={P.sideHeader}>
@@ -213,7 +213,7 @@ export default function CanliDestekPage() {
 
       {/* Sağ panel */}
       {selected ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <div className="canli-panel" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {/* Header */}
           <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(201,168,76,0.08)', background: 'var(--bg-sidebar)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

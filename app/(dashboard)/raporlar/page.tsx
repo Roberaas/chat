@@ -13,9 +13,9 @@ const INTENT_LABEL: Record<string, string> = {
   human_handover: 'Canlı Destek', complaint: 'Şikayet', brand_info: 'Marka Bilgi',
   usage_question: 'Kullanım Sorusu', menu: 'Menü', smalltalk: 'Sohbet', other: 'Diğer',
 }
-const COLORS = ['#C9A84C','#A8882A','#8B6914','#6B5210','#C8C0B0','#8A8580','#6B6760','#3A3730']
+const COLORS = ['#C9A84C','#A8882A','#8B6914','#6B5210','var(--text-body)','#8A8580','#6B6760','var(--bg-card2)']
 const ETIKET_RENKLER = ['#7c9059','#c4633f','#d9c07a','#928c79','#a8b885','#d97757','#3d3a30','#cfd9b4']
-const tooltipStyle = { background: '#181612', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '8px', fontSize: '11px', color: '#C8C0B0' }
+const tooltipStyle = { background: 'var(--bg-card)', border: '1px solid rgba(139,105,20,0.2)', borderRadius: '8px', fontSize: '11px', color: 'var(--text-body)' }
 
 
 export default function RaporlarPage() {

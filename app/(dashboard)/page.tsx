@@ -7,6 +7,8 @@ function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d:
   const degisim = d.degisim
   const fmtTL = (n: number | null) => n != null ? n.toLocaleString('tr-TR', { maximumFractionDigits: n < 10 ? 4 : 0 }) + ' ₺' : '—'
   const fmtUSD = (n: number | null) => n != null && usdRate ? '$' + (n / usdRate).toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
+  const mainVal = usdRate && alis != null ? fmtUSD(alis) : fmtTL(alis)
+  const subVal  = usdRate && alis != null ? fmtTL(alis) : ''
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-gold)', borderRadius: 10, padding: small ? '10px 14px' : '14px 18px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -14,16 +16,16 @@ function FiyatKart({ label, d, sym, color, small, usdRate }: { label: string; d:
         <span style={{ color, fontSize: small ? 12 : 14 }}>{sym}</span>
       </div>
       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: small ? 20 : 26, fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1 }}>
-        {fmtTL(alis)}
+        {mainVal}
       </div>
-      {usdRate && alis != null && (
+      {subVal && (
         <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
-          {fmtUSD(alis)}
+          {subVal}
         </div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
         <span style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-          {satis != null && !small ? `satış ${fmtTL(satis)}` : ''}
+          {satis != null && !small && !usdRate ? `satış ${fmtTL(satis)}` : ''}
         </span>
         {degisim != null && !isNaN(degisim) && (
           <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: degisim >= 0 ? 'var(--gold)' : '#C4364A' }}>
@@ -233,10 +235,10 @@ export default function DashboardPage() {
 
       {/* Fiyat Kartları */}
       {fiyatlar && (
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 24, padding: '0 32px' }} className="px-4 sm:px-8">
           {/* Altın */}
           <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Altın</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
             {[
               { label: 'Gram Altın',  d: fiyatlar.altin?.gram,   sym: '✦', color: '#8B6914', usdRate: true },
               { label: '14 Ayar',     d: fiyatlar.altin?.ayar14, sym: '✦', color: '#8B6914', usdRate: true },
@@ -259,7 +261,7 @@ export default function DashboardPage() {
           </div>
           {/* Döviz */}
           <div style={{ fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>Döviz</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {[
               { label: 'USD',  d: fiyatlar.doviz?.usd, sym: '$',  color: '#7A9A6A' },
               { label: 'EUR',  d: fiyatlar.doviz?.eur, sym: '€',  color: '#6A7A9A' },
