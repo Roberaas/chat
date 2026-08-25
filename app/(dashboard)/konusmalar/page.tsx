@@ -214,7 +214,7 @@ export default function KonusmalarPage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 400, overflowY: 'auto' }}>
                       {gecmis.map((m, i) => {
-                        const isBot = m.role === 'assistant'
+                        const isBot = m.role === 'assistant' || m.role === 'agent'
                         return (
                           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: isBot ? 'flex-start' : 'flex-end', gap: 2 }}>
                             <span style={{ fontSize: 9, color: '#5A5550', letterSpacing: '0.1em' }}>{isBot ? 'Roberto' : 'Müşteri'}</span>
