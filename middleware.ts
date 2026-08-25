@@ -18,7 +18,9 @@ export function middleware(request: NextRequest) {
   }
 
   // Auth varken login'e girmeye çalışıyorsa ana sayfaya yönlendir
-  if (auth && isLoginPage) {
+  // logout=1 parametresi varsa yönlendirme — çıkış akışı
+  const isLogout = request.nextUrl.searchParams.get('logout') === '1'
+  if (auth && isLoginPage && !isLogout) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 

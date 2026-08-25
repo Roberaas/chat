@@ -147,7 +147,7 @@ export default function MusterilerPage() {
         {[
           { key: 'vip', label: 'VIP', value: segmentStats.vip, icon: Crown, color: 'bg-[var(--bg-card)] border-ink-700 text-cream-50', sub: '3+ sipariş veya abone' },
           { key: 'aktif', label: 'Aktif', value: segmentStats.aktif, icon: TrendingUp, color: 'bg-[rgba(201,168,76,0.06)] border-[rgba(201,168,76,0.15)] text-[#C9A84C]', sub: 'Son 30 günde aktif' },
-          { key: 'yeni', label: 'Yeni', value: segmentStats.yeni, icon: Users, color: 'bg-white border-[rgba(201,168,76,0.15)] text-[#EDE8DF]', sub: '30-90 gün' },
+          { key: 'yeni', label: 'Yeni', value: segmentStats.yeni, icon: Users, color: 'bg-[var(--bg-card)] border-[rgba(201,168,76,0.15)] text-[#EDE8DF]', sub: '30-90 gün' },
           { key: 'kayip', label: 'Kayıp', value: segmentStats.kayip, icon: Users, color: 'bg-[rgba(139,38,53,0.1)] border-[rgba(139,38,53,0.25)] text-ember-700', sub: '90+ gün önce aktif' },
         ].map(({ key, label, value, icon: Icon, color, sub }) => (
           <div key={key} onClick={() => setFilter(filter === key as any ? 'all' : key as any)}
@@ -232,7 +232,7 @@ export default function MusterilerPage() {
           <div className="absolute inset-0 bg-[var(--bg-card)]/40 backdrop-blur-sm" />
           <div className="relative w-full max-w-md  h-full overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
 
-            <div className="sticky top-0 bg-white border-b border-[rgba(201,168,76,0.15)] z-10 p-5">
+            <div className="sticky top-0 bg-[var(--bg-card)] border-b border-[rgba(201,168,76,0.15)] z-10 p-5">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold ${SEGMENT_COLOR[selected.segment]}`}>

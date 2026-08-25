@@ -39,3 +39,4 @@ kullanicilar (id, ad, kullanici_adi, sifre_hash, rol, aktif, son_giris, created_
 -- Aktivite logu
 aktivite_log (id, kullanici_adi, kullanici_ad, aksiyon, sayfa, detay, created_at)
 ```
+# push test Mon Aug 24 15:06:38 UTC 2026

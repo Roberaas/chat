@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Download } from 'lucide-react'
 
 type Step = 'sifre' | 'otp'
 
@@ -13,7 +14,27 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [maskedPhone, setMaskedPhone] = useState('')
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [installing, setInstalling] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  async function installApp() {
+    if (!installPrompt) return
+    setInstalling(true)
+    installPrompt.prompt()
+    await installPrompt.userChoice
+    setInstallPrompt(null)
+    setInstalling(false)
+  }
 
   async function loginWithPassword() {
     if (!kullanici_adi || !sifre) { setError('Kullanıcı adı ve şifre gerekli'); return }
@@ -135,6 +156,24 @@ export default function LoginPage() {
             </div>
           )}
         </div>
+
+        {installPrompt && (
+          <button
+            onClick={installApp}
+            disabled={installing}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              width: '100%', marginTop: 16, padding: '11px 0',
+              background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.2)',
+              borderRadius: 10, fontSize: 13, color: '#8B6914', cursor: installing ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit', fontWeight: 500, transition: 'all 0.2s',
+              opacity: installing ? 0.7 : 1
+            }}
+          >
+            <Download size={14} strokeWidth={1.75} />
+            {installing ? 'Kuruluyor...' : 'Uygulamayı Kur'}
+          </button>
+        )}
 
         <p style={{ textAlign: 'center', fontSize: 10, color: '#A8A39E', marginTop: 24, fontFamily: 'JetBrains Mono, monospace' }}>
           roberto admin · v2.1

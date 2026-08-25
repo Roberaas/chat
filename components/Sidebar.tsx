@@ -32,9 +32,9 @@ export default function Sidebar({ onClose }: { onClose?: () => void; dark?: bool
   }, [])
 
   async function logout() {
+    onClose?.()
     await fetch('/api/auth', { method: 'DELETE' })
-    router.push('/login')
-    router.refresh()
+    window.location.href = '/login?logout=1'
   }
 
   const items = [

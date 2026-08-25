@@ -19,21 +19,40 @@ module.exports = {
           dark: '#8B6914',
           subtle: 'rgba(201,168,76,0.12)',
         },
+        // obsidian → beyaz tema karşılıkları
         obsidian: {
-          DEFAULT: '#0A0908',
-          2: '#111009',
-          3: '#181612',
-          4: '#1F1D17',
-          5: '#272420',
+          DEFAULT: '#F5F3EF',
+          2: '#F0EDE8',
+          3: '#FFFFFF',   // bg-obsidian-3  → kart beyazı
+          4: '#F0EDE8',   // bg-obsidian-4  → iç kart
+          5: '#E8E5E0',
+        },
+        // ink → metin renkleri (beyaz temada koyu)
+        ink: {
+          300: 'rgba(139,105,20,0.25)',
+          700: '#3A3530',
+          900: '#1A1410',
         },
         stone: {
-          DEFAULT: '#3A3730',
-          light: '#6B6760',
+          DEFAULT: '#7A7468',  // text-stone → muted
+          light: '#A8A39E',    // text-stone-light → faint
         },
         cream: {
-          DEFAULT: '#F5F0E8',
-          dim: '#C8C0B0',
-          muted: '#8A8580',
+          DEFAULT: '#1A1410',  // text-cream → koyu metin (beyaz temada)
+          50:  '#1A1410',
+          dim: '#3A3530',
+          muted: '#7A7468',
+          200: 'rgba(139,105,20,0.15)',
+          300: 'rgba(139,105,20,0.25)',
+        },
+        moss: {
+          400: '#7A9A6A',
+          500: '#5A8050',
+          300: '#A8C898',
+        },
+        ember: {
+          200: 'rgba(196,54,74,0.3)',
+          700: '#C4364A',
         },
         ruby: {
           DEFAULT: '#8B2635',
