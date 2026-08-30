@@ -206,11 +206,11 @@ export default function RaporIletPage() {
         )}
         {state === 'preview_ok' && (
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={onReset} style={{ flex: '0 0 auto', padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 10, color: '#7A7468', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <X size={14} /> Kapat
+            <button onClick={onPreview} style={{ flex: '0 0 auto', padding: '14px 16px', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 10, color: 'var(--gold-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Eye size={14} /> Önizlemeyi Aç
             </button>
             <button onClick={onSend} style={{ flex: 1, padding: '14px 24px', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', border: 'none', borderRadius: 10, color: 'var(--bg-base)', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <Send size={13} /> Onayla & Gönder
+              <Send size={13} /> Gönder
             </button>
           </div>
         )}
@@ -233,7 +233,7 @@ export default function RaporIletPage() {
   }
 
   // ── PREVIEW MODAL ──
-  function PreviewModal({ html, onClose }: { html: string; onClose: () => void }) {
+  function PreviewModal({ html, onClose, onSend, sending }: { html: string; onClose: () => void; onSend: () => void; sending?: boolean }) {
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '40px 20px', overflowY: 'auto' }}>
         <div style={{ background: 'var(--bg-base)', borderRadius: 16, width: '100%', maxWidth: 680, border: '1px solid rgba(201,168,76,0.2)' }}>
@@ -249,9 +249,17 @@ export default function RaporIletPage() {
               <div style={{ background: '#EDE8E0', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid rgba(139,105,20,0.12)' }}>
                 {['#C4364A','#C9A84C','#7AC98A'].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c, opacity: 0.6 }} />)}
               </div>
-              <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                <iframe srcDoc={html} style={{ width: '100%', border: 'none', minHeight: 600 }} title="Mail Önizleme" />
+              <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                <iframe srcDoc={html} style={{ width: '100%', border: 'none', minHeight: 500 }} title="Mail Önizleme" />
               </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button onClick={onClose} style={{ flex: '0 0 auto', padding: '13px 18px', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 10, color: '#7A7468', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <X size={13} /> Kapat
+              </button>
+              <button onClick={onSend} disabled={sending} style={{ flex: 1, padding: '13px 24px', background: sending ? 'rgba(201,168,76,0.3)' : 'linear-gradient(135deg,#C9A84C,#8B6914)', border: 'none', borderRadius: 10, color: sending ? '#7A7468' : 'var(--bg-base)', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: sending ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Send size={13} /> {sending ? 'Gönderiliyor...' : 'Onayla & Gönder'}
+              </button>
             </div>
           </div>
         </div>
@@ -267,11 +275,11 @@ export default function RaporIletPage() {
     <>
       {/* HAFTALIK PREVIEW MODAL */}
       {haftalikState === 'preview_ok' && haftalikPreviewHtml && (
-        <PreviewModal html={haftalikPreviewHtml} onClose={() => setHaftalikState('idle')} />
+        <PreviewModal html={haftalikPreviewHtml} onClose={() => setHaftalikPreviewHtml('')} onSend={haftalikGonder} sending={haftalikState === 'sending'} />
       )}
       {/* AYLIK PREVIEW MODAL */}
       {aylikState === 'preview_ok' && aylikPreviewHtml && (
-        <PreviewModal html={aylikPreviewHtml} onClose={() => setAylikState('idle')} />
+        <PreviewModal html={aylikPreviewHtml} onClose={() => setAylikPreviewHtml('')} onSend={aylikGonder} sending={aylikState === 'sending'} />
       )}
 
       <div style={{ padding: '24px 16px', maxWidth: 900, margin: '0 auto' }}>
