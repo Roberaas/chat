@@ -275,11 +275,11 @@ export default function RaporIletPage() {
     <>
       {/* HAFTALIK PREVIEW MODAL */}
       {haftalikState === 'preview_ok' && haftalikPreviewHtml && (
-        <PreviewModal html={haftalikPreviewHtml} onClose={() => setHaftalikPreviewHtml('')} onSend={haftalikGonder} sending={haftalikState === 'sending'} />
+        <PreviewModal html={haftalikPreviewHtml} onClose={() => setHaftalikPreviewHtml('')} onSend={haftalikGonder} />
       )}
       {/* AYLIK PREVIEW MODAL */}
       {aylikState === 'preview_ok' && aylikPreviewHtml && (
-        <PreviewModal html={aylikPreviewHtml} onClose={() => setAylikPreviewHtml('')} onSend={aylikGonder} sending={aylikState === 'sending'} />
+        <PreviewModal html={aylikPreviewHtml} onClose={() => setAylikPreviewHtml('')} onSend={aylikGonder} />
       )}
 
       <div style={{ padding: '24px 16px', maxWidth: 900, margin: '0 auto' }}>
