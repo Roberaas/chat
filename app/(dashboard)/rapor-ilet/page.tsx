@@ -363,7 +363,7 @@ export default function RaporIletPage() {
                     <button onClick={() => setGunlukState('preview_ok')} style={{ flex: '0 0 auto', padding: '14px 18px', background: 'var(--bg-card)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 10, color: 'var(--gold-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                       <Eye size={14} /> Önizle
                     </button>
-                    <button onClick={gunlukGonder} disabled={gunlukState === 'sending'} style={{ flex: 1, padding: '14px 24px', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', border: 'none', borderRadius: 10, color: 'var(--bg-base)', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <button onClick={gunlukGonder} style={{ flex: 1, padding: '14px 24px', background: 'linear-gradient(135deg,#C9A84C,#8B6914)', border: 'none', borderRadius: 10, color: 'var(--bg-base)', fontSize: 12, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                       <Send size={13} /> Raporu Gönder
                     </button>
                   </div>
