@@ -2,23 +2,19 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Mic, MicOff, X, Volume2, Loader2 } from 'lucide-react'
+import { Mic, MicOff, X, Volume2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 type Mesaj = { rol: 'user' | 'assistant'; metin: string }
 
 const SAYFALAR: Record<string, string> = {
-  'sipariş': '/siparisler', 'siparişler': '/siparisler',
-  'konuşma': '/konusmalar', 'mesaj': '/konusmalar',
+  'konuşma': '/konusmalar', 'konuşmalar': '/konusmalar', 'mesaj': '/konusmalar',
   'destek': '/canli-destek', 'canlı': '/canli-destek',
   'müşteri': '/musteriler', 'müşteriler': '/musteriler',
-  'abone': '/abonelikler', 'abonelik': '/abonelikler',
-  'ödeme': '/odemeler', 'ödemeler': '/odemeler',
-  'muhasebe': '/muhasebe', 'gelir': '/muhasebe',
-  'harita': '/harita', 'teslimat': '/harita',
   'görev': '/calisma', 'çalışma': '/calisma',
   'takvim': '/takvim',
   'rapor': '/raporlar', 'raporlar': '/raporlar',
-  'reklam': '/reklamlar',
+  'kullanıcı': '/kullanicilar', 'kullanıcılar': '/kullanicilar',
   'ana sayfa': '/', 'genel': '/',
 }
 
@@ -34,6 +30,8 @@ export default function VoiceAssistant() {
   const wakeRef = useRef<any>(null)
   const acikRef = useRef(false)
   acikRef.current = acik
+  const durumRef = useRef(durum)
+  durumRef.current = durum
 
   useEffect(() => {
     if (mesajlarRef.current) mesajlarRef.current.scrollTop = mesajlarRef.current.scrollHeight
@@ -52,83 +50,53 @@ export default function VoiceAssistant() {
     window.speechSynthesis.speak(u)
   }, [])
 
-  // Tüm veriyi derin analiz için çek
+  // WhatsApp bot + görev verisini asistana özetle
   const tumVeriCek = useCallback(async () => {
     try {
-      const [sipRes, abRes, gorevRes, sessionRes] = await Promise.all([
-        fetch('/api/shopify/orders').then(r => r.json()).catch(() => ({ orders: [] })),
-        fetch('/api/aboneliker').then(r => r.json()).catch(() => ({ subs: [] })),
+      const [sessRes, gorevRes] = await Promise.all([
+        supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500),
         fetch('/api/gorev').then(r => r.json()).catch(() => ({ gorevler: [] })),
-        fetch('/api/konusmalar').then(r => r.json()).catch(() => ({ sessions: [] })),
       ])
-
-      const orders = sipRes.orders || []
+      const sessions: any[] = sessRes.data || []
       const now = new Date()
       const bugun = now.toDateString()
-      const ayBas = new Date(now.getFullYear(), now.getMonth(), 1)
       const haftaOnce = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
       const ikiHaftaOnce = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
 
-      const bugunOrders = orders.filter((o: any) => new Date(o.created_at).toDateString() === bugun)
-      const buHaftaOrders = orders.filter((o: any) => new Date(o.created_at) >= haftaOnce)
-      const gecenHaftaOrders = orders.filter((o: any) => {
-        const d = new Date(o.created_at)
-        return d >= ikiHaftaOnce && d < haftaOnce
-      })
-      const bekleyenSip = orders.filter((o: any) => !o.fulfillment_status || o.fulfillment_status === 'unfulfilled')
-      const iadeSip = orders.filter((o: any) => o.has_refund)
-      const ayGelir = orders.filter((o: any) => new Date(o.created_at) >= ayBas && o.financial_status === 'paid')
-        .reduce((t: number, o: any) => t + parseFloat(o.total_price || 0), 0)
-      const ortSepet = orders.length > 0 ? orders.reduce((t: number, o: any) => t + parseFloat(o.total_price || 0), 0) / orders.length : 0
+      const bugunS = sessions.filter(x => new Date(x.updated_at).toDateString() === bugun)
+      const buHafta = sessions.filter(x => new Date(x.updated_at) >= haftaOnce)
+      const gecenHafta = sessions.filter(x => { const d = new Date(x.updated_at); return d >= ikiHaftaOnce && d < haftaOnce })
+      const canli = sessions.filter(x => x.bulundugu_menu === 'canli')
+      const canliTarih = sessions.filter(x => x.last_intent === 'human_handover' || x.bulundugu_menu === 'canli')
+      const botOran = sessions.length ? Math.round(((sessions.length - canliTarih.length) / sessions.length) * 100) : 0
 
-      // Ürün analizi
-      const urunSayac: Record<string, number> = {}
-      orders.forEach((o: any) => {
-        o.line_items?.forEach((li: any) => {
-          urunSayac[li.title] = (urunSayac[li.title] || 0) + li.quantity
-        })
-      })
-      const enCokSatan = Object.entries(urunSayac).sort((a,b) => b[1]-a[1]).slice(0,3).map(([k,v]) => `${k}(${v})`).join(', ')
-
-      const aboneler = abRes.subs || []
-      const aktifAboneler = aboneler.filter((a: any) => a.durum === 'abone')
-      const bekleyenAboneler = aboneler.filter((a: any) => a.durum === 'bekliyor')
-      const haftalikAdet = aktifAboneler.reduce((t: number, a: any) => t + (a.haftalik_adet || 0), 0)
-      const aylikAbonelikGelir = haftalikAdet * 130 * 4
+      const intentSayac: Record<string, number> = {}
+      sessions.forEach(x => { const i = x.last_intent || 'other'; intentSayac[i] = (intentSayac[i] || 0) + 1 })
+      const enCokNiyet = Object.entries(intentSayac).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k}(${v})`).join(', ')
+      const trend = buHafta.length > gecenHafta.length ? 'artıyor' : buHafta.length < gecenHafta.length ? 'azalıyor' : 'stabil'
 
       const gorevler = gorevRes.gorevler || []
       const bekleyenGorev = gorevler.filter((g: any) => g.durum === 'bekliyor')
       const acilGorev = bekleyenGorev.filter((g: any) => g.oncelik === 'acil')
       const gecikGorev = bekleyenGorev.filter((g: any) => g.bitis_tarihi && new Date(g.bitis_tarihi) < now)
 
-      const haftaTrend = buHaftaOrders.length > gecenHaftaOrders.length ? 'artıyor' :
-        buHaftaOrders.length < gecenHaftaOrders.length ? 'azalıyor' : 'stabil'
-
       return `
-=== GÜNCEL DASHBOARD VERİLERİ ===
+=== GÜNCEL PANEL VERİLERİ ===
 TARİH: ${now.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}
 
-SİPARİŞ ANALİZİ:
-- Toplam sipariş: ${orders.length}
-- Bugün: ${bugunOrders.length} sipariş
-- Bu hafta: ${buHaftaOrders.length} sipariş (geçen hafta: ${gecenHaftaOrders.length})
-- Haftalık trend: ${haftaTrend}
-- Kargo bekleyen: ${bekleyenSip.length} sipariş
-- İade olan: ${iadeSip.length} sipariş
-- Bu ay gelir: ${ayGelir.toLocaleString('tr')} TL
-- Ortalama sepet: ${Math.round(ortSepet).toLocaleString('tr')} TL
-- En çok satan: ${enCokSatan || 'veri yok'}
+WHATSAPP BOT:
+- Toplam konuşma: ${sessions.length}
+- Bugün aktif: ${bugunS.length}
+- Bu hafta: ${buHafta.length} (geçen hafta: ${gecenHafta.length}) — trend ${trend}
+- Şu an canlı destekte bekleyen: ${canli.length}
+- Canlı desteğe düşen toplam: ${canliTarih.length}
+- Bot başarı oranı: %${botOran}
+- En sık niyetler: ${enCokNiyet || 'veri yok'}
 
-ABONELİK ANALİZİ:
-- Aktif abone: ${aktifAboneler.length}
-- Onay bekleyen: ${bekleyenAboneler.length}
-- Haftalık teslimat: ${haftalikAdet} adet
-- Tahmini aylık abonelik geliri: ${aylikAbonelikGelir.toLocaleString('tr')} TL
-
-GÖREV ANALİZİ:
-- Bekleyen görev: ${bekleyenGorev.length}
-- Acil görev: ${acilGorev.length}
-- Geciken görev: ${gecikGorev.length}
+GÖREVLER:
+- Bekleyen: ${bekleyenGorev.length}
+- Acil: ${acilGorev.length}
+- Geciken: ${gecikGorev.length}
 ${acilGorev[0] ? '- ACİL: ' + acilGorev[0].baslik : ''}
 ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
       `.trim()
@@ -218,9 +186,6 @@ ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
     recognitionRef.current = r
     try { r.start() } catch {}
   }, [soruy])
-
-  const durumRef = useRef(durum)
-  durumRef.current = durum
 
   const wakeWordBaslat = useCallback(() => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -324,10 +289,10 @@ ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
   }
 
   const DURUM_RENK: Record<string, string> = {
-    bekliyor: 'bg-ink-500',
-    dinliyor: 'bg-moss-500 animate-pulse',
-    isleniyor: 'bg-amber-400',
-    konusuyor: 'bg-ember-400 animate-pulse',
+    bekliyor: 'var(--tx3)',
+    dinliyor: 'var(--green)',
+    isleniyor: 'var(--amber)',
+    konusuyor: 'var(--ac)',
   }
   const DURUM_YAZI: Record<string, string> = {
     bekliyor: 'Hazır',
@@ -335,16 +300,15 @@ ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
     isleniyor: 'Düşünüyorum...',
     konusuyor: 'Konuşuyor...',
   }
+  const pulse = durum === 'dinliyor' || durum === 'konusuyor'
 
   return (
     <>
       {/* Mikrofon butonu */}
       {!acik && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+        <div style={{ position: 'fixed', bottom: 22, right: 22, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
           {hata && (
-            <div className="bg-ember-50 border border-ember-200 rounded-xl px-3 py-2 text-xs text-ember-700 max-w-[200px] text-right">
-              {hata}
-            </div>
+            <div className="toast toast-err" style={{ margin: 0, maxWidth: 220, textAlign: 'right', fontSize: 12 }}>{hata}</div>
           )}
           <button
             onClick={izin ? () => {
@@ -353,14 +317,16 @@ ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
               setMesajlar([{ rol: 'assistant', metin: k }])
               setTimeout(() => konuş(k), 300)
             } : izinAl}
-            className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${izin ? 'bg-ink-900 hover:bg-ink-700' : 'bg-ember-500 hover:bg-ember-600'}`}
             title={izin ? '"Hey Roberto" deyin veya tıklayın' : 'Mikrofon izni için tıklayın'}
+            style={{ width: 52, height: 52, borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer', background: izin ? 'linear-gradient(135deg,var(--ac),#5b4de0)' : 'var(--s5)', boxShadow: izin ? '0 6px 20px rgba(124,106,247,.4)' : '0 4px 14px rgba(0,0,0,.25)', transition: 'transform .15s' }}
+            onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.08)')}
+            onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
           >
-            {izin ? <Mic className="w-6 h-6 text-white" strokeWidth={1.75} /> : <MicOff className="w-6 h-6 text-white" strokeWidth={1.75} />}
+            {izin ? <Mic size={22} strokeWidth={1.75} /> : <MicOff size={22} strokeWidth={1.75} />}
           </button>
           {izin && (
-            <div className="flex items-center gap-1.5 text-[10px] text-ink-400 font-mono">
-              <div className="w-1.5 h-1.5 rounded-full bg-moss-500 animate-pulse" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--tx3)', fontFamily: 'JetBrains Mono, monospace' }}>
+              <span className="anim-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)' }} />
               Hey Roberto
             </div>
           )}
@@ -369,68 +335,52 @@ ${bekleyenGorev[0] ? '- Son görev: ' + bekleyenGorev[0].baslik : ''}
 
       {/* Asistan paneli */}
       {acik && (
-        <div className="fixed bottom-6 right-6 z-50 w-80 rounded-2xl shadow-2xl border border-cream-200 overflow-hidden flex flex-col bg-white" style={{ maxHeight: '65vh' }}>
+        <div className="card anim-pop" style={{ position: 'fixed', bottom: 22, right: 22, zIndex: 50, width: 'min(340px, calc(100vw - 32px))', maxHeight: '65vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,.45)', background: 'var(--s1)' }}>
 
-          {/* Header */}
-          <div className="bg-ink-900 px-4 py-3 flex items-center gap-3 shrink-0">
-            <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-moss-700 flex items-center justify-center text-xl">🥛</div>
-              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-ink-900 ${DURUM_RENK[durum]}`} />
+          <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--bdr)', flexShrink: 0 }}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'var(--ac2)', color: 'var(--ac)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Mic size={17} /></div>
+              <span className={pulse ? 'anim-pulse' : undefined} style={{ position: 'absolute', bottom: -2, right: -2, width: 11, height: 11, borderRadius: '50%', border: '2px solid var(--s1)', background: DURUM_RENK[durum] }} />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-cream-50">Roberto Asistan</div>
-              <div className="text-[10px] text-ink-400 font-mono">{DURUM_YAZI[durum]}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--tx)' }}>Roberto Asistan</div>
+              <div style={{ fontSize: 10.5, color: 'var(--tx3)', fontFamily: 'JetBrains Mono, monospace' }}>{DURUM_YAZI[durum]}</div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               {durum === 'konusuyor' && (
-                <button onClick={() => window.speechSynthesis.cancel()} className="p-1.5 rounded-lg hover:bg-ink-700 text-ink-400 hover:text-white transition-colors">
-                  <Volume2 className="w-3.5 h-3.5" />
-                </button>
+                <button onClick={() => window.speechSynthesis.cancel()} title="Sustur" style={{ background: 'none', border: 'none', color: 'var(--tx3)', padding: 6 }}><Volume2 size={14} /></button>
               )}
-              <button onClick={kapat} className="p-1.5 rounded-lg hover:bg-ink-700 text-ink-400 hover:text-white transition-colors">
-                <X className="w-3.5 h-3.5" />
-              </button>
+              <button onClick={kapat} title="Kapat" style={{ background: 'none', border: 'none', color: 'var(--tx3)', padding: 6 }}><X size={14} /></button>
             </div>
           </div>
 
-          {/* Mesajlar */}
-          <div ref={mesajlarRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-cream-50 min-h-0">
+          <div ref={mesajlarRef} style={{ flex: 1, overflowY: 'auto', padding: 14, display: 'flex', flexDirection: 'column', gap: 10, minHeight: 0, background: 'var(--bg)' }}>
             {mesajlar.map((m, i) => (
-              <div key={i} className={`flex ${m.rol === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                  m.rol === 'user'
-                    ? 'bg-ink-900 text-cream-50 rounded-br-sm'
-                    : 'bg-white border border-cream-200 text-ink-800 rounded-bl-sm shadow-sm'
-                }`}>
-                  {m.metin}
-                </div>
+              <div key={i} style={{ display: 'flex', justifyContent: m.rol === 'user' ? 'flex-end' : 'flex-start' }}>
+                <div style={{
+                  maxWidth: '85%', padding: '9px 13px', fontSize: 13, lineHeight: 1.5,
+                  borderRadius: 14, borderBottomRightRadius: m.rol === 'user' ? 4 : 14, borderBottomLeftRadius: m.rol === 'user' ? 14 : 4,
+                  background: m.rol === 'user' ? 'var(--ac)' : 'var(--s3)', color: m.rol === 'user' ? '#fff' : 'var(--tx)',
+                  border: m.rol === 'user' ? 'none' : '1px solid var(--bdr)',
+                }}>{m.metin}</div>
               </div>
             ))}
             {durum === 'isleniyor' && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-cream-200 px-4 py-2.5 rounded-2xl rounded-bl-sm flex items-center gap-2 shadow-sm">
-                  <div className="flex gap-1">
-                    {[0,1,2].map(i => (
-                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-ink-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                    ))}
-                  </div>
+              <div style={{ display: 'flex' }}>
+                <div style={{ background: 'var(--s3)', border: '1px solid var(--bdr)', padding: '10px 14px', borderRadius: 14, borderBottomLeftRadius: 4, display: 'flex', gap: 4 }}>
+                  {[0, 1, 2].map(i => <span key={i} className="anim-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--tx3)', animationDelay: `${i * 0.15}s` }} />)}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Alt bar */}
-          <div className="px-4 py-3 border-t border-cream-100 bg-white flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${DURUM_RENK[durum]}`} />
-              <span className="text-xs text-ink-400 font-mono">{DURUM_YAZI[durum]}</span>
+          <div style={{ padding: '10px 14px', borderTop: '1px solid var(--bdr)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: DURUM_RENK[durum] }} />
+              <span style={{ fontSize: 11.5, color: 'var(--tx3)', fontFamily: 'JetBrains Mono, monospace' }}>{DURUM_YAZI[durum]}</span>
             </div>
             {(durum === 'bekliyor' || durum === 'dinliyor') && (
-              <button onClick={dinlemeBaslat}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-moss-50 text-moss-700 rounded-xl text-xs font-medium hover:bg-moss-100 transition-colors">
-                <Mic className="w-3 h-3" />
-                Konuş
-              </button>
+              <button className="btn" onClick={dinlemeBaslat} style={{ padding: '6px 12px', fontSize: 12 }}><Mic size={12} /> Konuş</button>
             )}
           </div>
         </div>

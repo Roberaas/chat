@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Search, X, Star, ShoppingBag, MessageSquare, Repeat, TrendingUp, Users, Crown } from 'lucide-react'
+import TopBar from '@/components/TopBar'
+import StatCard from '@/components/StatCard'
+import { Search, X, ShoppingBag, MessageSquare, Repeat, TrendingUp, Users, Crown, UserX, ChevronRight } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -14,14 +16,19 @@ type Customer = {
   totalSpent: number
   orderCount: number
   segment: 'vip' | 'aktif' | 'yeni' | 'kayip'
-  abonelik?: any   // ← EKLENDİ
+  abonelik?: any
 }
+
+type Seg = 'vip' | 'aktif' | 'yeni' | 'kayip'
+
+const SEG_BADGE: Record<Seg, string> = { vip: 'badge-ac', aktif: 'badge-green', yeni: 'badge-blue', kayip: 'badge-red' }
+const SEG_LABEL: Record<Seg, string> = { vip: 'VIP', aktif: 'Aktif', yeni: 'Yeni', kayip: 'Kayıp' }
 
 export default function MusterilerPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<'all' | 'vip' | 'aktif' | 'yeni' | 'kayip'>('all')
+  const [filter, setFilter] = useState<'all' | Seg>('all')
   const [selected, setSelected] = useState<Customer | null>(null)
   const [profilEtiketler, setProfilEtiketler] = useState<any[]>([])
 
@@ -36,20 +43,17 @@ export default function MusterilerPage() {
     const sessions = (sessionRes.data || []) as any[]
     const aboneler: any[] = []
     const orders: any[] = []
-    // Telefon bazlı müşteri map'i
     const customerMap: Record<string, Customer> = {}
 
-    // WhatsApp session'lardan
     sessions.forEach((s: any) => {
       const phone = s.phone
       if (!customerMap[phone]) {
-        customerMap[phone] = { phone, orders: [], totalSpent: 0, orderCount: 0, segment: 'yeni', session: s }
+        customerMap[phone] = { phone, name: s.musteri_adi || undefined, orders: [], totalSpent: 0, orderCount: 0, segment: 'yeni', session: s }
       } else {
         customerMap[phone].session = s
       }
     })
 
-    // Aboneleri ekle
     aboneler.forEach((a: any) => {
       const phone = a.iletisim
       if (!customerMap[phone]) {
@@ -59,10 +63,8 @@ export default function MusterilerPage() {
       customerMap[phone].name = customerMap[phone].name || `${a.ad} ${a.soyad}`
     })
 
-    // Shopify siparişleri ekle (telefon eşleştirme)
     orders.forEach((o: any) => {
       const rawPhone = (o.phone || '').replace(/\D/g, '')
-      // Format normalizasyon: 905xx, 5xx, 05xx hepsini eşleştir
       const phoneVariants = [
         rawPhone,
         rawPhone.startsWith('90') ? rawPhone.slice(2) : rawPhone,
@@ -78,22 +80,16 @@ export default function MusterilerPage() {
       }
     })
 
-    // Segmentasyon
     const now = new Date()
     const thirtyDays = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     const ninetyDays = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
 
     Object.values(customerMap).forEach(c => {
       const lastActive = c.session ? new Date(c.session.updated_at) : null
-      if (c.orderCount >= 3 || c.abonelik?.durum === 'abone') {
-        c.segment = 'vip'
-      } else if (lastActive && lastActive > thirtyDays) {
-        c.segment = 'aktif'
-      } else if (lastActive && lastActive < ninetyDays) {
-        c.segment = 'kayip'
-      } else {
-        c.segment = 'yeni'
-      }
+      if (c.orderCount >= 3 || c.abonelik?.durum === 'abone') c.segment = 'vip'
+      else if (lastActive && lastActive > thirtyDays) c.segment = 'aktif'
+      else if (lastActive && lastActive < ninetyDays) c.segment = 'kayip'
+      else c.segment = 'yeni'
     })
 
     setCustomers(Object.values(customerMap).sort((a, b) => {
@@ -113,9 +109,7 @@ export default function MusterilerPage() {
   }, [selected])
 
   const filtered = customers.filter(c => {
-    const matchSearch = !search ||
-      c.phone.includes(search) ||
-      (c.name || '').toLowerCase().includes(search.toLowerCase())
+    const matchSearch = !search || c.phone.includes(search) || (c.name || '').toLowerCase().includes(search.toLowerCase())
     const matchFilter = filter === 'all' || c.segment === filter
     return matchSearch && matchFilter
   })
@@ -127,246 +121,185 @@ export default function MusterilerPage() {
     kayip: customers.filter(c => c.segment === 'kayip').length,
   }
 
-  const SEGMENT_COLOR: Record<string, string> = {
-    vip: 'bg-[var(--bg-card)] text-cream-50',
-    aktif: 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]',
-    yeni: 'bg-[var(--bg-card2)] text-[#7A7468]',
-    kayip: 'bg-[rgba(139,38,53,0.1)] text-[#D04858]',
-  }
-  const SEGMENT_LABEL: Record<string, string> = { vip: '👑 VIP', aktif: '✓ Aktif', yeni: '🆕 Yeni', kayip: '⚠ Kayıp' }
+  const cards: { key: Seg; label: string; Icon: any; accent: string; sub: string }[] = [
+    { key: 'vip', label: 'VIP', Icon: Crown, accent: 'var(--ac)', sub: '3+ sipariş veya abone' },
+    { key: 'aktif', label: 'Aktif', Icon: TrendingUp, accent: 'var(--green)', sub: 'Son 30 günde aktif' },
+    { key: 'yeni', label: 'Yeni', Icon: Users, accent: 'var(--blue)', sub: '30–90 gün' },
+    { key: 'kayip', label: 'Kayıp', Icon: UserX, accent: 'var(--red)', sub: '90+ gün önce aktif' },
+  ]
 
   return (
-    <div style={{ padding: "32px 28px", maxWidth: 1280, margin: "0 auto" }}>
-      <header className="mb-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-[#5A5550] mb-2">{customers.length} müşteri</p>
-        <h1 className="font-display text-3xl md:text-5xl text-[#EDE8DF] tracking-tight">Müşteriler</h1>
-      </header>
+    <>
+      <TopBar title="Müşteriler" subtitle={`${customers.length} müşteri`} />
+      <div style={{ padding: 22, maxWidth: 1360, width: '100%', margin: '0 auto' }}>
 
-      {/* Segment kartlar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        {[
-          { key: 'vip', label: 'VIP', value: segmentStats.vip, icon: Crown, color: 'bg-[var(--bg-card)] border-ink-700 text-cream-50', sub: '3+ sipariş veya abone' },
-          { key: 'aktif', label: 'Aktif', value: segmentStats.aktif, icon: TrendingUp, color: 'bg-[rgba(201,168,76,0.06)] border-[rgba(201,168,76,0.15)] text-[#C9A84C]', sub: 'Son 30 günde aktif' },
-          { key: 'yeni', label: 'Yeni', value: segmentStats.yeni, icon: Users, color: 'bg-[var(--bg-card)] border-[rgba(201,168,76,0.15)] text-[#EDE8DF]', sub: '30-90 gün' },
-          { key: 'kayip', label: 'Kayıp', value: segmentStats.kayip, icon: Users, color: 'bg-[rgba(139,38,53,0.1)] border-[rgba(139,38,53,0.25)] text-ember-700', sub: '90+ gün önce aktif' },
-        ].map(({ key, label, value, icon: Icon, color, sub }) => (
-          <div key={key} onClick={() => setFilter(filter === key as any ? 'all' : key as any)}
-            className={`border rounded-2xl p-4 md:p-6 cursor-pointer transition-all hover:opacity-75 ${color} ${filter === key ? 'ring-2 ring-offset-2 ring-ink-900' : ''}`}>
-            <div className="flex items-start justify-between mb-3">
-              <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">{label}</span>
-              <Icon className="w-4 h-4 opacity-40" strokeWidth={1.5} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 14, marginBottom: 16 }}>
+          {cards.map(c => (
+            <div key={c.key} style={{ outline: filter === c.key ? `2px solid ${c.accent}` : 'none', outlineOffset: 2, borderRadius: 14 }}>
+              <StatCard label={c.label} value={segmentStats[c.key]} sub={c.sub} Icon={c.Icon} accent={c.accent}
+                onClick={() => setFilter(filter === c.key ? 'all' : c.key)} />
             </div>
-            <div className="font-display text-3xl md:text-4xl mb-1">{value}</div>
-            <div className="text-[10px] opacity-50 font-mono">{sub}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Arama */}
-      <div className="flex gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5A5550]" />
-          <input type="text" placeholder="Telefon veya isim ara..." value={search} onChange={e => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 card-premium rounded-xl text-sm text-[#B8B0A0] placeholder-ink-300 focus:outline-none focus:border-moss-400" />
-          {search && <button onClick={() => setSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5A5550]"><X className="w-3.5 h-3.5" /></button>}
+          ))}
         </div>
-        {filter !== 'all' && (
-          <button onClick={() => setFilter('all')} className="px-4 py-2 card-premium rounded-xl text-sm text-[#9A928A] hover:text-[#B8B0A0]">
-            Filtreyi Kaldır
-          </button>
-        )}
-      </div>
 
-      {/* Müşteri listesi */}
-      <div className="card-premium overflow-hidden">
-        {loading ? <div className="p-4 space-y-3">{[1,2,3,4,5].map(i => <div key={i} className="animate-pulse h-16  rounded-xl" />)}</div> : (
-          <table className="w-full">
-            <thead className="">
-              <tr>{['Müşteri','Telefon','Segment','Siparişler','Harcama','Abonelik','Son Aktif',''].map(h => (
-                <th key={h} className="px-5 py-4 text-left text-[10px] uppercase tracking-[0.2em] text-[#5A5550]">{h}</th>
-              ))}</tr>
-            </thead>
-            <tbody>
-              {filtered.map(c => (
-                <tr key={c.phone} onClick={() => setSelected(c)} className="border-t border-[rgba(201,168,76,0.08)] hover: cursor-pointer transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${SEGMENT_COLOR[c.segment]}`}>
-                        {c.segment === 'vip' ? '👑' : (c.name || c.phone).slice(0,1).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-[#EDE8DF]">{c.name || '—'}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4 font-mono text-sm text-[#9A928A]">{c.phone}</td>
-                  <td className="px-5 py-4">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${SEGMENT_COLOR[c.segment]}`}>
-                      {SEGMENT_LABEL[c.segment]}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 font-mono text-sm text-[#B8B0A0]">{c.orderCount || '—'}</td>
-                  <td className="px-5 py-4 font-mono text-sm text-[#B8B0A0]">{c.totalSpent > 0 ? `${c.totalSpent.toLocaleString('tr')} TL` : '—'}</td>
-                  <td className="px-5 py-4">
-                    {c.abonelik ? (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.abonelik.durum === 'abone' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[var(--bg-card2)] text-[#7A7468]'}`}>
-                        {c.abonelik.durum === 'abone' ? `✓ ${c.abonelik.haftalik_adet} adet` : 'Bekliyor'}
-                      </span>
-                    ) : <span className="text-[#5A5550] text-xs">—</span>}
-                  </td>
-                  <td className="px-5 py-4 text-xs text-[#5A5550] font-mono">
-                    {c.session ? formatDistanceToNow(new Date(c.session.updated_at), { addSuffix: true, locale: tr }) : '—'}
-                  </td>
-                  <td className="px-5 py-4 text-[#5A5550]">›</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {!loading && filtered.length === 0 && <div className="p-12 text-center text-[#5A5550] font-mono text-sm">müşteri bulunamadı</div>}
-      </div>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <Search size={14} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--tx3)' }} />
+            <input className="inp" placeholder="Telefon veya isim ara..." value={search} onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 38, paddingRight: 36 }} />
+            {search && <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--tx3)', background: 'none', border: 'none' }}><X size={14} /></button>}
+          </div>
+          {filter !== 'all' && <button className="btn-ghost" onClick={() => setFilter('all')}>Filtreyi kaldır</button>}
+        </div>
 
-      {/* Müşteri 360° Profil */}
-      {selected && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setSelected(null)}>
-          <div className="absolute inset-0 bg-[var(--bg-card)]/40 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md  h-full overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-
-            <div className="sticky top-0 bg-[var(--bg-card)] border-b border-[rgba(201,168,76,0.15)] z-10 p-5">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold ${SEGMENT_COLOR[selected.segment]}`}>
-                    {selected.segment === 'vip' ? '👑' : (selected.name || selected.phone).slice(0,1).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="font-medium text-[#EDE8DF]">{selected.name || '—'}</div>
-                    <div className="font-mono text-sm text-[#7A7468]">{selected.phone}</div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${SEGMENT_COLOR[selected.segment]}`}>
-                      {SEGMENT_LABEL[selected.segment]}
-                    </span>
-                    {profilEtiketler.map(e => (
-                      <span key={e.id} className="text-[10px] px-2 py-0.5 rounded-full font-medium text-white mt-1 inline-block" style={{ background: e.renk }}>
-                        {e.etiket}
-                      </span>
+        <div className="card">
+          {loading ? (
+            <div style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[1, 2, 3, 4, 5].map(i => <div key={i} className="anim-pulse" style={{ height: 52, background: 'var(--s2)', borderRadius: 8 }} />)}
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', minWidth: 720, borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    {['Müşteri', 'Telefon', 'Segment', 'Siparişler', 'Harcama', 'Abonelik', 'Son Aktif', ''].map(h => (
+                      <th key={h} className="kpi-label" style={{ padding: '12px 18px', textAlign: 'left', marginBottom: 0, borderBottom: '1px solid var(--bdr)' }}>{h}</th>
                     ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(c => (
+                    <tr key={c.phone} className="row" style={{ display: 'table-row', cursor: 'pointer' }} onClick={() => setSelected(c)}>
+                      <td style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdr)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div className="sb-av" style={{ width: 30, height: 30 }}>{(c.name || c.phone).slice(0, 1).toUpperCase()}</div>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--tx)' }}>{c.name || '—'}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 18px', fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5, color: 'var(--tx2)', borderBottom: '1px solid var(--bdr)' }}>{c.phone}</td>
+                      <td style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdr)' }}><span className={`badge ${SEG_BADGE[c.segment]}`}>{SEG_LABEL[c.segment]}</span></td>
+                      <td style={{ padding: '12px 18px', fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5, borderBottom: '1px solid var(--bdr)' }}>{c.orderCount || '—'}</td>
+                      <td style={{ padding: '12px 18px', fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5, borderBottom: '1px solid var(--bdr)' }}>{c.totalSpent > 0 ? `${c.totalSpent.toLocaleString('tr')} TL` : '—'}</td>
+                      <td style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdr)' }}>
+                        {c.abonelik
+                          ? <span className={`badge ${c.abonelik.durum === 'abone' ? 'badge-green' : 'badge-muted'}`}>{c.abonelik.durum === 'abone' ? `✓ ${c.abonelik.haftalik_adet} adet` : 'Bekliyor'}</span>
+                          : <span style={{ color: 'var(--tx3)', fontSize: 12 }}>—</span>}
+                      </td>
+                      <td style={{ padding: '12px 18px', fontSize: 11.5, color: 'var(--tx3)', whiteSpace: 'nowrap', borderBottom: '1px solid var(--bdr)' }}>
+                        {c.session ? formatDistanceToNow(new Date(c.session.updated_at), { addSuffix: true, locale: tr }) : '—'}
+                      </td>
+                      <td style={{ padding: '12px 18px', color: 'var(--tx3)', borderBottom: '1px solid var(--bdr)' }}><ChevronRight size={14} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {!loading && filtered.length === 0 && <div style={{ padding: 48, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>müşteri bulunamadı</div>}
+        </div>
+      </div>
+
+      {/* Müşteri 360° profil */}
+      {selected && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9990, display: 'flex', justifyContent: 'flex-end' }} onClick={() => setSelected(null)}>
+          <div className="anim-fade" style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,.6)', backdropFilter: 'blur(4px)' }} />
+          <div className="anim-slide-r" style={{ position: 'relative', width: '100%', maxWidth: 440, height: '100vh', overflowY: 'auto', background: 'var(--s1)', borderLeft: '1px solid var(--bdr2)' }} onClick={e => e.stopPropagation()}>
+
+            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--topbar-bg)', backdropFilter: 'blur(12px)', padding: '16px 20px', borderBottom: '1px solid var(--bdr)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="sb-av" style={{ width: 44, height: 44, borderRadius: 12, fontSize: 16 }}>{(selected.name || selected.phone).slice(0, 1).toUpperCase()}</div>
+                <div>
+                  <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--tx)' }}>{selected.name || '—'}</div>
+                  <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5, color: 'var(--tx3)', marginTop: 1 }}>{selected.phone}</div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                    <span className={`badge ${SEG_BADGE[selected.segment]}`}>{SEG_LABEL[selected.segment]}</span>
+                    {profilEtiketler.map(e => <span key={e.id} className="badge" style={{ background: e.renk, color: '#fff' }}>{e.etiket}</span>)}
                   </div>
                 </div>
-                <button onClick={() => setSelected(null)} className="text-[#5A5550] hover:text-[#B8B0A0]"><X className="w-5 h-5" /></button>
               </div>
+              <button className="btn-ghost" onClick={() => setSelected(null)} style={{ padding: 7 }}><X size={14} /></button>
             </div>
 
-            <div className="p-5 space-y-4">
-
-              {/* Özet */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="card-premium rounded-xl p-3 text-center">
-                  <div className="font-display text-2xl text-[#EDE8DF]">{selected.orderCount}</div>
-                  <div className="text-[10px] text-[#5A5550] uppercase tracking-wide mt-1">Sipariş</div>
-                </div>
-                <div className="card-premium rounded-xl p-3 text-center">
-                  <div className="font-display text-xl text-[#C9A84C]">{selected.totalSpent > 0 ? `${selected.totalSpent.toLocaleString('tr')}` : '—'}</div>
-                  <div className="text-[10px] text-[#5A5550] uppercase tracking-wide mt-1">TL Harcama</div>
-                </div>
-                <div className="card-premium rounded-xl p-3 text-center">
-                  <div className="font-display text-2xl text-[#EDE8DF]">{selected.abonelik ? selected.abonelik.haftalik_adet : '—'}</div>
-                  <div className="text-[10px] text-[#5A5550] uppercase tracking-wide mt-1">Haftalık</div>
-                </div>
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+                {[
+                  { v: selected.orderCount, l: 'Sipariş' },
+                  { v: selected.totalSpent > 0 ? selected.totalSpent.toLocaleString('tr') : '—', l: 'TL Harcama' },
+                  { v: selected.abonelik ? selected.abonelik.haftalik_adet : '—', l: 'Haftalık' },
+                ].map(x => (
+                  <div key={x.l} className="card" style={{ background: 'var(--s2)', padding: '12px 8px', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 700, color: 'var(--tx)' }}>{x.v}</div>
+                    <div className="kpi-label" style={{ marginTop: 5, marginBottom: 0 }}>{x.l}</div>
+                  </div>
+                ))}
               </div>
 
-              {/* WhatsApp Konuşma */}
               {selected.session && (
-                <div className="card-premium rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <MessageSquare className="w-3.5 h-3.5 text-[#5A5550]" strokeWidth={1.5} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A5550]">WhatsApp</span>
+                <div className="card" style={{ background: 'var(--s2)' }}>
+                  <div className="card-h" style={{ padding: '11px 16px' }}>
+                    <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5 }}><MessageSquare size={13} style={{ color: 'var(--tx3)' }} /> WhatsApp</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-[#7A7468]">Son mesaj</span>
-                      <span className="text-[#B8B0A0] italic max-w-[180px] truncate">"{selected.session.musteri_yazdigi || '—'}"</span>
+                  {[
+                    { l: 'Son mesaj', v: selected.session.musteri_yazdigi ? `“${selected.session.musteri_yazdigi}”` : '—' },
+                    { l: 'Son niyet', v: selected.session.last_intent || '—' },
+                    { l: 'KVKK', v: selected.session.kvkk_onay ? '✓ Onaylı' : '✗ Yok' },
+                    { l: 'Son aktif', v: formatDistanceToNow(new Date(selected.session.updated_at), { addSuffix: true, locale: tr }) },
+                  ].map(x => (
+                    <div key={x.l} className="row" style={{ justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--tx3)' }}>{x.l}</span>
+                      <span style={{ fontSize: 12.5, color: 'var(--tx)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.v}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#7A7468]">Son niyet</span>
-                      <span className="text-[#B8B0A0]">{selected.session.last_intent || '—'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#7A7468]">KVKK</span>
-                      <span className={selected.session.kvkk_onay ? 'text-[#C9A84C]' : 'text-[#D04858]'}>{selected.session.kvkk_onay ? '✓ Onaylı' : '✗ Yok'}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#7A7468]">Son aktif</span>
-                      <span className="text-[#7A7468] font-mono text-xs">{formatDistanceToNow(new Date(selected.session.updated_at), { addSuffix: true, locale: tr })}</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
 
-              {/* Abonelik */}
               {selected.abonelik && (
-                <div className="bg-moss-50 border border-moss-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Repeat className="w-3.5 h-3.5 text-[#C9A84C]" strokeWidth={1.5} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#C9A84C]">Abonelik</span>
+                <div className="card" style={{ background: 'var(--green2)', borderColor: 'rgba(34,211,160,.25)' }}>
+                  <div className="card-h" style={{ padding: '11px 16px' }}>
+                    <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: 'var(--green)' }}><Repeat size={13} /> Abonelik</span>
                   </div>
-                  <div className="space-y-1.5 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-[#C9A84C]">Durum</span>
-                      <span className="font-medium text-moss-800">{selected.abonelik.durum === 'abone' ? '✓ Aktif' : 'Bekliyor'}</span>
+                  {[
+                    { l: 'Durum', v: selected.abonelik.durum === 'abone' ? '✓ Aktif' : 'Bekliyor' },
+                    { l: 'Haftalık adet', v: selected.abonelik.haftalik_adet },
+                    { l: 'Aylık gelir', v: `${(selected.abonelik.haftalik_adet * (selected.abonelik.fiyat_tekil || 130) * 4).toLocaleString('tr')} TL` },
+                  ].map(x => (
+                    <div key={x.l} className="row" style={{ justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--tx2)' }}>{x.l}</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--tx)' }}>{x.v}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#C9A84C]">Haftalık adet</span>
-                      <span className="font-medium text-moss-800">{selected.abonelik.haftalik_adet}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#C9A84C]">Aylık gelir</span>
-                      <span className="font-medium text-moss-800">{(selected.abonelik.haftalik_adet * (selected.abonelik.fiyat_tekil || 130) * 4).toLocaleString('tr')} TL</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
 
-              {/* Sipariş geçmişi */}
               {selected.orders.length > 0 && (
-                <div className="card-premium rounded-xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-[rgba(201,168,76,0.08)] flex items-center gap-2">
-                    <ShoppingBag className="w-3.5 h-3.5 text-[#5A5550]" strokeWidth={1.5} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#5A5550]">Sipariş Geçmişi</span>
+                <div className="card" style={{ background: 'var(--s2)' }}>
+                  <div className="card-h" style={{ padding: '11px 16px' }}>
+                    <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5 }}><ShoppingBag size={13} style={{ color: 'var(--tx3)' }} /> Sipariş Geçmişi</span>
                   </div>
-                  <div className="divide-y divide-cream-100">
-                    {selected.orders.map(o => (
-                      <div key={o.id} className="px-4 py-3 flex items-center justify-between">
-                        <div>
-                          <div className="font-mono text-sm font-medium text-[#EDE8DF]">{o.name}</div>
-                          <div className="text-xs text-[#7A7468] font-mono">{format(new Date(o.created_at), 'd MMM yyyy', { locale: tr })}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-mono text-sm text-[#B8B0A0]">{parseFloat(o.total_price).toLocaleString('tr')} TL</div>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${o.financial_status === 'paid' ? 'bg-[rgba(201,168,76,0.1)] text-[#C9A84C]' : 'bg-[var(--bg-card2)] text-[#7A7468]'}`}>
-                            {o.financial_status === 'paid' ? 'Ödendi' : o.financial_status}
-                          </span>
-                        </div>
+                  {selected.orders.map(o => (
+                    <div key={o.id} className="row" style={{ justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5, fontWeight: 600 }}>{o.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--tx3)' }}>{format(new Date(o.created_at), 'd MMM yyyy', { locale: tr })}</div>
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12.5 }}>{parseFloat(o.total_price).toLocaleString('tr')} TL</div>
+                        <span className={`badge ${o.financial_status === 'paid' ? 'badge-green' : 'badge-muted'}`}>{o.financial_status === 'paid' ? 'Ödendi' : o.financial_status}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              {/* Aksiyonlar */}
-              <div className="space-y-2 pt-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {selected.session?.slack_thread_ts && (
-                  <a href="/canli-destek" className="w-full flex items-center justify-center gap-2 py-3 bg-[#A83040] text-white rounded-xl text-sm font-medium hover:bg-ember-700 transition-colors">
-                    💬 Canlı Destek'te Aç
-                  </a>
+                  <a href="/canli-destek" className="btn-danger" style={{ justifyContent: 'center', padding: '10px 0' }}>Canlı Destek'te Aç</a>
                 )}
-                <a href={`https://wa.me/${selected.phone}`} target="_blank"
-                  className="w-full flex items-center justify-center gap-2 py-3 card-premium text-[#B8B0A0] rounded-xl text-sm font-medium hover: transition-colors">
-                  📱 WhatsApp'ta Aç
-                </a>
+                <a href={`https://wa.me/${selected.phone}`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ justifyContent: 'center', padding: '10px 0' }}>WhatsApp'ta Aç</a>
               </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

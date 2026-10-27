@@ -1,145 +1,80 @@
 'use client'
-
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { LayoutDashboard, MessagesSquare, Headphones, BarChart3, LogOut, X, Users, CheckSquare, CalendarDays, UserCog, FileText } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { LogOut, Search } from 'lucide-react'
+import RobertoLogo from './RobertoLogo'
+import { NAV, navFor, isActive, ROL_ETIKET } from '@/lib/nav'
+import { useMe, useCounts, logout } from '@/lib/hooks'
 
-export default function Sidebar({ onClose }: { onClose?: () => void; dark?: boolean }) {
+export default function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [canliCount, setCanliCount] = useState(0)
-  const [konusmalar, setKonusmalar] = useState(0)
-  const [mevcutKullanici, setMevcutKullanici] = useState<{ ad: string; rol: string } | null>(null)
+  const me = useMe()
+  const { canli, konusmalar } = useCounts()
+  const rol = me?.rol || 'admin'
+  const groups = me ? navFor(rol) : NAV
+  const init = (me?.ad || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 
-  useEffect(() => {
-    async function loadCounts() {
-      const { data } = await supabase.from('wa_sessions_roberto').select('phone, slack_thread_ts, updated_at, bulundugu_menu')
-      const sessions = data || []
-      setCanliCount(sessions.filter((s: any) => s.bulundugu_menu === 'canli').length)
-      setKonusmalar(sessions.filter((s: any) => new Date(s.updated_at).toDateString() === new Date().toDateString()).length)
-    }
-    loadCounts()
-    const t = setInterval(loadCounts, 30000)
-    return () => clearInterval(t)
-  }, [])
-
-  useEffect(() => {
-    fetch('/api/auth').then(r => r.json()).then(d => {
-      if (d.ok && d.kullanici) setMevcutKullanici(d.kullanici)
-    })
-  }, [])
-
-  async function logout() {
-    onClose?.()
-    await fetch('/api/auth', { method: 'DELETE' })
-    window.location.href = '/login?logout=1'
-  }
-
-  const items = [
-    { href: '/', label: 'Genel Bakış', icon: LayoutDashboard },
-    { href: '/konusmalar', label: 'Konuşmalar', icon: MessagesSquare, badge: konusmalar > 0 ? konusmalar : null },
-    { href: '/canli-destek', label: 'Canlı Destek', icon: Headphones, badge: canliCount > 0 ? canliCount : null, urgent: canliCount > 0 },
-    { href: '/musteriler', label: 'Müşteriler', icon: Users },
-    { href: '/calisma', label: 'Çalışma', icon: CheckSquare },
-    { href: '/takvim', label: 'Takvim', icon: CalendarDays },
-    { href: '/kullanicilar', label: 'Kullanıcılar', icon: UserCog },
-    { href: '/rapor-ilet', label: 'Rapor İlet', icon: FileText },
-    { href: '/raporlar', label: 'Raporlar', icon: BarChart3 },
-  ]
+  const badgeOf = (b?: string) => b === 'canli' ? canli : b === 'konusmalar' ? konusmalar : 0
 
   return (
-    <aside style={{ background: 'var(--bg-sidebar)', borderRight: '1px solid rgba(201,168,76,0.1)' }} className="w-60 h-full flex flex-col">
-      {/* Logo */}
-      <div className="px-6 py-6" style={{ borderBottom: '1px solid rgba(201,168,76,0.08)' }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              roberto<span style={{ color: 'var(--gold-light)' }}>.</span>
-            </div>
-            <div style={{ fontSize: 9, letterSpacing: '0.3em', color: 'var(--text-muted)', marginTop: 2, textTransform: 'uppercase' }}>
-              admin panel
-            </div>
-          </div>
-          {onClose && (
-            <button onClick={onClose} className="lg:hidden" style={{ color: 'var(--text-muted)' }}>
-              <X size={16} />
-            </button>
-          )}
+    <aside className="sb">
+      <div className="sb-logo">
+        <RobertoLogo size={32} />
+        <div>
+          <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto</p>
+          <p style={{ fontSize: 9.5, color: 'var(--tx3)', marginTop: 2 }}>Yönetim Paneli</p>
         </div>
       </div>
 
-      {/* User */}
-      {mevcutKullanici && (
-        <div className="px-4 py-3 mx-3 mt-3 rounded-lg" style={{ background: 'rgba(139,105,20,0.08)', border: '1px solid rgba(201,168,76,0.1)' }}>
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg, #C9A84C, #8B6914)', color: 'var(--bg-base)' }}>
-              {mevcutKullanici.ad.slice(0,1).toUpperCase()}
-            </div>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 500, color: '#E8D5A3' }}>{mevcutKullanici.ad}</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{mevcutKullanici.rol}</div>
-            </div>
+      <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--bdr)' }}>
+        <button
+          onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '7px 10px', background: 'var(--s2)', border: '1px solid var(--bdr)', borderRadius: 8, fontSize: 12.5, color: 'var(--tx3)', cursor: 'pointer' }}
+        >
+          <Search size={13} />
+          <span style={{ flex: 1, textAlign: 'left' }}>Ara...</span>
+          <kbd style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10 }}>Ctrl K</kbd>
+        </button>
+      </div>
+
+      {me && (
+        <div style={{ padding: '6px 12px', borderBottom: '1px solid var(--bdr)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', background: 'var(--s2)', borderRadius: 7 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: rol === 'admin' ? 'var(--ac)' : rol === 'operasyon' ? 'var(--blue)' : 'var(--green)', flexShrink: 0 }} />
+            <span style={{ fontSize: 10.5, color: 'var(--tx2)', fontWeight: 600 }}>{ROL_ETIKET[rol] || rol}</span>
           </div>
         </div>
       )}
 
-      {/* Nav */}
-      <nav className="flex-1 p-3 overflow-y-auto mt-2">
-        <ul className="space-y-0.5">
-          {items.map((item) => {
-            const Icon = item.icon
-            const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all"
-                  style={active ? {
-                    background: 'linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04))',
-                    border: '1px solid rgba(201,168,76,0.18)',
-                    color: '#E8D5A3',
-                  } : {
-                    color: 'var(--text-muted)',
-                    border: '1px solid transparent',
-                  }}
-                  onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.color = '#C8C0B0' }}
-                  onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}
-                >
-                  <Icon size={15} strokeWidth={1.75} />
-                  <span style={{ fontSize: 13, fontWeight: active ? 500 : 400, flex: 1 }}>{item.label}</span>
-                  {(item as any).badge != null ? (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={
-                      (item as any).urgent
-                        ? { background: '#8B2635', color: '#fff', animation: 'urgentPulse 1.5s ease-in-out infinite' }
-                        : { background: 'rgba(139,105,20,0.15)', color: 'var(--gold-light)' }
-                    }>
-                      {(item as any).badge}
+      <nav className="sb-nav">
+        {groups.map(sec => (
+          <div key={sec.g}>
+            <p className="sb-group">{sec.g}</p>
+            {sec.items.map(({ href, label, Icon, badge }) => {
+              const n = badgeOf(badge)
+              return (
+                <Link key={href} href={href} className={`sb-item ${isActive(pathname, href) ? 'active' : ''}`}>
+                  <span className="sb-icon"><Icon size={14} strokeWidth={1.8} /></span>
+                  <span style={{ flex: 1 }}>{label}</span>
+                  {n > 0 && (
+                    <span className={`badge ${badge === 'canli' ? 'badge-red' : 'badge-ac'}`} style={{ padding: '1px 7px', fontSize: 10.5, animation: badge === 'canli' ? 'pulse 1.5s ease-in-out infinite' : undefined }}>
+                      {n}
                     </span>
-                  ) : active ? (
-                    <span className="w-1 h-1 rounded-full" style={{ background: 'var(--gold-light)' }} />
-                  ) : null}
+                  )}
                 </Link>
-              </li>
-            )
-          })}
-        </ul>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* Logout */}
-      <div className="p-3" style={{ borderTop: '1px solid rgba(201,168,76,0.08)' }}>
-        <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all"
-          style={{ color: '#5A5550', fontSize: 13 }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#C8C0B0'}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#5A5550'}
-        >
-          <LogOut size={15} strokeWidth={1.75} />
-          Çıkış Yap
-        </button>
+      <div className="sb-user" onClick={logout}>
+        <div className="sb-av">{init}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--tx)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{me?.ad || '...'}</p>
+          <p style={{ fontSize: 10, color: 'var(--tx3)', marginTop: 1 }}>Çıkış yap</p>
+        </div>
+        <LogOut size={13} style={{ color: 'var(--tx3)', flexShrink: 0 }} strokeWidth={1.8} />
       </div>
     </aside>
   )

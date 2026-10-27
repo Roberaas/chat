@@ -1,26 +1,55 @@
-import { LucideIcon } from 'lucide-react'
+'use client'
+import { useEffect, useState } from 'react'
 
-export default function StatCard({
-  label, value, delta, icon: Icon, tone = 'default', sub,
-}: {
-  label: string; value: string | number; delta?: string
-  icon: LucideIcon; tone?: 'default' | 'gold' | 'ruby'; sub?: string
-}) {
-  const styles = {
-    default: { bg: 'var(--bg-card)', border: 'var(--border-gold)', iconColor: 'var(--text-muted)' },
-    gold: { bg: 'rgba(139,105,20,0.05)', border: 'rgba(139,105,20,0.2)', iconColor: 'var(--gold)' },
-    ruby: { bg: 'rgba(139,38,53,0.06)', border: 'rgba(139,38,53,0.2)', iconColor: '#C4364A' },
-  }
-  const s = styles[tone]
+function useCountUp(target: number, duration = 1000) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    const start = performance.now()
+    let id = 0
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1)
+      setVal(Math.round((1 - Math.pow(1 - p, 3)) * target))
+      if (p < 1) id = requestAnimationFrame(tick)
+    }
+    id = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(id)
+  }, [target, duration])
+  return val
+}
+
+interface StatCardProps {
+  label: string
+  value: string | number
+  sub?: string
+  accent?: string
+  Icon?: any
+  onClick?: () => void
+  pulse?: boolean
+}
+
+export default function StatCard({ label, value, sub, accent = 'var(--ac)', Icon, onClick, pulse }: StatCardProps) {
+  const str = String(value)
+  const numeric = /^\d+$/.test(str) ? parseInt(str, 10) : null
+  const animated = useCountUp(numeric ?? 0)
+
   return (
-    <div className="relative rounded-xl p-5 transition-all" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
-      <div className="flex items-start justify-between mb-4">
-        <span style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 500 }}>{label}</span>
-        <Icon size={14} color={s.iconColor} strokeWidth={1.5} />
-      </div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 42, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-0.02em', fontWeight: 300 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>{sub}</div>}
-      {delta && <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: 8 }}>{delta}</div>}
+    <div
+      className="kpi"
+      onClick={onClick}
+      style={{ borderLeft: `2.5px solid ${accent}`, cursor: onClick ? 'pointer' : 'default' }}
+    >
+      {pulse && (
+        <div style={{ position: 'absolute', top: 10, right: 10, width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse 2.5s ease-in-out infinite' }} />
+      )}
+      <div style={{ position: 'absolute', top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right, color-mix(in srgb, ${accent} 12%, transparent), transparent 70%)`, pointerEvents: 'none' }} />
+      {Icon && (
+        <div style={{ width: 34, height: 34, borderRadius: 9, background: `color-mix(in srgb, ${accent} 12%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+          <Icon size={15} style={{ color: accent }} strokeWidth={1.9} />
+        </div>
+      )}
+      <p className="kpi-label">{label}</p>
+      <p className="kpi-value">{numeric !== null ? animated : str}</p>
+      {sub && <p className="kpi-sub">{sub}</p>}
     </div>
   )
 }

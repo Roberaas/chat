@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   const { data: subs } = await supabase.from('push_subscriptions').select('*')
   if (!subs || subs.length === 0) return NextResponse.json({ ok: true, sent: 0 })
 
-  const payload = JSON.stringify({ title, body, url: url || '/dashboard/canli-destek', tag })
+  const payload = JSON.stringify({ title, body, url: url || '/canli-destek', tag })
   let sent = 0; const failed: string[] = []
 
   await Promise.all(subs.map(async (sub) => {

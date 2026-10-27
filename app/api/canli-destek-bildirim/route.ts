@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         title,
         body: bildirimBody,
-        url: '/dashboard/canli-destek',
+        url: '/canli-destek',
         tag: `canli-destek-${phone}`
       })
     })

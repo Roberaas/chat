@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Download } from 'lucide-react'
+import { Download, ShieldCheck, ArrowLeft } from 'lucide-react'
+import RobertoLogo from '@/components/RobertoLogo'
 
 type Step = 'sifre' | 'otp'
 
@@ -70,113 +71,74 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  const inputStyle = {
-    width: '100%', background: 'rgba(139,105,20,0.04)', border: '1px solid rgba(139,105,20,0.15)',
-    borderRadius: 8, padding: '12px 14px', fontSize: 14, color: '#1A1410',
-    outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' as const
-  }
-
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F3EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <div style={{ width: '100%', maxWidth: 360, position: 'relative' }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, fontWeight: 300, color: '#1A1410', letterSpacing: '-0.03em', lineHeight: 1 }}>
-            roberto<span style={{ color: '#8B6914' }}>.</span>
-          </div>
-          <div style={{ marginTop: 10, height: 1, background: 'linear-gradient(90deg, transparent, rgba(139,105,20,0.4), transparent)' }} />
-          <div style={{ fontSize: 10, letterSpacing: '0.35em', color: '#7A7468', marginTop: 10, textTransform: 'uppercase' }}>
-            yönetim paneli
-          </div>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: 640, height: 640, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,106,247,.14), transparent 65%)', pointerEvents: 'none' }} />
+
+      <div className="anim-up" style={{ width: '100%', maxWidth: 380, position: 'relative' }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{ display: 'inline-block', marginBottom: 14 }}><RobertoLogo size={48} /></div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.4px' }}>Roberto</h1>
+          <p style={{ fontSize: 12.5, color: 'var(--tx3)', marginTop: 4 }}>WhatsApp Bot Yönetim Paneli</p>
         </div>
 
-        {/* Card */}
-        <div style={{ background: '#FFFFFF', border: '1px solid rgba(139,105,20,0.12)', borderRadius: 16, padding: 32, boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+        <div className="card" style={{ padding: 28 }}>
           {step === 'sifre' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A7468', display: 'block', marginBottom: 8 }}>
-                  Kullanıcı Adı
-                </label>
-                <input type="text" value={kullanici_adi} onChange={e => setKullaniciAdi(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && loginWithPassword()}
-                  placeholder="kullanici.adi" style={inputStyle} />
+                <label className="label">Kullanıcı Adı</label>
+                <input className="inp" type="text" value={kullanici_adi} onChange={e => setKullaniciAdi(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && loginWithPassword()} placeholder="kullanici.adi" autoComplete="username" />
               </div>
               <div>
-                <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A7468', display: 'block', marginBottom: 8 }}>
-                  Şifre
-                </label>
-                <input type="password" value={sifre} onChange={e => setSifre(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && loginWithPassword()}
-                  placeholder="••••••••" style={inputStyle} />
+                <label className="label">Şifre</label>
+                <input className="inp" type="password" value={sifre} onChange={e => setSifre(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && loginWithPassword()} placeholder="••••••••" autoComplete="current-password" />
               </div>
 
-              {error && (
-                <div style={{ padding: '10px 14px', background: 'rgba(168,48,64,0.06)', border: '1px solid rgba(168,48,64,0.2)', borderRadius: 8, fontSize: 12, color: '#A83040' }}>
-                  {error}
-                </div>
-              )}
+              {error && <div className="toast toast-err" style={{ margin: 0 }}>{error}</div>}
 
-              <button onClick={loginWithPassword} disabled={loading}
-                style={{ padding: '13px 0', background: 'linear-gradient(135deg,#8B6914,#6B4F0A)', border: 'none', borderRadius: 8, color: '#FFF8E8', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+              <button className="btn" onClick={loginWithPassword} disabled={loading} style={{ justifyContent: 'center', padding: '11px 0' }}>
                 {loading ? 'Doğrulanıyor...' : 'Devam Et →'}
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 13, color: '#3A3530', marginBottom: 6 }}>SMS kodu gönderildi</div>
-                <div style={{ fontSize: 12, color: '#7A7468' }}>{maskedPhone}</div>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--ac2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                  <ShieldCheck size={18} style={{ color: 'var(--ac)' }} />
+                </div>
+                <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--tx)' }}>SMS kodu gönderildi</p>
+                <p style={{ fontSize: 12, color: 'var(--tx3)', marginTop: 3, fontFamily: 'JetBrains Mono, monospace' }}>{maskedPhone}</p>
               </div>
               <div>
-                <label style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7A7468', display: 'block', marginBottom: 8 }}>
-                  Doğrulama Kodu
-                </label>
-                <input type="number" value={otp} onChange={e => setOtp(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && verifyOtp()}
-                  placeholder="000000" maxLength={6}
-                  style={{ ...inputStyle, fontSize: 24, textAlign: 'center', letterSpacing: '0.3em', fontFamily: 'JetBrains Mono, monospace' }} />
+                <label className="label">Doğrulama Kodu</label>
+                <input className="inp" type="number" value={otp} onChange={e => setOtp(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && verifyOtp()} placeholder="000000"
+                  style={{ fontSize: 24, textAlign: 'center', letterSpacing: '.3em', fontFamily: 'JetBrains Mono, monospace' }} />
               </div>
 
-              {error && (
-                <div style={{ padding: '10px 14px', background: 'rgba(168,48,64,0.06)', border: '1px solid rgba(168,48,64,0.2)', borderRadius: 8, fontSize: 12, color: '#A83040' }}>
-                  {error}
-                </div>
-              )}
+              {error && <div className="toast toast-err" style={{ margin: 0 }}>{error}</div>}
 
-              <button onClick={verifyOtp} disabled={loading}
-                style={{ padding: '13px 0', background: 'linear-gradient(135deg,#8B6914,#6B4F0A)', border: 'none', borderRadius: 8, color: '#FFF8E8', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+              <button className="btn" onClick={verifyOtp} disabled={loading} style={{ justifyContent: 'center', padding: '11px 0' }}>
                 {loading ? 'Doğrulanıyor...' : 'Giriş Yap'}
               </button>
-
-              <button onClick={() => { setStep('sifre'); setOtp(''); setError('') }}
-                style={{ background: 'none', border: 'none', fontSize: 12, color: '#7A7468', cursor: 'pointer', textDecoration: 'underline' }}>
-                Geri dön
+              <button className="btn-ghost" onClick={() => { setStep('sifre'); setOtp(''); setError('') }} style={{ justifyContent: 'center' }}>
+                <ArrowLeft size={13} /> Geri dön
               </button>
             </div>
           )}
         </div>
 
         {installPrompt && (
-          <button
-            onClick={installApp}
-            disabled={installing}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              width: '100%', marginTop: 16, padding: '11px 0',
-              background: 'rgba(139,105,20,0.06)', border: '1px solid rgba(139,105,20,0.2)',
-              borderRadius: 10, fontSize: 13, color: '#8B6914', cursor: installing ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', fontWeight: 500, transition: 'all 0.2s',
-              opacity: installing ? 0.7 : 1
-            }}
-          >
+          <button className="btn-ghost" onClick={installApp} disabled={installing} style={{ width: '100%', justifyContent: 'center', marginTop: 14, padding: '10px 0' }}>
             <Download size={14} strokeWidth={1.75} />
             {installing ? 'Kuruluyor...' : 'Uygulamayı Kur'}
           </button>
         )}
 
-        <p style={{ textAlign: 'center', fontSize: 10, color: '#A8A39E', marginTop: 24, fontFamily: 'JetBrains Mono, monospace' }}>
-          roberto admin · v2.1
+        <p style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--tx3)', marginTop: 22, fontFamily: 'JetBrains Mono, monospace' }}>
+          roberto admin · v3.0
         </p>
       </div>
     </div>

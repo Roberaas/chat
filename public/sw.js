@@ -7,14 +7,14 @@ self.addEventListener('push', function(event) {
     badge: '/favicon.ico',
     tag: data.tag || 'roberto-bildirim',
     requireInteraction: true,
-    data: { url: data.url || '/dashboard/canli-destek' }
+    data: { url: data.url || '/canli-destek' }
   }
   event.waitUntil(self.registration.showNotification(title, options))
 })
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close()
-  const url = event.notification.data?.url || '/dashboard/canli-destek'
+  const url = event.notification.data?.url || '/canli-destek'
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
       for (const client of clientList) {
