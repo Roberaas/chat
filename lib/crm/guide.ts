@@ -68,6 +68,8 @@ export const FIELDS: { entity: string; field: string; req: string; desc: string 
 ]
 
 export const WHERE: { what: string; where: string; how: string }[] = [
+  { what: 'Kendi müşteri raporum, geri kazanılacak müşteriler', where: 'Genel → Müşteri Raporum', how: 'Müşteri sayısı, ciro, tekrar alma oranı, en iyi müşteriler, 90+ gündür gelmeyenler, danışman karşılaştırması ve ay sonu hedef tahmini. Yalnız kendi müşterilerinizi gösterir.' },
+  { what: 'Fatura, sözleşme, teklif dosyası', where: 'Sipariş satırındaki ataç, Fırsat/Teklif penceresi, B2B firma penceresi', how: 'İlgili kayda yükleyin; yalnız o kaydı görebilen kişiler dosyayı açabilir.' },
   { what: 'Bayiye özel fiyat', where: 'Satış → Fiyat Listeleri', how: 'Liste oluşturun (genel indirim % veya ürün bazlı fiyat), mağazaya atayın. Bayi kendi fiyatını Ürünler sayfasında görür.' },
   { what: 'Cari / kredi limiti / ödeme', where: 'Satış → Cari / Kredi', how: 'Limit ve vade tanımlayın, ödemeyi girin. Limit aşılırsa bildirim gider; sipariş engellenmez.' },
   { what: 'Etiket ve özel alan', where: 'Yönetim → Özel Alanlar / Etiketler', how: 'Alanı/etiketi tanımlayın; müşteri kartında doldurun. Segment ve filtrede kullanılır.' },

@@ -83,7 +83,7 @@ export default function HedeflerPage() {
                     {isCurrent && <i title="Bugünkü beklenen seviye" style={{ position: 'absolute', left: `${pace * 100}%`, top: -3, bottom: -3, width: 2, background: 'var(--tx3)' }} />}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: 'var(--tx2)', marginTop: 8 }}><span>{money(r.actual)}</span><span>Hedef {money(r.target)}</span></div>
-                  {isCurrent && r.target > r.actual && <div style={{ fontSize: 12, color: 'var(--tx3)', marginTop: 4 }}>Kalan {money(r.target - r.actual)} · {dim - day} gün</div>}
+                  {isCurrent && r.target > r.actual && <div style={{ fontSize: 12, color: 'var(--tx3)', marginTop: 4 }}>Kalan {money(r.target - r.actual)} · {dim - day} gün{day > 0 && <> · tempoyla ay sonu tahmini <b style={{ color: r.actual / pace >= r.target ? 'var(--green)' : 'var(--amber)' }}>{money(r.actual / pace)}</b></>}</div>}
                 </div>)
             })}
           </div>)}

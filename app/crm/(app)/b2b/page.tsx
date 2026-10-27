@@ -1,4 +1,5 @@
 'use client'
+import Attachments from '@/components/crm/Attachments'
 import { useCallback, useEffect, useState } from 'react'
 import { Plus, X } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
@@ -107,6 +108,8 @@ export default function B2BPage() {
               <input className="inp" style={{ width: 110 }} inputMode="decimal" placeholder="Tutar (₺)" value={oppF.amount} onChange={e => setOppF({ ...oppF, amount: e.target.value })} />
               <button className="btn" onClick={addOpp}>Ekle</button>
             </div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx2)', margin: '16px 0 6px' }}>Dosyalar (sözleşme, vergi levhası vb.)</div>
+            <Attachments entity="business_account" entityId={sel.id} />
           </div>
         </div>)}
 

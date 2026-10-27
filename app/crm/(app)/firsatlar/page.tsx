@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Plus, X, LayoutGrid, List, Trash2, CalendarClock } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
+import Attachments from '@/components/crm/Attachments'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
@@ -286,6 +287,11 @@ export default function FirsatlarPage() {
                 <input className="inp" style={{ flex: 1, minWidth: 140 }} placeholder="Teklif notu" value={qForm.notes} onChange={e => setQForm(f => ({ ...f, notes: e.target.value }))} />
                 <button className="btn" onClick={addQuote}>Teklif oluştur</button></div>}
             </>) : null}
+
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx2)', marginBottom: 6 }}>Dosyalar (fırsat)</div>
+            <div style={{ marginBottom: 14 }}><Attachments entity="opportunity" entityId={sel.id} /></div>
+            {quotes.length > 0 && <><div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx2)', marginBottom: 6 }}>Teklif dosyaları</div>
+              {quotes.map(q => <div key={q.id} style={{ marginBottom: 12 }}><div style={{ fontSize: 12, color: 'var(--tx3)', marginBottom: 4 }}>T-{q.quote_no}</div><Attachments entity="quotation" entityId={q.id} canWrite={crm.can('quotations.write')} /></div>)}</>}
 
             <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx2)', marginBottom: 6 }}>Aşama geçmişi</div>
             {hist.map(h => <div key={h.id} style={{ fontSize: 12.5, color: 'var(--tx3)', padding: '2px 0' }}>{new Date(h.changed_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })} · {h.from_stage ? `${stageOf(h.from_stage)?.label} → ` : ''}{stageOf(h.to_stage)?.label}</div>)}

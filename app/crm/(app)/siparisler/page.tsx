@@ -1,10 +1,11 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Download, ShoppingBag } from 'lucide-react'
+import { Download, ShoppingBag, Paperclip, X } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import Empty from '@/components/crm/Empty'
 import { Kpi, KpiStrip } from '@/components/crm/Kpi'
+import Attachments from '@/components/crm/Attachments'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
@@ -19,6 +20,7 @@ const TD = { padding: '11px 18px', whiteSpace: 'nowrap' as const }
 export default function SiparislerPage() {
   const crm = useCrm()
   const supabase = createCrmBrowserClient()
+  const [files, setFiles] = useState<O | null>(null)
   const [rows, setRows] = useState<O[]>([])
   const [count, setCount] = useState(0)
   const [page, setPage] = useState(0)
@@ -82,7 +84,7 @@ export default function SiparislerPage() {
               <thead><tr style={{ textAlign: 'left', color: 'var(--tx3)', fontSize: 12.5 }}>{['Sipariş', 'Müşteri', 'Tarih', 'Mağaza / bayi', 'Kaynak', 'Durum', 'Tutar'].map((h, i) => <th key={h} style={{ ...TH, textAlign: i === 6 ? 'right' : 'left' }}>{h}</th>)}</tr></thead>
               <tbody>{rows.map(o => (
                 <tr key={o.id} style={{ borderTop: '1px solid var(--bdr)' }}>
-                  <td style={{ ...TD, color: 'var(--tx)', fontWeight: 600 }}>{o.order_no || o.id.slice(0, 8)}</td>
+                  <td style={{ ...TD, color: 'var(--tx)', fontWeight: 600 }}>{o.order_no || o.id.slice(0, 8)} {crm.can('attachments.read') && <button className="btn-ghost" title="Dosyalar (fatura, irsaliye)" aria-label="Dosyalar" onClick={() => setFiles(o)} style={{ padding: '2px 6px', marginLeft: 4 }}><Paperclip size={12} /></button>}</td>
                   <td style={TD}><Link href={`/crm/musteriler/${o.customer_id}`} style={{ color: 'var(--tx)' }}>{o.customers ? `${o.customers.first_name} ${o.customers.last_name}`.trim() : '—'}</Link>{o.customers?.phone && <div style={{ fontSize: 12, color: 'var(--tx3)' }}>{o.customers.phone}</div>}</td>
                   <td style={TD}>{dt(o.ordered_at)}</td><td style={TD}>{sname(o.store_id)}</td><td style={TD}>{o.source_system}</td>
                   <td style={TD}><span className={`badge ${(ST[o.status] || ['', 'badge-muted'])[1]}`}>{(ST[o.status] || [o.status])[0]}</span></td>
@@ -92,6 +94,13 @@ export default function SiparislerPage() {
           {pages > 1 && <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: 12, borderTop: '1px solid var(--bdr)' }}><button className="btn-ghost" disabled={page === 0} onClick={() => setPage(page - 1)}>Önceki</button><button className="btn-ghost" disabled={page + 1 >= pages} onClick={() => setPage(page + 1)}>Sonraki</button></div>}
         </div>
       </div>
+      {files && (
+        <div className="overlay" onClick={e => { if (e.target === e.currentTarget) setFiles(null) }}>
+          <div className="modal anim-pop" style={{ maxWidth: 520 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}><h2 className="modal-title" style={{ marginBottom: 0 }}>Sipariş {files.order_no || files.id.slice(0, 8)} dosyaları</h2><button onClick={() => setFiles(null)} style={{ background: 'none', border: 'none', color: 'var(--tx3)' }} aria-label="Kapat"><X size={18} /></button></div>
+            <Attachments entity="order" entityId={files.id} />
+          </div>
+        </div>)}
     </>
   )
 }

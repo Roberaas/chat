@@ -9,6 +9,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   { g: 'Genel', items: [
     { href: '/crm', label: 'Dashboard', Icon: LayoutDashboard, perm: 'dashboard.read' },
     { href: '/crm/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'dashboard.read' },
+    { href: '/crm/bayi-raporu', label: 'Müşteri Raporum', Icon: Contact, perm: 'dashboard.read' },
     { href: '/crm/hedefler', label: 'Hedefler', Icon: Flag, perm: 'targets.read' },
     { href: '/crm/bildirimler', label: 'Bildirimler', Icon: Bell },
     { href: '/crm/rehber', label: 'Rehber', Icon: BookOpen },
