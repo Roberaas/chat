@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { crmMiddleware } from '@/lib/crm/supabase/middleware'
 
 const ROL_YETKILER: Record<string, string[]> = {
   admin: [],
@@ -7,7 +8,11 @@ const ROL_YETKILER: Record<string, string[]> = {
   destek: ['/', '/konusmalar', '/canli-destek', '/calisma', '/takvim'],
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  // CRM (Supabase Auth) — WhatsApp paneli cookie girişinden tamamen ayrı
+  if (request.nextUrl.pathname === '/crm' || request.nextUrl.pathname.startsWith('/crm/')) {
+    return crmMiddleware(request)
+  }
   const auth = request.cookies.get('rb_session') || request.cookies.get('roberto-auth') || request.cookies.get('roberto-admin-auth')
   const pathname = request.nextUrl.pathname
   const isLoginPage = pathname === '/login'
