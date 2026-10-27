@@ -1,8 +1,10 @@
-// Kapatılabilir CRM modülleri. Listede olmayan sayfalar (müşteri, sipariş, ürün, B2B, cari, ayarlar...) veri modülleridir ve hep açıktır.
+// Kapatılabilir CRM modülleri. Listede olmayan sayfalar (müşteri, B2B, cari, ayarlar...) veri modülleridir ve hep açıktır.
 export type CrmModule = { key: string; label: string; desc: string; paths: string[] }
 
 export const CRM_MODULES: CrmModule[] = [
   { key: 'reports', label: 'Raporlama', desc: 'Dashboard, Raporlar, Müşteri Raporum, Hedefler, Müşteri Analizi', paths: ['/crm', '/crm/raporlar', '/crm/bayi-raporu', '/crm/hedefler', '/crm/analiz'] },
+  { key: 'orders', label: 'Siparişler', desc: 'Sipariş listesi ve detayları (veri girişi arka planda sürer)', paths: ['/crm/siparisler'] },
+  { key: 'products', label: 'Ürünler', desc: 'Ürün kataloğu', paths: ['/crm/urunler'] },
   { key: 'sales', label: 'Satış fırsatları ve teklifler', desc: 'Fırsatlar menüsü', paths: ['/crm/firsatlar'] },
   { key: 'tasks', label: 'Görev, takvim ve randevu', desc: 'Görevler, Takvim, Randevular, Bildirimler', paths: ['/crm/gorevler', '/crm/takvim', '/crm/randevular', '/crm/bildirimler'] },
   { key: 'service', label: 'Satış sonrası', desc: 'Servis, tamir ve iade talepleri', paths: ['/crm/servis'] },

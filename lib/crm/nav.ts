@@ -7,6 +7,8 @@ export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string
 
 // Menüde görünmeyen, Ayarlar sayfasından açılan veri ve yönetim sayfaları
 export const ADMIN_LINKS: (CrmNavItem & { desc: string })[] = [
+  { href: '/crm/musteriler', label: 'Tüm Müşteriler', Icon: Contact, perm: 'customers.read', desc: 'Kanal ayrımı olmadan tüm müşteri listesi' },
+  { href: '/crm/rehber', label: 'Rehber', Icon: BookOpen, desc: 'Kullanım kılavuzu' },
   { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read', desc: 'Bayi ve toptancı firmaları, yetkili kişiler' },
   { href: '/crm/fiyatlar', label: 'Fiyat Listeleri', Icon: Tags, perm: 'pricing.read', desc: 'Bayiye özel fiyat ve iskonto' },
   { href: '/crm/cari', label: 'Cari / Kredi', Icon: Wallet, perm: 'credit.read', desc: 'Bayi bakiyesi, limit ve vade' },
@@ -20,7 +22,7 @@ export const ADMIN_LINKS: (CrmNavItem & { desc: string })[] = [
   { href: '/crm/denetim', label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read', desc: 'Kim neyi değiştirdi' },
   { href: '/crm/guvenlik', label: 'Güvenlik', Icon: ShieldCheck, desc: 'Hesap güvenliği' },
 ]
-const ADMIN_PERMS = ['integrations.manage', 'settings.manage', 'b2b.read', 'pricing.read', 'credit.read', 'data.import', 'customers.export', 'reports.export', 'stores.manage', 'users.read', 'customers.merge', 'audit.read']
+const ADMIN_PERMS = ['customers.read', 'orders.read', 'products.read', 'integrations.manage', 'settings.manage', 'b2b.read', 'pricing.read', 'credit.read', 'data.import', 'customers.export', 'reports.export', 'stores.manage', 'users.read', 'customers.merge', 'audit.read']
 
 export function crmItemAllowed(ctx: { isSuperAdmin: boolean; permissions: string[] }, i: CrmNavItem) {
   if (ctx.isSuperAdmin) return true
@@ -37,13 +39,14 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/bayi-raporu', label: 'Müşteri Raporum', Icon: Contact, perm: 'dashboard.read' },
     { href: '/crm/hedefler', label: 'Hedefler', Icon: Flag, perm: 'targets.read' },
     { href: '/crm/bildirimler', label: 'Bildirimler', Icon: Bell },
-    { href: '/crm/rehber', label: 'Rehber', Icon: BookOpen },
   ]},
   { g: 'Data', items: [
-    { href: '/crm/musteriler', label: 'Müşteriler', Icon: Contact, perm: 'customers.read' },
-    { href: '/crm/firsatlar',  label: 'Fırsatlar',  Icon: Target, perm: 'opportunities.read' },
+    { href: '/crm/musteriler?kanal=eticaret', label: 'E-Ticaret', Icon: ShoppingBag, perm: 'customers.read' },
+    { href: '/crm/musteriler?kanal=perakende', label: 'Perakende', Icon: Store, perm: 'customers.read' },
+    { href: '/crm/musteriler?kanal=toptan', label: 'Toptan', Icon: Building2, perm: 'customers.read' },
     { href: '/crm/siparisler', label: 'Siparişler', Icon: ShoppingBag, perm: 'orders.read' },
     { href: '/crm/urunler',    label: 'Ürünler',    Icon: Gem,    perm: 'products.read' },
+    { href: '/crm/firsatlar',  label: 'Fırsatlar',  Icon: Target, perm: 'opportunities.read' },
     { href: '/crm/ozel-gunler', label: 'Özel Günler', Icon: Cake, perm: 'customers.read' },
     { href: '/crm/gorevler',   label: 'Görevler',   Icon: CheckSquare, perm: 'tasks.read' },
     { href: '/crm/takvim', label: 'Takvim', Icon: CalendarRange, anyOf: ['tasks.read', 'appointments.read'] },

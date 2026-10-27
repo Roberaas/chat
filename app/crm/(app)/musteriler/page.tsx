@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Plus, Search, X, Crown, ChevronLeft, ChevronRight } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { useCrm } from '@/components/crm/CrmProvider'
@@ -11,7 +12,12 @@ type Row = {
   id: string; customer_no: number; first_name: string; last_name: string; phone: string | null; email: string | null
   is_vip: boolean; store_id: string; assigned_to: string | null; registered_at: string; total_spent: number; last_purchase_at: string | null; source: string
 }
-type StoreOpt = { id: string; name: string }
+type StoreOpt = { id: string; name: string; store_type?: string }
+const KANAL: Record<string, { title: string; types: string[] }> = {
+  eticaret: { title: 'E-Ticaret', types: ['online'] },
+  perakende: { title: 'Perakende', types: ['store', 'hq'] },
+  toptan: { title: 'Toptan', types: ['wholesale', 'dealer'] },
+}
 type Person = { id: string; first_name: string; last_name: string }
 type Dup = { id: string; customer_no: number; display_name: string; store_name: string; accessible: boolean; match_on: string }
 
@@ -20,6 +26,7 @@ const EMPTY = { first_name: '', last_name: '', phone: '', email: '', store_id: '
 
 export default function MusterilerPage() {
   const crm = useCrm()
+  const kanal = KANAL[useSearchParams().get('kanal') || '']
   const supabase = createCrmBrowserClient()
   const canWrite = crm.can('customers.write')
   const [rows, setRows] = useState<Row[]>([])
@@ -45,7 +52,7 @@ export default function MusterilerPage() {
   useEffect(() => {
     (async () => {
       const [s, p] = await Promise.all([
-        supabase.from('stores').select('id, name').eq('is_active', true).order('name'),
+        supabase.from('stores').select('id, name, store_type').eq('is_active', true).order('name'),
         supabase.from('profiles').select('id, first_name, last_name'),
       ])
       setStores((s.data || []) as StoreOpt[]); setPeople((p.data || []) as Person[])
@@ -53,6 +60,8 @@ export default function MusterilerPage() {
     })()
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
+  const kanalIds = kanal ? stores.filter(x => kanal.types.includes(x.store_type || '')).map(x => x.id) : []
+  const kanalKey = kanalIds.join(',')
   const load = useCallback(async () => {
     setLoading(true)
     let qb = supabase.from('customers')
@@ -60,12 +69,14 @@ export default function MusterilerPage() {
       .eq('status', 'active')
     if (qDebounced) qb = qb.ilike('search_text', `%${qDebounced.replace(/[%_]/g, ' ')}%`)
     if (storeF) qb = qb.eq('store_id', storeF)
+    else if (kanal) qb = qb.in('store_id', kanalIds.length ? kanalIds : ['00000000-0000-0000-0000-000000000000'])
     if (vipF) qb = qb.eq('is_vip', true)
     if (mineF) qb = qb.eq('assigned_to', crm.profile.id)
     if (tagF) { const { data: ct } = await supabase.from('customer_tags').select('customer_id').eq('tag_id', tagF).limit(5000); qb = qb.in('id', (ct || []).map((x: any) => x.customer_id)) }
     const { data, count } = await qb.order('registered_at', { ascending: false }).range(page * PAGE, page * PAGE + PAGE - 1)
     setRows((data || []) as Row[]); setTotal(count || 0); setLoading(false)
-  }, [qDebounced, storeF, vipF, mineF, tagF, page])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [qDebounced, storeF, vipF, mineF, tagF, page, kanal, kanalKey, stores.length])  // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { setStoreF('') }, [kanal])
   useEffect(() => { load() }, [load])
 
   const storeName = (id: string) => stores.find(s => s.id === id)?.name || '—'
@@ -105,7 +116,7 @@ export default function MusterilerPage() {
 
   return (
     <>
-      <CrmTopBar title="Müşteriler" subtitle={`${total} kayıt`}
+      <CrmTopBar title={kanal ? `${kanal.title} Müşterileri` : 'Müşteriler'} subtitle={`${total} kayıt`}
         action={canWrite && <button className="btn" onClick={() => { setForm({ ...EMPTY, store_id: stores.length === 1 ? stores[0].id : '', show: true }); setDups([]); setErr('') }}><Plus size={14} /> Müşteri Ekle</button>} />
       <div style={{ padding: 22, maxWidth: 1300, width: '100%', margin: '0 auto' }}>
         <div className="card" style={{ padding: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
@@ -114,7 +125,7 @@ export default function MusterilerPage() {
             <input className="inp" style={{ paddingLeft: 32 }} placeholder="Ad, telefon veya e-posta ara" value={q} onChange={e => setQ(e.target.value)} />
           </div>
           <select className="inp" style={{ width: 180 }} value={storeF} onChange={e => { setStoreF(e.target.value); setPage(0) }}>
-            <option value="">Tüm mağazalar</option>{stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            <option value="">Tüm mağazalar</option>{(kanal ? stores.filter(x => kanal.types.includes(x.store_type || '')) : stores).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           {tagList.length > 0 && <select className="inp" style={{ width: 160 }} value={tagF} onChange={e => { setTagF(e.target.value); setPage(0) }}>
             <option value="">Tüm etiketler</option>{tagList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}

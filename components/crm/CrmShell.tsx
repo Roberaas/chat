@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
 import { LogOut, Menu, X, MessageCircle } from 'lucide-react'
 import RobertoLogo from '@/components/RobertoLogo'
@@ -12,14 +12,20 @@ import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const ctx = useCrm()
   const pathname = usePathname()
+  const sp = useSearchParams()
   const groups = crmNavFor(ctx)
+  const isAct = (href: string) => {
+    const [path, qs] = href.split('?')
+    if (!qs) return crmIsActive(pathname, path) && !(path === '/crm/musteriler' && sp.get('kanal'))
+    return pathname === path && new URLSearchParams(qs).get('kanal') === sp.get('kanal')
+  }
   return (
     <nav className="sb-nav">
       {groups.map(sec => (
         <div key={sec.g}>
           <p className="sb-group">{sec.g}</p>
           {sec.items.map(({ href, label, Icon }) => (
-            <Link key={href} href={href} onClick={onNavigate} className={`sb-item ${crmIsActive(pathname, href) ? 'active' : ''}`}>
+            <Link key={href} href={href} onClick={onNavigate} className={`sb-item ${isAct(href) ? 'active' : ''}`}>
               <span className="sb-icon"><Icon size={14} strokeWidth={1.8} /></span>
               <span style={{ flex: 1 }}>{label}</span>
             </Link>
