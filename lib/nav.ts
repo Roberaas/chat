@@ -34,6 +34,8 @@ export const NAV: { g: string; items: NavItem[] }[] = [
   { g: 'Sistem', items: [
     { href: '/kullanicilar', label: 'Kullanıcılar', Icon: UserCog, roles: ['admin'] },
     { href: '/api-kullanimi', label: 'API Kullanımı', Icon: Gauge, roles: ['admin'] },
+  ]},
+  { g: 'Diğer', items: [
     { href: '/crm', label: 'CRM', Icon: Contact, roles: ['admin'] },
   ]},
 ]
