@@ -128,11 +128,9 @@ export default function MusterilerPage() {
           {showSF && <select className="inp" style={{ width: 180 }} value={storeF} onChange={e => { setStoreF(e.target.value); setPage(0) }}>
             <option value="">Tüm mağazalar</option>{(kanal ? stores.filter(x => kanal.types.includes(x.store_type || '')) : stores).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>}
-          {tagList.length > 0 && <select className="inp" style={{ width: 160 }} value={tagF} onChange={e => { setTagF(e.target.value); setPage(0) }}>
+          {showSF && tagList.length > 0 && <select className="inp" style={{ width: 160 }} value={tagF} onChange={e => { setTagF(e.target.value); setPage(0) }}>
             <option value="">Tüm etiketler</option>{tagList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>}
-          <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={vipF} onChange={e => { setVipF(e.target.checked); setPage(0) }} /> Sadece VIP</label>
-          <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={mineF} onChange={e => { setMineF(e.target.checked); setPage(0) }} /> Benim müşterilerim</label>
         </div>
 
         <div className="card" style={{ overflow: 'hidden' }}>
@@ -206,7 +204,7 @@ export default function MusterilerPage() {
               </div>
               )}
               <div><label className="label">Şehir</label><input className="inp" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} /></div>
-              {crm.can('vip.manage') && <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={form.is_vip} onChange={e => setForm(f => ({ ...f, is_vip: e.target.checked }))} /> VIP müşteri</label>}
+              {showSF && crm.can('vip.manage') && <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={form.is_vip} onChange={e => setForm(f => ({ ...f, is_vip: e.target.checked }))} /> VIP müşteri</label>}
               {dups.length > 0 && (
                 <div style={{ border: '1px solid var(--amber)', borderRadius: 10, padding: 12, fontSize: 12.5 }}>
                   <b style={{ color: 'var(--amber)' }}>Olası mükerrer kayıt</b>
