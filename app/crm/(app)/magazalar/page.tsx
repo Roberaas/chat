@@ -9,7 +9,7 @@ import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 type StoreRow = { id: string; code: string; name: string; store_type: string; city: string | null; address: string | null; phone: string | null; manager_id: string | null; is_active: boolean }
 type Person = { id: string; first_name: string; last_name: string }
 type Member = { user_id: string; store_id: string; is_primary: boolean }
-const TYPE: Record<string, string> = { store: 'Mağaza', hq: 'Merkez', online: 'Online' }
+const TYPE: Record<string, string> = { store: 'Mağaza', hq: 'Merkez', online: 'Online', dealer: 'Bayi', wholesale: 'Toptancı' }
 const EMPTY = { id: '', code: '', name: '', store_type: 'store', city: '', address: '', phone: '', manager_id: '', is_active: true }
 
 export default function MagazalarPage() {
@@ -135,7 +135,7 @@ export default function MagazalarPage() {
                 <div><label className="label">Kod *</label><input className="inp" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="IST01" style={{ fontFamily: 'JetBrains Mono, monospace' }} /></div>
                 <div><label className="label">Tür</label>
                   <select className="inp" value={form.store_type} onChange={e => setForm(f => ({ ...f, store_type: e.target.value }))}>
-                    <option value="store">Mağaza</option><option value="hq">Merkez Ofis</option><option value="online">Online Kanal</option>
+                    <option value="store">Mağaza</option><option value="hq">Merkez Ofis</option><option value="online">Online Kanal</option><option value="dealer">Bayi</option><option value="wholesale">Toptancı</option>
                   </select></div>
               </div>
               <div><label className="label">Ad *</label><input className="inp" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>

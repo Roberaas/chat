@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -8,6 +8,8 @@ export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string
 export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   { g: 'Genel', items: [
     { href: '/crm', label: 'Dashboard', Icon: LayoutDashboard, perm: 'dashboard.read' },
+    { href: '/crm/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'dashboard.read' },
+    { href: '/crm/bildirimler', label: 'Bildirimler', Icon: Bell },
   ]},
   { g: 'Müşteri', items: [
     { href: '/crm/musteriler', label: 'Müşteriler', Icon: Contact, perm: 'customers.read' },
@@ -25,6 +27,8 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read' },
   ]},
   { g: 'Yönetim', items: [
+    { href: '/crm/aktivite', label: 'Aktivite İzleme', Icon: Activity, perm: 'activity.read' },
+    { href: '/crm/iceaktar', label: 'İçe / Dışa Aktar', Icon: FileSpreadsheet, anyOf: ['data.import', 'customers.export', 'reports.export'] },
     { href: '/crm/otomasyonlar',   label: 'Otomasyonlar',   Icon: Workflow, perm: 'settings.manage' },
     { href: '/crm/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug,     perm: 'integrations.manage' },
     { href: '/crm/magazalar',   label: 'Mağazalar',    Icon: Store,      anyOf: ['stores.manage', 'users.read'] },

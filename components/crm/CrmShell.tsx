@@ -97,9 +97,22 @@ function Mobile() {
   )
 }
 
+function Heartbeat() {
+  useEffect(() => {
+    const supabase = createCrmBrowserClient()
+    const beat = () => { if (document.visibilityState === 'visible') supabase.rpc('touch_seen').then(() => {}, () => {}) }
+    beat()
+    const t = setInterval(beat, 120000)
+    document.addEventListener('visibilitychange', beat)
+    return () => { clearInterval(t); document.removeEventListener('visibilitychange', beat) }
+  }, [])
+  return null
+}
+
 export default function CrmShell({ ctx, children }: { ctx: CrmContext; children: ReactNode }) {
   return (
     <CrmProvider value={ctx}>
+      <Heartbeat />
       <style>{`
         .dw{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
         .dsb{display:flex}

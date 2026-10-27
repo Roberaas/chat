@@ -38,3 +38,31 @@ test('webhook imza: reddedilir', () => {
   assert.ok(!verifyWebhookSignature({ secret, timestamp: '', signature: '', rawBody: body, nowMs: now }), 'boş')
   assert.ok(!verifyWebhookSignature({ secret, timestamp: 'abc', signature: sign('abc'), rawBody: body, nowMs: now }), 'NaN')
 })
+
+import { buildXlsx, parseXlsx, csvCell } from '../lib/crm/xlsx.ts'
+import { autoMap, normHeader } from '../lib/crm/import-config.ts'
+
+test('xlsx gidiş-dönüş: yaz, oku', async () => {
+  const buf = await buildXlsx([{ name: 'Müşteriler', columns: [{ header: 'Ad *', key: 'a' }, { header: 'Telefon', key: 'b' }, { header: 'Doğum Tarihi', key: 'c' }],
+    rows: [{ a: 'Ayşe', b: '0532 111 22 33', c: '1990-05-21' }, { a: '', b: '', c: '' }, { a: 'Çağrı', b: '05551112233', c: new Date('1985-01-02T00:00:00Z') }] }])
+  const p = await parseXlsx(buf)
+  assert.deepEqual(p.headers, ['Ad *', 'Telefon', 'Doğum Tarihi'])
+  assert.equal(p.rows.length, 2, 'boş satır atlanır')
+  assert.equal(p.rows[0].cells[0], 'Ayşe'); assert.equal(p.rows[0].row, 2)
+  assert.equal(p.rows[1].row, 4, 'Excel satır numarası korunur')
+  assert.equal(p.rows[1].cells[2], '1985-01-02', 'tarih ISO metne çevrilir')
+})
+test('xlsx: satır sınırı', async () => {
+  const rows = Array.from({ length: 30 }, (_, i) => ({ a: 'x' + i }))
+  const p = await parseXlsx(await buildXlsx([{ name: 'S', columns: [{ header: 'A', key: 'a' }], rows }]), 10)
+  assert.equal(p.rows.length, 10); assert.ok(p.tooMany)
+})
+test('csv formül enjeksiyonu', () => {
+  assert.equal(csvCell('=1+1'), `"'=1+1"`); assert.equal(csvCell('+90'), `"'+90"`); assert.equal(csvCell('a"b'), '"a""b"')
+})
+test('başlık otomatik eşleme (Türkçe, büyük/küçük, eş anlamlı)', () => {
+  assert.equal(normHeader('Doğum Tarihi'), 'dogum tarihi'); assert.equal(normHeader('E-POSTA'), 'e posta')
+  const m = autoMap(['Adı', 'Soyadı', 'GSM', 'E-Posta', 'İl', 'Alakasız'], 'customers')
+  assert.deepEqual(m, { first_name: 0, last_name: 1, phone: 2, email: 3, city: 4 })
+  const p = autoMap(['SKU', 'Ürün Adı', 'Fiyat'], 'products'); assert.deepEqual(p, { sku: 0, name: 1, price: 2 })
+})

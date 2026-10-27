@@ -17,6 +17,7 @@ export const ROLE_LABEL: Record<string, string> = {
   store_manager: 'Mağaza Müdürü', sales_advisor: 'Satış Danışmanı',
   ecommerce_support: 'E-ticaret / Müşteri Hizmetleri', after_sales: 'Satış Sonrası Hizmetler',
   b2b_manager: 'B2B / Bayi Yöneticisi',
+  dealer_admin: 'Bayi / Toptancı Yöneticisi', dealer_user: 'Bayi / Toptancı Kullanıcısı',
 }
 export const can = (ctx: Pick<CrmContext, 'isSuperAdmin' | 'permissions'>, perm: string) =>
   ctx.isSuperAdmin || ctx.permissions.includes(perm)

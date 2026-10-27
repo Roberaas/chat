@@ -43,6 +43,7 @@ export default function CrmBell() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', fontSize: 12.5, fontWeight: 700, color: 'var(--tx)' }}>
             Bildirimler {unread > 0 && <button onClick={markAll} style={{ background: 'none', border: 'none', color: 'var(--ac)', fontSize: 12, cursor: 'pointer' }}>Tümünü okundu yap</button>}
           </div>
+          <Link href="/crm/bildirimler" onClick={() => setOpen(false)} style={{ display: 'block', padding: '4px 10px 8px', fontSize: 12, color: 'var(--ac)', textDecoration: 'none' }}>Tüm bildirimler ve duyurular →</Link>
           {items.length === 0 ? <div style={{ padding: 24, textAlign: 'center', fontSize: 12.5, color: 'var(--tx3)' }}>Bildirim yok</div> : items.map(n => {
             const inner = (<div style={{ padding: '8px 10px', borderRadius: 8, background: n.read_at ? 'transparent' : 'var(--ac2)' }}>
               <div style={{ fontSize: 13, color: 'var(--tx)', fontWeight: n.read_at ? 400 : 600 }}>{n.title}</div>

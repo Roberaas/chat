@@ -15,7 +15,6 @@ type Stats = {
 }
 const RANGES = [['7', 'Son 7 gün'], ['30', 'Son 30 gün'], ['90', 'Son 90 gün'], ['365', 'Son 1 yıl'], ['custom', 'Özel']] as const
 const money = (n: number) => `${Number(n).toLocaleString('tr-TR')} ₺`
-const csvCell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
 
 export default function CrmDashboard() {
   const crm = useCrm()
@@ -39,13 +38,6 @@ export default function CrmDashboard() {
   }, [range, from, to, store])  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [load])
 
-  function exportReport() {
-    if (!s) return
-    const rows: unknown[][] = [['Mağaza', 'Müşteri', 'Yeni', 'VIP', 'Aktif fırsat'], ...s.per_store.map(x => [x.name, x.customers, x.new, x.vip, x.opps_active]), [], ['Danışman', 'Müşteri', 'Kazanılan', 'Kazanılan tutar', 'Tamamlanan görev', 'Tamamlanan randevu'], ...s.advisors.map(a => [a.name, a.customers, a.won, a.won_amount, a.tasks_done, a.appointments_done])]
-    const blob = new Blob(['﻿' + rows.map(r => r.map(csvCell).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' })
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `crm-rapor-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href)
-  }
-
   const empty = (t: string) => <div style={{ padding: 22, textAlign: 'center', color: 'var(--tx3)', fontSize: 12.5 }}>{t}</div>
   return (
     <div style={{ padding: 22, maxWidth: 1250, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -54,8 +46,8 @@ export default function CrmDashboard() {
         {range === 'custom' && <><input className="inp" style={{ width: 150 }} type="date" value={from} onChange={e => setFrom(e.target.value)} /><input className="inp" style={{ width: 150 }} type="date" value={to} onChange={e => setTo(e.target.value)} /></>}
         {stores.length > 1 && <select className="inp" style={{ width: 180 }} value={store} onChange={e => setStore(e.target.value)}><option value="">Tüm mağazalar</option>{stores.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}</select>}
         <div style={{ flex: 1 }} />
-        {crm.can('reports.export') && s && <button className="btn-ghost" onClick={exportReport}><Download size={14} /> Raporu indir (CSV)</button>}
-        {crm.can('customers.export') && <a className="btn-ghost" href={`/api/crm/export/customers${store ? `?store=${store}` : ''}`} style={{ textDecoration: 'none' }}><Download size={14} /> Müşteri listesi (CSV)</a>}
+        {crm.can('reports.export') && s && <a className="btn-ghost" href={`/api/crm/export/report?from=${new Date(range === 'custom' && from ? from : Date.now() - (parseInt(range) || 30) * 86400000).toISOString().slice(0, 10)}&to=${range === 'custom' && to ? to : new Date().toISOString().slice(0, 10)}${store ? `&store=${store}` : ''}`} style={{ textDecoration: 'none' }}><Download size={14} /> Raporu indir (Excel)</a>}
+        {crm.can('customers.export') && <a className="btn-ghost" href={`/api/crm/export/customers${store ? `?store=${store}` : ''}`} style={{ textDecoration: 'none' }}><Download size={14} /> Müşteri listesi (Excel)</a>}
       </div>
       {err && <div style={{ color: 'var(--red)', fontSize: 13 }}>{err}</div>}
       {!s ? <div className="card anim-pulse" style={{ height: 160 }} /> : (<>
