@@ -13,7 +13,7 @@ type Col = { header: string; key: string; width?: number; kind?: 'date' | 'datet
 type Def = { perms: string[]; table: string; select: string; order: string; dateCol?: string; storeCol?: string; cols: Col[]; map: (r: any) => Record<string, unknown>; label: string }
 
 const SRC: Record<string, string> = { walk_in: 'Mağaza', whatsapp: 'WhatsApp', ecommerce: 'E-ticaret', referral: 'Tavsiye', event: 'Etkinlik', social: 'Sosyal', phone: 'Telefon', other: 'Diğer' }
-const ORD: Record<string, string> = { pending: 'Beklemede', paid: 'Ödendi', shipped: 'Kargoda', delivered: 'Teslim', cancelled: 'İptal', refunded: 'İade' }
+const ORD: Record<string, string> = { pending: 'Beklemede', paid: 'Ödendi', shipped: 'Kargoda', delivered: 'Teslim', cancelled: 'İptal', returned: 'İade' }
 const TASK: Record<string, string> = { pending: 'Bekliyor', in_progress: 'Devam', done: 'Tamam', cancelled: 'İptal' }
 const PRIO: Record<string, string> = { low: 'Düşük', normal: 'Normal', high: 'Yüksek' }
 const TYPE: Record<string, string> = { dealer: 'Bayi', corporate: 'Kurumsal', wholesale: 'Toptan' }

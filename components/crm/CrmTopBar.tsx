@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import ThemeToggle from '@/components/ThemeToggle'
 import CrmBell from '@/components/crm/CrmBell'
+import CrmSearch from '@/components/crm/CrmSearch'
 
 export default function CrmTopBar({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export default function CrmTopBar({ title, subtitle, action }: { title: string; 
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
         {action}
+        <CrmSearch />
         <CrmBell />
         <ThemeToggle />
       </div>

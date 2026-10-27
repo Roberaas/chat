@@ -10,7 +10,7 @@ import { ROLE_LABEL } from '@/lib/crm/types'
 
 type N = { id: string; type: string; title: string; body: string | null; link: string | null; read_at: string | null; created_at: string }
 type A = { id: string; title: string; body: string; severity: string; audience_roles: string[] | null; sent_count: number; created_at: string }
-const TYPE: Record<string, string> = { announcement: 'Duyuru', import: 'İçe aktarma', opportunity_won: 'Fırsat', service_high: 'Servis', integration_error: 'Entegrasyon', digest: 'Özet', task: 'Görev', appointment: 'Randevu' }
+const TYPE: Record<string, string> = { announcement: 'Duyuru', import: 'İçe aktarma', opportunity_won: 'Fırsat', service_high: 'Servis', integration_error: 'Entegrasyon', digest: 'Özet', task: 'Görev', appointment: 'Randevu', birthday: 'Doğum günü' }
 const SEV: Record<string, string> = { info: 'badge-muted', warning: 'badge-amber', critical: 'badge-red' }
 const PAGE = 30
 

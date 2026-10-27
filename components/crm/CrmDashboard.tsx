@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Download, Check, Store, UserCog, FileSpreadsheet, Plug, Inbox, Activity as ActivityIcon, Plus } from 'lucide-react'
+import { Cake, Download, Check, Store, UserCog, FileSpreadsheet, Plug, Inbox, Activity as ActivityIcon, Plus } from 'lucide-react'
 import { Kpi, KpiStrip } from '@/components/crm/Kpi'
 import Empty from '@/components/crm/Empty'
 import { FeedRow, ago, type FeedItem } from '@/components/crm/ActivityFeed'
@@ -32,6 +32,7 @@ export default function CrmDashboard() {
   const [team, setTeam] = useState<{ id: string; name: string; last_seen_at: string | null; actions: number; active: boolean }[]>([])
   const [feed, setFeed] = useState<FeedItem[]>([])
   const canActivity = crm.can('activity.read')
+  const [bdays, setBdays] = useState<{ customer_id: string; name: string; days_left: number; turning: number }[]>([])
   const canSetup = crm.can('integrations.manage')
 
   useEffect(() => { supabase.from('stores').select('id, name').eq('is_active', true).order('name').then(({ data }) => setStores((data || []) as any)) }, [])  // eslint-disable-line react-hooks/exhaustive-deps
@@ -41,6 +42,7 @@ export default function CrmDashboard() {
       const c = (t: string, f?: (q: any) => any) => { let q: any = supabase.from(t).select('id', { count: 'exact', head: true }); if (f) q = f(q); return q.then((r: any) => r.count || 0) }
       Promise.all([c('stores'), c('profiles'), c('customers'), c('products'), c('integrations', (q: any) => q.eq('status', 'active'))]).then(([stores, users, customers, products, integrations]) => setSetup({ stores, users, customers, products, integrations }))
     }
+    if (crm.can('customers.read')) supabase.rpc('special_days', { p_days: 7 }).then(({ data }) => setBdays((data || []) as any))
     if (canActivity) {
       const loadTeam = () => {
         supabase.rpc('activity_users', { p_from: new Date(Date.now() - 864e5).toISOString(), p_to: new Date().toISOString() }).then(({ data }) => setTeam((data || []) as any))
@@ -116,6 +118,15 @@ export default function CrmDashboard() {
           <Kpi label="Yaklaşan randevu" value={s.appointments_upcoming} sub="önümüzdeki 7 gün" tone="blue" />
           <Kpi label="Açık servis talebi" value={s.service_open} sub={`${s.service_overdue} SLA aşımı`} tone={s.service_overdue ? 'red' : 'ac'} />
         </KpiStrip>
+
+        {bdays.length > 0 && (
+          <div className="card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Cake size={18} style={{ color: 'var(--gold)' }} /><div><div className="card-title">Yaklaşan doğum günleri</div><div style={{ fontSize: 12.5, color: 'var(--tx3)' }}>Önümüzdeki 7 gün, {bdays.length} müşteri</div></div></div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+              {bdays.slice(0, 5).map(b => <Link key={b.customer_id} href={`/crm/musteriler/${b.customer_id}`} className="chip">{b.name} · {b.days_left === 0 ? 'bugün' : `${b.days_left} gün`}</Link>)}
+            </div>
+            <Link href="/crm/ozel-gunler" className="btn-ghost">Tümü</Link>
+          </div>)}
 
         {canActivity && (
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.7fr) minmax(0,1fr)', gap: 22 }} className="dash-split">

@@ -68,7 +68,7 @@ export const FIELDS: { entity: string; field: string; req: string; desc: string 
 ]
 
 export const WHERE: { what: string; where: string; how: string }[] = [
-  { what: 'Mağaza / bayi / toptancı', where: 'Yönetim → Mağazalar', how: 'Tür seçerek ekleyin (Mağaza, Bayi, Toptancı, Online, Merkez). Kod benzersizdir.' },
+  { what: 'Mağaza / bayi / toptancı', where: 'Yönetim → Mağazalar', how: 'Tür seçerek ekleyin (Mağaza, Bayi, Toptancı, Online, Merkez). Kod benzersizdir. Bir bayinin kendi şubesi varsa şubeyi açarken "Bağlı olduğu bayi / merkez" alanını seçin: bayi yöneticileri şubeyi otomatik görür.' },
   { what: 'Çalışan, bayi kullanıcısı', where: 'Yönetim → Kullanıcılar', how: 'Rol ve bağlı mağaza seçin. Bayi yöneticisi kendi mağazasına kullanıcı ekleyebilir.' },
   { what: 'Mevcut müşteri listesi (Excel)', where: 'Yönetim → İçe / Dışa Aktar', how: 'Şablonu indirin, doldurun, yükleyin, sütunları eşleyin, önizleyip aktarın.' },
   { what: 'Ürün kataloğu', where: 'İçe / Dışa Aktar (toplu) veya Entegrasyon (otomatik)', how: 'Elle Excel ile ya da e-ticaret/ERP\'den product.upsert olayı ile.' },
@@ -79,6 +79,13 @@ export const WHERE: { what: string; where: string; how: string }[] = [
   { what: 'Servis talebi', where: 'Satış Sonrası', how: 'Müşteri/ürün/sipariş ile bağlanır, SLA takibi vardır.' },
   { what: 'Kampanya', where: 'Pazarlama → Segmentler → Kampanyalar', how: 'Önce segment (filtre) oluşturun, sonra kampanya. İzni olmayan müşteriye gönderilmez.' },
   { what: 'B2B firma (toptan müşteri)', where: 'Kurumsal → B2B / Bayi', how: 'Firma, yetkili kişi ve fırsatları tutar.' },
+  { what: 'Sipariş listesi ve ciro', where: 'Müşteri → Siparişler', how: 'Filtreleyin, Excel indirin. Siparişler entegrasyondan otomatik gelir.' },
+  { what: 'Doğum günleri', where: 'Müşteri → Özel Günler', how: 'Müşteri kartındaki doğum tarihinden hesaplanır; danışmana otomatik bildirim gider, WhatsApp ile tebrik edilir.' },
+  { what: 'Müşteri segmentleri (RFM)', where: 'Pazarlama → Müşteri Analizi', how: 'Şampiyon, Sadık, Risk altında, Uyuyan gibi gruplar otomatik hesaplanır.' },
+  { what: 'Satış hedefi', where: 'Genel → Hedefler', how: 'Mağaza veya danışman için aylık ciro hedefi girin; ilerleme siparişlerden hesaplanır.' },
+  { what: 'Mükerrer müşteri', where: 'Yönetim → Mükerrer Kayıtlar', how: 'Aynı ad-soyadlı kayıtları görüp tek kayda birleştirin.' },
+  { what: 'Rol ve yetki tablosu', where: 'Yönetim → Roller ve Yetkiler', how: 'Hangi rolün neyi yapabildiğini görün (yalnız süper admin).' },
+  { what: 'Hızlı arama', where: 'Ctrl + K (her sayfada)', how: 'Müşteri, sipariş, ürün, fırsat ve firma arar; yalnız erişiminiz olan kayıtları getirir.' },
   { what: 'Duyuru / bildirim', where: 'Genel → Bildirimler', how: 'Yöneticiler role veya mağazaya duyuru gönderir.' },
 ]
 

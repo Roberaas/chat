@@ -6,11 +6,11 @@ import ConfirmModal from '@/components/ConfirmModal'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
-type StoreRow = { id: string; code: string; name: string; store_type: string; city: string | null; address: string | null; phone: string | null; manager_id: string | null; is_active: boolean }
+type StoreRow = { id: string; code: string; name: string; store_type: string; city: string | null; address: string | null; phone: string | null; manager_id: string | null; is_active: boolean; parent_id: string | null }
 type Person = { id: string; first_name: string; last_name: string }
 type Member = { user_id: string; store_id: string; is_primary: boolean }
 const TYPE: Record<string, string> = { store: 'Mağaza', hq: 'Merkez', online: 'Online', dealer: 'Bayi', wholesale: 'Toptancı' }
-const EMPTY = { id: '', code: '', name: '', store_type: 'store', city: '', address: '', phone: '', manager_id: '', is_active: true }
+const EMPTY = { id: '', code: '', name: '', store_type: 'store', city: '', address: '', phone: '', manager_id: '', parent_id: '', is_active: true }
 
 export default function MagazalarPage() {
   const crm = useCrm()
@@ -41,6 +41,8 @@ export default function MagazalarPage() {
   useEffect(() => { load() }, [load])
 
   const nameOf = (id: string | null) => { const p = people.find(x => x.id === id); return p ? `${p.first_name} ${p.last_name}` : '—' }
+  const storeName = (id: string | null) => stores.find(x => x.id === id)?.name
+  const branchCount = (id: string) => stores.filter(x => x.parent_id === id).length
   const staffCount = (sid: string) => members.filter(m => m.store_id === sid).length
 
   async function save() {
@@ -49,7 +51,7 @@ export default function MagazalarPage() {
     const payload = {
       code: form.code.trim().toUpperCase(), name: form.name.trim(), store_type: form.store_type,
       city: form.city.trim() || null, address: form.address.trim() || null, phone: form.phone.trim() || null,
-      manager_id: form.manager_id || null, is_active: form.is_active,
+      manager_id: form.manager_id || null, parent_id: form.parent_id || null, is_active: form.is_active,
     }
     let error
     if (form.id) ({ error } = await supabase.from('stores').update(payload).eq('id', form.id))
@@ -110,12 +112,14 @@ export default function MagazalarPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12.5, color: 'var(--tx2)', marginBottom: 14 }}>
                   {(s.city || s.address) && <div style={{ display: 'flex', gap: 6 }}><MapPin size={13} style={{ color: 'var(--tx3)', marginTop: 2 }} />{[s.city, s.address].filter(Boolean).join(' · ')}</div>}
+                  {s.parent_id && <div>Bağlı olduğu: <b style={{ color: 'var(--tx)' }}>{storeName(s.parent_id) || '—'}</b></div>}
+                  {branchCount(s.id) > 0 && <div>{branchCount(s.id)} şube</div>}
                   <div>Müdür: <b style={{ color: 'var(--tx)' }}>{nameOf(s.manager_id)}</b></div>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Users size={13} style={{ color: 'var(--tx3)' }} />{staffCount(s.id)} personel</div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setStaffOf(s); setErr('') }}>Personel</button>
-                  {canManage && <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setForm({ id: s.id, code: s.code, name: s.name, store_type: s.store_type, city: s.city || '', address: s.address || '', phone: s.phone || '', manager_id: s.manager_id || '', is_active: s.is_active, show: true })}>Düzenle</button>}
+                  {canManage && <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setForm({ id: s.id, code: s.code, name: s.name, store_type: s.store_type, city: s.city || '', address: s.address || '', phone: s.phone || '', manager_id: s.manager_id || '', parent_id: s.parent_id || '', is_active: s.is_active, show: true })}>Düzenle</button>}
                 </div>
               </div>
             ))}
@@ -149,6 +153,12 @@ export default function MagazalarPage() {
                   <option value="">— Seçilmedi —</option>
                   {people.map(p => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}
                 </select></div>
+              <div><label className="label">Bağlı olduğu bayi / merkez (şube ise)</label>
+                <select className="inp" value={form.parent_id} onChange={e => setForm(f => ({ ...f, parent_id: e.target.value }))}>
+                  <option value="">— Bağımsız birim —</option>
+                  {stores.filter(x => x.id !== form.id && x.parent_id !== form.id).map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+                </select>
+                <div style={{ fontSize: 11.5, color: 'var(--tx3)', marginTop: 4 }}>Şube açıldığında üst bayinin yöneticileri şubeyi otomatik görür; şube personeli yalnız kendi şubesini görür.</div></div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--tx2)' }}>
                 <input type="checkbox" checked={form.is_active} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} /> Aktif
               </label>
