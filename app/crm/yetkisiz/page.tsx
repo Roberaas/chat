@@ -1,9 +1,6 @@
 import Link from 'next/link'
 import { Lock } from 'lucide-react'
 
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-
 export default function Yetkisiz() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: 24 }}>

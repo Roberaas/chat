@@ -18,6 +18,8 @@ export async function POST(_req: Request, props: { params: Promise<{ id: string 
   if (!UUID.test(params.id)) return NextResponse.json({ ok: false, error: 'Geçersiz kampanya' }, { status: 400 })
 
   const db = createCrmServerClient()
+  const { data: mk } = await db.from('module_settings').select('enabled').eq('module', 'marketing').maybeSingle()
+  if (mk && mk.enabled === false) return NextResponse.json({ ok: false, error: 'Pazarlama modülü kapalı (Ayarlar → Modüller)' }, { status: 403 })
   const { data: camp } = await db.from('campaigns').select('id, channel, status').eq('id', params.id).maybeSingle()
   if (!camp) return NextResponse.json({ ok: false, error: 'Kampanya bulunamadı' }, { status: 404 })
   if (!providerFor(camp.channel as Channel)) {

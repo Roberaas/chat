@@ -1,3 +1,4 @@
+import { hrefDisabled } from '@/lib/crm/modules'
 import {
   LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen, Settings, Flag, ShoppingBag, Cake, PieChart, GitMerge, KeyRound, Tags, Wallet, CalendarRange, ListPlus,
 } from 'lucide-react'
@@ -53,8 +54,9 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   ]},
 ]
 
-export function crmNavFor(ctx: { isSuperAdmin: boolean; permissions: string[] }) {
+export function crmNavFor(ctx: { isSuperAdmin: boolean; permissions: string[]; disabledModules?: string[] }) {
   const ok = (i: CrmNavItem) => {
+    if (hrefDisabled(i.href, ctx.disabledModules)) return false
     if (ctx.isSuperAdmin) return true
     if (i.perm) return ctx.permissions.includes(i.perm)
     if (i.anyOf) return i.anyOf.some(p => ctx.permissions.includes(p))

@@ -2,9 +2,6 @@ import { redirect } from 'next/navigation'
 import CrmShell from '@/components/crm/CrmShell'
 import { getCrmContext } from '@/lib/crm/auth'
 
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-
 export const dynamic = 'force-dynamic'
 
 // Hesap sayfaları: MFA zorunluluğundan muaf (kayıt buradan yapılır)

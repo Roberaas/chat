@@ -3,9 +3,6 @@ import CrmShell from '@/components/crm/CrmShell'
 import { getCrmContext, smsVerified } from '@/lib/crm/auth'
 import { createCrmServerClient } from '@/lib/crm/supabase/server'
 
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-
 export const dynamic = 'force-dynamic'
 
 export default async function CrmAppLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +11,9 @@ export default async function CrmAppLayout({ children }: { children: React.React
   if (!ctx.profile.is_active) redirect('/crm/login?e=pasif')
   if (ctx.profile.must_change_password) redirect('/crm/sifre')
   if (!(await smsVerified(ctx))) redirect('/crm/login?sms=1')
+  const { data: dis } = await createCrmServerClient().from('module_settings').select('module').eq('enabled', false)
+  const disabledModules = (dis || []).map((r: { module: string }) => r.module)
   const { data: custom } = await createCrmServerClient().from('roles').select('code, name').eq('is_system', false)
   const roleNames = Object.fromEntries((custom || []).map((r: { code: string; name: string }) => [r.code, r.name]))
-  return <CrmShell ctx={ctx} roleNames={roleNames}>{children}</CrmShell>
+  return <CrmShell ctx={{ ...ctx, disabledModules }} roleNames={roleNames}>{children}</CrmShell>
 }

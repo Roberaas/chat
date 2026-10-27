@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { moduleForPath } from '@/lib/crm/modules'
 
 // /crm için oturum yenileme + kimlik doğrulama kapısı.
 // Yetkilendirme (rol/mağaza) burada DEĞİL, sunucu tarafında ve RLS'te yapılır.
@@ -30,6 +31,17 @@ export async function crmMiddleware(request: NextRequest) {
     const url = new URL('/crm/login', request.url)
     if (path !== '/crm') url.searchParams.set('next', path)
     return NextResponse.redirect(url)
+  }
+
+  // Kapalı modül: sayfaya girişi engelle (menüde de gizlenir). Yalnız eşleşen yollarda DB'ye bakılır.
+  const mod = user ? moduleForPath(path) : null
+  if (mod) {
+    const { data: ms } = await supabase.schema('crm').from('module_settings').select('enabled').eq('module', mod.key).maybeSingle()
+    if (ms && ms.enabled === false) {
+      const url = new URL(path === '/crm' ? '/crm/musteriler' : '/crm/modul-kapali', request.url)
+      if (path !== '/crm') url.searchParams.set('m', mod.label)
+      return NextResponse.redirect(url)
+    }
   }
   return response
 }

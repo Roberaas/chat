@@ -2,9 +2,7 @@ import Link from 'next/link'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { requireCrm } from '@/lib/crm/auth'
 import { API_REQS } from '@/lib/crm/guide'
-
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+import ModuleToggles from '@/components/crm/ModuleToggles'
 
 const th = { padding: '8px 14px', textAlign: 'left' as const, color: 'var(--tx3)', fontSize: 11.5 }
 const td = { padding: '9px 14px', fontSize: 12.5, color: 'var(--tx2)', verticalAlign: 'top' as const }
@@ -13,8 +11,9 @@ export default async function AyarlarPage() {
   await requireCrm('integrations.manage')
   return (
     <>
-      <CrmTopBar title="Ayarlar" subtitle="Entegrasyon için gerekli API bilgileri" />
+      <CrmTopBar title="Ayarlar" subtitle="Modüller ve entegrasyon bilgileri" />
       <div style={{ padding: 22, maxWidth: 1000, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <ModuleToggles />
         <div className="card" style={{ padding: 16, fontSize: 13, color: 'var(--tx2)', lineHeight: 1.7 }}>
           Bu liste, Pusula (ERP) ve Crealive (e-ticaret) sağlayıcılarından <b style={{ color: 'var(--tx)' }}>istenmesi gereken</b> API ve veri bilgilerini gösterir.
           Bilgiler gelince <Link href="/crm/entegrasyonlar" style={{ color: 'var(--ac)' }}>Entegrasyonlar</Link> sayfasındaki ilgili kartın "Kurulum" bölümünden bağlanır. Sağlayıcı webhook gönderemiyorsa n8n köprüsü kullanılır.

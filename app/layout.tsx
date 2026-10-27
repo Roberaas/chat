@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-
 export const metadata: Metadata = {
   manifest: '/manifest.json',
   title: 'Roberto · Yönetim Paneli',

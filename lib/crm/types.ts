@@ -11,6 +11,7 @@ export type CrmContext = {
   storeIds: string[]
   scope: 'all' | 'stores' | 'own'
   isSuperAdmin: boolean
+  disabledModules?: string[]
 }
 export const ROLE_LABEL: Record<string, string> = {
   super_admin: 'Super Admin', executive: 'Üst Yönetim', crm_marketing: 'CRM / Pazarlama',
