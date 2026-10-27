@@ -3,9 +3,6 @@ import CrmTopBar from '@/components/crm/CrmTopBar'
 import { requireCrm } from '@/lib/crm/auth'
 import { WHERE, ROLES, FIELDS } from '@/lib/crm/guide'
 
-// Remove this opt-out after verifying the segment passes validation without it.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-
 const th = { padding: '8px 14px', textAlign: 'left' as const, color: 'var(--tx3)', fontSize: 11.5 }
 const td = { padding: '9px 14px', fontSize: 12.5, color: 'var(--tx2)', verticalAlign: 'top' as const }
 
@@ -18,12 +15,34 @@ const STEPS: [string, string, string][] = [
   ['6', 'Segment ve kampanyaları oluşturun', '/crm/segmentler'],
 ]
 
+const BAYI: { q: string; steps: string[]; href: string }[] = [
+  { q: 'Yeni müşteri nasıl eklenir?', href: '/crm/musteriler', steps: ['Müşteriler menüsünü açın.', '"Yeni müşteri"ye basın, ad ve telefonu yazın.', 'Pazarlama iznini işaretleyin (SMS/WhatsApp için gerekli).', 'Kaydedin; kart açılır, not ve dosya ekleyebilirsiniz.'] },
+  { q: 'Satış fırsatı nasıl takip edilir?', href: '/crm/firsatlar', steps: ['Fırsatlar menüsünde "Yeni fırsat" açın ve müşteriyi seçin.', 'Ürünleri ve tahmini tutarı girin.', 'Görüşme ilerledikçe fırsatı bir sonraki aşamaya taşıyın.', 'Teklif hazırsa fırsatın içinden teklif oluşturun.'] },
+  { q: 'Sipariş nasıl girilir ve belgesi nasıl eklenir?', href: '/crm/siparisler', steps: ['Siparişler menüsünde yeni sipariş açın, müşteri ve ürünleri seçin.', 'Kaydedin; sipariş listede görünür.', 'Satırdaki ataç simgesiyle fatura veya irsaliye dosyasını ekleyin.'] },
+  { q: 'Bakiyemi ve limitimi nerede görürüm?', href: '/crm/cari', steps: ['Cari / Kredi menüsünü açın.', 'Satırda limit, bakiye, kullanılabilir tutar ve vade bilgisi görünür.', '"Hareketler" ile sipariş ve tahsilat geçmişine bakın.'] },
+  { q: 'Müşterilerime toplu mesaj nasıl gönderilir?', href: '/crm/kampanyalar', steps: ['Segmentler menüsünde bir müşteri grubu oluşturun (ör. 6 aydır alışveriş yapmayanlar).', 'Kampanyalar menüsünde yeni kampanya açın; kanalı (SMS/WhatsApp/e-posta) ve mesajı seçin.', 'Gönder\'e basın. Mesaj almak istemeyenlere gönderilmez.'] },
+  { q: 'Hedefimi ve müşteri raporumu nerede görürüm?', href: '/crm/bayi-raporu', steps: ['"Müşteri Raporum" menüsünde en çok alışveriş yapanları ve uzun süredir gelmeyenleri görün.', '"Hedefler" menüsünde aylık hedef, gerçekleşen tutar ve ay sonu tahmini yer alır.'] },
+]
+
 export default async function RehberPage() {
   await requireCrm()
   return (
     <>
       <CrmTopBar title="Rehber" subtitle="Hangi bilgi nereye girer, kim ne görür" />
       <div style={{ padding: 22, maxWidth: 1000, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="card" style={{ padding: 16 }}>
+          <div className="card-title" style={{ marginBottom: 10 }}>Bayi için hızlı başlangıç</div>
+          <div style={{ display: 'grid', gap: 14 }}>
+            {BAYI.map(b => (
+              <div key={b.q}>
+                <Link href={b.href} style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--tx)', textDecoration: 'none' }}>{b.q}</Link>
+                <ol style={{ margin: '6px 0 0', paddingLeft: 20, fontSize: 12.5, color: 'var(--tx2)', display: 'grid', gap: 3 }}>
+                  {b.steps.map(x => <li key={x}>{x}</li>)}
+                </ol>
+              </div>))}
+          </div>
+        </div>
+
         <div className="card" style={{ padding: 16 }}>
           <div className="card-title" style={{ marginBottom: 10 }}>Kurulum sırası</div>
           <div style={{ display: 'grid', gap: 8 }}>
