@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/crm.test.ts tests/panel-session.test.ts"
+    "test": "node --test tests/crm.test.ts tests/panel-session.test.ts tests/panel-password.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",

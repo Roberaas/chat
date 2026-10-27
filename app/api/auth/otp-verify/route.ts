@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/panelSession'
 import { rateLimit } from '@/lib/crm/auth'
+import { timingSafeEqual } from 'crypto'
 
 export async function POST(req: Request) {
   const supabase = createClient(
@@ -27,14 +28,22 @@ export async function POST(req: Request) {
 
   const { data: code } = await supabase
     .from('otp_codes')
-    .select('otp, expires_at, used')
+    .select('otp, expires_at, used, attempts')
     .eq('kullanici_id', user.id)
     .eq('used', false)
     .single()
 
   if (!code) return NextResponse.json({ ok: false, error: 'Kod bulunamadı' })
   if (new Date(code.expires_at) < new Date()) return NextResponse.json({ ok: false, error: 'Kod süresi doldu' })
-  if (code.otp !== otp) return NextResponse.json({ ok: false, error: 'Kod hatalı' })
+  if ((code.attempts ?? 0) >= 5) {
+    await supabase.from('otp_codes').update({ used: true }).eq('kullanici_id', user.id)
+    return NextResponse.json({ ok: false, error: 'Çok fazla hatalı deneme. Yeni kod isteyin.' })
+  }
+  const a = Buffer.from(code.otp), b = Buffer.from(otp)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    await supabase.from('otp_codes').update({ attempts: (code.attempts ?? 0) + 1 }).eq('kullanici_id', user.id)
+    return NextResponse.json({ ok: false, error: 'Kod hatalı' })
+  }
 
   await supabase.from('otp_codes').update({ used: true }).eq('kullanici_id', user.id)
   await supabase.from('kullanicilar').update({ son_giris: new Date().toISOString() }).eq('id', user.id)

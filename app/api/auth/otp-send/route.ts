@@ -4,11 +4,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 import { rateLimit } from '@/lib/crm/auth'
+import { verifyPassword, hashPassword } from '@/lib/panelPassword'
 
-
-function hashSifre(sifre: string) {
-  return crypto.createHash('sha256').update(sifre).digest('hex')
-}
 
 function maskPhone(phone: string) {
   const p = phone.replace(/\D/g, '')
@@ -26,22 +23,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Çok fazla deneme. Birkaç dakika sonra tekrar deneyin.' }, { status: 429 })
   }
 
-  const { data: user } = await supabase
+  const { data: row } = await supabase
     .from('kullanicilar')
-    .select('id, telefon, aktif')
+    .select('id, telefon, aktif, sifre_hash')
     .eq('kullanici_adi', kullanici_adi)
-    .in('sifre_hash', [hashSifre(sifre), crypto.createHash('sha256').update(sifre + 'roberto-salt-2024').digest('hex')])
     .eq('aktif', true)
-    .single()
-
-  if (!user) return NextResponse.json({ ok: false, error: 'Kullanıcı adı veya şifre hatalı' })
+    .maybeSingle()
+  const v = verifyPassword(sifre, row?.sifre_hash)
+  if (!row || !v.ok) return NextResponse.json({ ok: false, error: 'Kullanıcı adı veya şifre hatalı' })
+  if (v.upgrade) await supabase.from('kullanicilar').update({ sifre_hash: hashPassword(sifre) }).eq('id', row.id)
+  const user = row
   if (!user.telefon) return NextResponse.json({ ok: false, error: 'Telefon numarası kayıtlı değil' })
 
   const otp = crypto.randomInt(100000, 1000000).toString()
   const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString()
 
   await supabase.from('otp_codes').upsert({
-    kullanici_id: user.id, otp, expires_at: expires, used: false
+    kullanici_id: user.id, otp, expires_at: expires, used: false, attempts: 0
   }, { onConflict: 'kullanici_id' })
 
   const phone = user.telefon.replace(/\D/g, '').replace(/^90/, '').replace(/^0/, '')
