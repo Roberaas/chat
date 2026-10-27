@@ -82,6 +82,7 @@ export const WHERE: { what: string; where: string; how: string }[] = [
   { what: 'Sipariş listesi ve ciro', where: 'Müşteri → Siparişler', how: 'Filtreleyin, Excel indirin. Siparişler entegrasyondan otomatik gelir.' },
   { what: 'Doğum günleri', where: 'Müşteri → Özel Günler', how: 'Müşteri kartındaki doğum tarihinden hesaplanır; danışmana otomatik bildirim gider, WhatsApp ile tebrik edilir.' },
   { what: 'Müşteri segmentleri (RFM)', where: 'Pazarlama → Müşteri Analizi', how: 'Şampiyon, Sadık, Risk altında, Uyuyan gibi gruplar otomatik hesaplanır.' },
+  { what: 'Bayinin / müdürün kendi şubesi', where: 'Yönetim → Mağazalar → kartta "+ Şube Ekle"', how: 'Bayi yöneticisi ve mağaza müdürü kendi birimine bağlı şube açar, adres/telefon düzenler. Şube kodu üst birim kodunun devamıdır (BAYI-KADIKOY). Süper admin dışındakiler başka bayinin birimine şube açamaz.' },
   { what: 'Mağazaya / bayiye özel rol', where: 'Yönetim → Roller ve Yetkiler (süper admin)', how: '"Yeni Rol" ile ad verin, isterseniz bir mağazaya bağlayın, tabloda kutulara tıklayarak yetkileri işaretleyin. "Devredilebilir" işaretlerseniz bayi yöneticisi / mağaza müdürü kendi personeline atayabilir. Mağazalar → Personel ekranından da rol değiştirilir.' },
   { what: 'Satış hedefi', where: 'Genel → Hedefler', how: 'Mağaza veya danışman için aylık ciro hedefi girin; ilerleme siparişlerden hesaplanır.' },
   { what: 'Mükerrer müşteri', where: 'Yönetim → Mükerrer Kayıtlar', how: 'Aynı ad-soyadlı kayıtları görüp tek kayda birleştirin.' },

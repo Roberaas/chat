@@ -18,6 +18,7 @@ export default function MagazalarPage() {
   const crm = useCrm()
   const canManage = crm.can('stores.manage')
   const canMembers = crm.can('users.manage')
+  const canBranch = !crm.can('stores.manage') && (crm.roles.includes('dealer_admin') || crm.roles.includes('store_manager'))
   const supabase = createCrmBrowserClient()
   const [stores, setStores] = useState<StoreRow[]>([])
   const [people, setPeople] = useState<Person[]>([])
@@ -31,6 +32,9 @@ export default function MagazalarPage() {
   const [transfer, setTransfer] = useState<{ user: string; to: string }>({ user: '', to: '' })
   const [removeM, setRemoveM] = useState<Member | null>(null)
   const [err, setErr] = useState('')
+  const BEMPTY = { show: false, parent: null as StoreRow | null, id: '', code: '', name: '', city: '', address: '', phone: '', is_active: true }
+  const [br, setBr] = useState(BEMPTY)
+  const [brErr, setBrErr] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -71,6 +75,17 @@ export default function MagazalarPage() {
     setForm({ ...EMPTY, show: false }); load()
   }
 
+  async function saveBranch() {
+    if (!br.name.trim() || (!br.id && !br.code.trim())) { setBrErr('Kod ve ad gerekli'); return }
+    setBrErr('')
+    const { error } = br.id
+      ? await supabase.rpc('update_branch', { p_id: br.id, p_name: br.name, p_city: br.city, p_address: br.address, p_phone: br.phone, p_active: br.is_active })
+      : await supabase.rpc('create_branch', { p_parent: br.parent!.id, p_code: br.code, p_name: br.name, p_city: br.city, p_address: br.address, p_phone: br.phone })
+    if (error) { setBrErr(error.message); return }
+    setBr(BEMPTY); load()
+  }
+  const myParents = stores.filter(x => crm.storeIds.includes(x.id) && x.is_active)
+
   async function addMember() {
     if (!staffOf || !addUser) return
     const { error } = await supabase.from('store_memberships').insert({ user_id: addUser, store_id: staffOf.id, is_primary: false })
@@ -105,7 +120,8 @@ export default function MagazalarPage() {
   return (
     <>
       <CrmTopBar title="Mağazalar" subtitle={`${stores.length} birim`}
-        action={canManage && <button className="btn" onClick={() => setForm({ ...EMPTY, show: true })}><Plus size={14} /> Mağaza Ekle</button>} />
+        action={canManage ? <button className="btn" onClick={() => setForm({ ...EMPTY, show: true })}><Plus size={14} /> Mağaza Ekle</button>
+          : canBranch && myParents.length === 1 ? <button className="btn" onClick={() => { setBr({ ...BEMPTY, show: true, parent: myParents[0] }); setBrErr('') }}><Plus size={14} /> Şube Ekle</button> : undefined} />
       <div style={{ padding: 22, maxWidth: 1200, width: '100%', margin: '0 auto' }}>
         {loading ? <div className="card anim-pulse" style={{ height: 120 }} /> : stores.length === 0 ? (
           <div className="card" style={{ padding: 48, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Erişebildiğiniz mağaza yok</div>
@@ -132,6 +148,8 @@ export default function MagazalarPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setStaffOf(s); setErr('') }}>Personel</button>
+                  {canBranch && crm.storeIds.includes(s.id) && <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setBr({ ...BEMPTY, show: true, parent: s }); setBrErr('') }}>+ Şube Ekle</button>}
+                  {canBranch && s.parent_id && crm.storeIds.includes(s.parent_id) && <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setBr({ show: true, parent: stores.find(x => x.id === s.parent_id) || null, id: s.id, code: s.code, name: s.name, city: s.city || '', address: s.address || '', phone: s.phone || '', is_active: s.is_active }); setBrErr('') }}>Düzenle</button>}
                   {canManage && <button className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setForm({ id: s.id, code: s.code, name: s.name, store_type: s.store_type, city: s.city || '', address: s.address || '', phone: s.phone || '', manager_id: s.manager_id || '', parent_id: s.parent_id || '', is_active: s.is_active, show: true })}>Düzenle</button>}
                 </div>
               </div>
@@ -177,6 +195,30 @@ export default function MagazalarPage() {
               </label>
               {err && <div className="toast toast-err" style={{ margin: 0 }}>{err}</div>}
               <button className="btn" onClick={save} style={{ justifyContent: 'center', padding: '11px 0' }}>Kaydet</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {br.show && (
+        <div className="overlay" onClick={e => { if (e.target === e.currentTarget) setBr(BEMPTY) }}>
+          <div className="modal anim-pop" style={{ maxWidth: 460 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <h2 className="modal-title" style={{ marginBottom: 0 }}>{br.id ? 'Şubeyi Düzenle' : 'Şube Ekle'}</h2>
+              <button onClick={() => setBr(BEMPTY)} style={{ background: 'none', border: 'none', color: 'var(--tx3)' }}><X size={18} /></button>
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--tx3)', marginBottom: 14 }}>Bağlı olduğu birim: <b style={{ color: 'var(--tx)' }}>{br.parent?.name}</b>. Yöneticiler şubeyi otomatik görür.</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {!br.id && <div><label className="label">Şube kodu * ({br.parent?.code}-…)</label><input className="inp" value={br.code} onChange={e => setBr(b => ({ ...b, code: e.target.value }))} placeholder="KADIKOY" style={{ fontFamily: 'JetBrains Mono, monospace' }} /></div>}
+              <div><label className="label">Şube adı *</label><input className="inp" value={br.name} onChange={e => setBr(b => ({ ...b, name: e.target.value }))} /></div>
+              <div className="modal-grid">
+                <div><label className="label">Şehir</label><input className="inp" value={br.city} onChange={e => setBr(b => ({ ...b, city: e.target.value }))} /></div>
+                <div><label className="label">Telefon</label><input className="inp" value={br.phone} onChange={e => setBr(b => ({ ...b, phone: e.target.value }))} /></div>
+              </div>
+              <div><label className="label">Adres</label><input className="inp" value={br.address} onChange={e => setBr(b => ({ ...b, address: e.target.value }))} /></div>
+              {br.id && <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={br.is_active} onChange={e => setBr(b => ({ ...b, is_active: e.target.checked }))} /> Aktif</label>}
+              {brErr && <div className="toast toast-err" style={{ margin: 0 }}>{brErr}</div>}
+              <button className="btn" onClick={saveBranch} style={{ justifyContent: 'center', padding: '11px 0' }}>Kaydet</button>
             </div>
           </div>
         </div>
