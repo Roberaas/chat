@@ -1,17 +1,18 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, X, Check, Trash2 } from 'lucide-react'
+import { Plus, X, Check, Trash2, Repeat } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
-type Task = { id: string; title: string; description: string | null; status: string; priority: string; due_at: string | null; assignee_id: string | null; store_id: string | null; customer_id: string | null; created_by: string | null; customers: { first_name: string; last_name: string } | null }
+type Task = { id: string; title: string; description: string | null; status: string; priority: string; due_at: string | null; assignee_id: string | null; store_id: string | null; customer_id: string | null; created_by: string | null; recurrence: string | null; recurrence_interval: number; customers: { first_name: string; last_name: string } | null }
 type Person = { id: string; first_name: string; last_name: string }
 const STATUS: Record<string, string> = { pending: 'Bekliyor', in_progress: 'Devam ediyor', done: 'Tamamlandı', cancelled: 'İptal edildi' }
 const PRIO: Record<string, [string, string]> = { low: ['Düşük', 'badge-muted'], normal: ['Normal', 'badge-blue'], high: ['Yüksek', 'badge-red'] }
 const isOverdue = (t: Task) => !!t.due_at && new Date(t.due_at) < new Date() && (t.status === 'pending' || t.status === 'in_progress')
-const EMPTY = { title: '', description: '', priority: 'normal', due: '', assignee_id: '', store_id: '' }
+const REC: Record<string, string> = { daily: 'gün', weekly: 'hafta', monthly: 'ay', yearly: 'yıl' }
+const EMPTY = { title: '', description: '', priority: 'normal', due: '', assignee_id: '', store_id: '', recurrence: '', interval: '1', until: '' }
 
 export default function GorevlerPage() {
   const crm = useCrm()
@@ -47,7 +48,11 @@ export default function GorevlerPage() {
   async function del(id: string) { const { error } = await supabase.from('tasks').delete().eq('id', id); if (error) setErr(error.message); else load() }
   async function create() {
     if (!form || !form.title.trim()) { setErr('Başlık zorunlu'); return }
+    const iv = parseInt(form.interval)
+    if (form.recurrence && !form.due) { setErr('Tekrarlayan görev için son tarih gerekli'); return }
+    if (form.recurrence && (isNaN(iv) || iv < 1 || iv > 365)) { setErr('Tekrar aralığı 1-365 olmalı'); return }
     const { error } = await supabase.from('tasks').insert({
+      recurrence: form.recurrence || null, recurrence_interval: form.recurrence ? iv : 1, recurrence_until: form.recurrence && form.until ? form.until : null,
       title: form.title, description: form.description.trim() || null, priority: form.priority,
       due_at: form.due ? new Date(form.due).toISOString() : null, assignee_id: form.assignee_id || crm.profile.id, store_id: form.store_id || null,
     })
@@ -77,6 +82,7 @@ export default function GorevlerPage() {
                     {t.due_at && <span style={{ color: od ? 'var(--red)' : 'var(--tx3)' }}> · {new Date(t.due_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}</span>}
                   </div>
                 </div>
+                {t.recurrence && <span className="badge badge-muted" title="Tamamlanınca bir sonraki tekrar otomatik açılır"><Repeat size={11} style={{ verticalAlign: -1 }} /> {t.recurrence_interval > 1 ? `${t.recurrence_interval} ` : 'her '}{REC[t.recurrence]}</span>}
                 {od && <span className="badge badge-red">Gecikti</span>}
                 <span className={`badge ${PRIO[t.priority][1]}`}>{PRIO[t.priority][0]}</span>
                 {canWrite ? <select className="inp" style={{ width: 140 }} value={t.status} onChange={e => setStatus(t.id, e.target.value)}>{Object.entries(STATUS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select> : <span className="badge badge-muted">{STATUS[t.status]}</span>}
@@ -100,6 +106,11 @@ export default function GorevlerPage() {
                 <div><label className="label">Mağaza</label><select className="inp" value={form.store_id} onChange={e => setForm({ ...form, store_id: e.target.value })}><option value="">—</option>{stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
                 {team && <div><label className="label">Atanan</label><select className="inp" value={form.assignee_id} onChange={e => setForm({ ...form, assignee_id: e.target.value })}><option value="">Ben</option>{people.map(p => <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>)}</select></div>}
               </div>
+              <div className="modal-grid">
+                <div><label className="label">Tekrar</label><select className="inp" value={form.recurrence} onChange={e => setForm({ ...form, recurrence: e.target.value })}><option value="">Tekrarlanmaz</option><option value="daily">Günlük</option><option value="weekly">Haftalık</option><option value="monthly">Aylık</option><option value="yearly">Yıllık</option></select></div>
+                {form.recurrence && <div><label className="label">Her kaç {REC[form.recurrence]}da bir</label><input className="inp" inputMode="numeric" value={form.interval} onChange={e => setForm({ ...form, interval: e.target.value })} /></div>}
+              </div>
+              {form.recurrence && <div><label className="label">Tekrar bitiş tarihi (boş = süresiz)</label><input className="inp" type="date" value={form.until} onChange={e => setForm({ ...form, until: e.target.value })} /><div style={{ fontSize: 11.5, color: 'var(--tx3)', marginTop: 4 }}>Görevi tamamlayınca bir sonraki tekrar otomatik açılır.</div></div>}
               {err && <div style={{ fontSize: 12.5, color: 'var(--red)' }}>{err}</div>}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}><button className="btn-ghost" onClick={() => setForm(null)}>Vazgeç</button><button className="btn" onClick={create}>Kaydet</button></div>
             </div>

@@ -20,6 +20,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/urunler',    label: 'Ürünler',    Icon: Gem,    perm: 'products.read' },
     { href: '/crm/ozel-gunler', label: 'Özel Günler', Icon: Cake, perm: 'customers.read' },
     { href: '/crm/gorevler',   label: 'Görevler',   Icon: CheckSquare, perm: 'tasks.read' },
+    { href: '/crm/takvim', label: 'Takvim', Icon: CalendarRange, anyOf: ['tasks.read', 'appointments.read'] },
     { href: '/crm/randevular', label: 'Randevular', Icon: CalendarDays, perm: 'appointments.read' },
     { href: '/crm/servis',     label: 'Satış Sonrası', Icon: Wrench, perm: 'service.read' },
   ]},

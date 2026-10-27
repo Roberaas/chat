@@ -62,6 +62,23 @@ export default function KampanyalarPage() {
     if (error) { setMsg(error.message); return }
     const r = (data as any[])[0]; setMsg(`Hedef kitle hazırlandı: ${r.total} kişi, ${r.eligible} izinli, ${r.skipped} izin yok (gönderilmeyecek)`); load()
   }
+  const [sending, setSending] = useState('')
+  const [prov, setProv] = useState<Record<string, string | null> | null>(null)
+  useEffect(() => { fetch('/api/crm/messaging').then(r => r.json()).then(j => { if (j.ok) setProv(Object.fromEntries(j.channels.map((c: any) => [c.channel, c.provider]))) }).catch(() => {}) }, [])
+  async function send(c: Camp) {
+    if (!confirm(`"${c.name}" kampanyası izinli alıcılara GERÇEKTEN gönderilecek. Devam edilsin mi?`)) return
+    setSending(c.id); let sent = 0, failed = 0
+    try {
+      for (let n = 0; n < 40; n++) {
+        const r = await fetch(`/api/crm/campaigns/${c.id}/send`, { method: 'POST' }); const j = await r.json().catch(() => ({}))
+        if (!r.ok || !j.ok) { setMsg(j.error || 'Gönderim başlatılamadı'); break }
+        sent += j.sent; failed += j.failed + j.retried
+        setMsg(`Gönderiliyor… ${sent} gönderildi, ${failed} hatalı/yeniden denenecek, ${j.remaining} bekliyor`); load()
+        if (j.remaining === 0) { setMsg(`Tamamlandı: ${sent} gönderildi, ${failed} hatalı`); break }
+        if (j.sent + j.failed + j.retried === 0) { setMsg(`Duraklatıldı (gönderim saati dışında veya günlük sınır doldu): ${sent} gönderildi, ${j.remaining} bekliyor. Uygun zamanda tekrar "Gönder"e basın.`); break }
+      }
+    } finally { setSending(''); load() }
+  }
   async function setStatus(id: string, status: string) { const { error } = await supabase.from('campaigns').update({ status }).eq('id', id); setMsg(error ? error.message : ''); load() }
 
   return (
@@ -69,7 +86,8 @@ export default function KampanyalarPage() {
       <CrmTopBar title="Kampanyalar" action={canWrite && <button className="btn" onClick={() => { setErr(''); tab === 'kampanya' ? setCf({ id: '', name: '', channel: 'sms', segment_id: '', template_id: '', scheduled_at: '' }) : setTf({ id: '', name: '', channel: 'sms', subject: '', body: '', is_active: true }) }}><Plus size={14} /> {tab === 'kampanya' ? 'Kampanya Ekle' : 'Şablon Ekle'}</button>} />
       <div style={{ padding: 22, maxWidth: 1000, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div className="card" style={{ padding: 12, fontSize: 12.5, color: 'var(--tx2)', display: 'flex', gap: 8 }}><Info size={15} style={{ flexShrink: 0, color: 'var(--ac)' }} />
-          Hedef kitle yalnızca ilgili kanalda pazarlama izni olan müşterilerden oluşur. Gerçek gönderim, SMS/e-posta/WhatsApp sağlayıcısı bağlandığında (Entegrasyonlar) başlar; o zamana kadar durumlar "gönderildi" olarak işaretlenmez.</div>
+          Hedef kitle yalnızca ilgili kanalda pazarlama izni olan müşterilerden oluşur. Gönderim yalnızca 09:00-20:00 (İstanbul) arasında ve günlük sınır dahilinde yapılır; izni iptal edilen kişiye gönderilmez. SMS metnine ret yolu (ör. "İptal için İPTAL yazın") eklemeyi unutmayın.
+          {prov && <> Sağlayıcı: {(['sms', 'whatsapp', 'email'] as const).map(k => <span key={k} className={`badge ${prov[k] ? 'badge-green' : 'badge-muted'}`} style={{ marginLeft: 4 }}>{CH[k]}: {prov[k] || 'bağlı değil'}</span>)}</>}</div>
         {msg && <div className="card" style={{ padding: 12, fontSize: 13, color: 'var(--tx2)' }}>{msg}</div>}
         <div className="card" style={{ overflow: 'hidden' }}>
           <div className="tabs"><button className={`tab ${tab === 'kampanya' ? 'active' : ''}`} onClick={() => setTab('kampanya')}>Kampanyalar</button><button className={`tab ${tab === 'sablon' ? 'active' : ''}`} onClick={() => setTab('sablon')}>Şablonlar</button></div>
@@ -82,6 +100,7 @@ export default function KampanyalarPage() {
                   <div style={{ fontSize: 12, color: 'var(--tx3)' }}>{segs.find(x => x.id === c.segment_id)?.name || 'Segment yok'} · {tpls.find(x => x.id === c.template_id)?.name || 'Şablon yok'}{s ? ` · ${s.total} kişi / ${s.total - s.skipped} izinli / ${s.sent + s.delivered} gönderildi / ${s.failed} hatalı` : ' · hedef kitle hazırlanmadı'}</div>
                 </div>
                 <span className={`badge ${STATUS[c.status][1]}`}>{STATUS[c.status][0]}</span>
+                {crm.can('campaigns.send') && ['ready', 'sending'].includes(c.status) && s && s.total - s.skipped > 0 && <button className="btn" disabled={!!sending || !prov?.[c.channel]} title={prov?.[c.channel] ? '' : 'Bu kanal için sağlayıcı bağlı değil'} onClick={() => send(c)}>{sending === c.id ? 'Gönderiliyor…' : 'Gönder'}</button>}
                 {canWrite && ['draft', 'ready'].includes(c.status) && <>
                   <button className="btn-ghost" onClick={() => setCf({ id: c.id, name: c.name, channel: c.channel, segment_id: c.segment_id || '', template_id: c.template_id || '', scheduled_at: '' })}>Düzenle</button>
                   <button className="btn-ghost" onClick={() => prepare(c.id)}>Hedef kitleyi hazırla</button>

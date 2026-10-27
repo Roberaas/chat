@@ -68,6 +68,13 @@ export const FIELDS: { entity: string; field: string; req: string; desc: string 
 ]
 
 export const WHERE: { what: string; where: string; how: string }[] = [
+  { what: 'Bayiye özel fiyat', where: 'Satış → Fiyat Listeleri', how: 'Liste oluşturun (genel indirim % veya ürün bazlı fiyat), mağazaya atayın. Bayi kendi fiyatını Ürünler sayfasında görür.' },
+  { what: 'Cari / kredi limiti / ödeme', where: 'Satış → Cari / Kredi', how: 'Limit ve vade tanımlayın, ödemeyi girin. Limit aşılırsa bildirim gider; sipariş engellenmez.' },
+  { what: 'Etiket ve özel alan', where: 'Yönetim → Özel Alanlar / Etiketler', how: 'Alanı/etiketi tanımlayın; müşteri kartında doldurun. Segment ve filtrede kullanılır.' },
+  { what: 'Dosya eki (sözleşme, belge)', where: 'Müşteri kartı → Dosyalar', how: 'En çok 10 MB; PDF, görsel, Office. Yalnız erişiminiz olan kayda yüklenir.' },
+  { what: 'Tekrarlayan görev', where: 'Görevler', how: 'Tekrar (günlük/haftalık/aylık/yıllık) seçin; görev tamamlanınca bir sonraki otomatik oluşur. Bitiş tarihi zorunludur.' },
+  { what: 'Takvim', where: 'Takvim', how: 'Görev, randevu ve doğum günlerini aylık görürsünüz; katmanları açıp kapatın.' },
+  { what: 'Kampanya gönderimi', where: 'Pazarlama → Kampanyalar', how: 'Hedef kitleyi hazırla → Hazır → Gönder. Yalnız izinli kişilere, 09:00-20:00 arası, günlük sınırla gider. Sağlayıcı ortam değişkenleriyle bağlanır.' },
   { what: 'Mağaza / bayi / toptancı', where: 'Yönetim → Mağazalar', how: 'Tür seçerek ekleyin (Mağaza, Bayi, Toptancı, Online, Merkez). Kod benzersizdir. Bir bayinin kendi şubesi varsa şubeyi açarken "Bağlı olduğu bayi / merkez" alanını seçin: bayi yöneticileri şubeyi otomatik görür.' },
   { what: 'Çalışan, bayi kullanıcısı', where: 'Yönetim → Kullanıcılar', how: 'Rol ve bağlı mağaza seçin. Bayi yöneticisi kendi mağazasına kullanıcı ekleyebilir.' },
   { what: 'Mevcut müşteri listesi (Excel)', where: 'Yönetim → İçe / Dışa Aktar', how: 'Şablonu indirin, doldurun, yükleyin, sütunları eşleyin, önizleyip aktarın.' },
