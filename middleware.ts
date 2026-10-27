@@ -11,7 +11,7 @@ const ROL_YETKILER: Record<string, string[]> = {
 import { verifySession, verifyInternal, SESSION_COOKIE } from '@/lib/panelSession'
 
 // Oturum gerektirmeyen API'ler: giriş akışı, CRM (kendi yetki kontrolü var), n8n çağrısı (rota içinde ayrıca korunur)
-const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim']
+const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim', '/api/csp-report']
 // Yalnızca admin rolü
 const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar']
 

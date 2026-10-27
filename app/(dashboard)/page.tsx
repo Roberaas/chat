@@ -117,7 +117,8 @@ export default function DashboardPage() {
     const dun = list.filter(s => new Date(s.updated_at) >= yesterday && new Date(s.updated_at) < today).length
     const buHafta = list.filter(s => new Date(s.updated_at) >= buHaftaBaslangic).length
     const gecenHafta = list.filter(s => new Date(s.updated_at) >= gecenHaftaBaslangic && new Date(s.updated_at) < gecenHaftaBitis).length
-    const canli = list.filter(s => s.last_intent === 'human_handover' || (s as any).bulundugu_menu === 'canli').length
+    // Bekleyen = şu an canlı destek modunda olanlar. last_intent geçmiş bir etiket olduğundan sayıma katılmaz (cevaplananlar şişirirdi).
+    const canli = list.filter(s => (s as any).bulundugu_menu === 'canli').length
     const kvkkOnayli = list.filter(s => s.kvkk_onay === true).length
     const kvkkOranı = list.length ? Math.round((kvkkOnayli / list.length) * 100) : 0
 

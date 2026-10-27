@@ -35,6 +35,11 @@ export async function POST(req: Request) {
   const user = row
   if (!user.telefon) return NextResponse.json({ ok: false, error: 'Telefon numarası kayıtlı değil' })
 
+  // SMS suistimali: aynı kullanıcıya 1 dakika içinde ikinci kod gönderilmez (veritabanı tabanlı, sunucu örneğinden bağımsız)
+  const { data: prev } = await supabase.from('otp_codes').select('expires_at, used').eq('kullanici_id', user.id).maybeSingle()
+  if (prev && !prev.used && new Date(prev.expires_at).getTime() - Date.now() > 4 * 60_000) {
+    return NextResponse.json({ ok: false, error: 'Kod az önce gönderildi. Yaklaşık 1 dakika sonra tekrar deneyin.' }, { status: 429 })
+  }
   const otp = crypto.randomInt(100000, 1000000).toString()
   const expires = new Date(Date.now() + 5 * 60 * 1000).toISOString()
 
