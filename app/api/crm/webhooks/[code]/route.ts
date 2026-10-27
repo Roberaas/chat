@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createHmac, timingSafeEqual } from 'crypto'
+import { verifyWebhookSignature } from '@/lib/crm/signature'
 import { createCrmAdminClient } from '@/lib/crm/supabase/admin'
 import { rateLimit } from '@/lib/crm/auth'
 
@@ -37,10 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { code: strin
 
   const ts = req.headers.get('x-crm-timestamp') || ''
   const sig = (req.headers.get('x-crm-signature') || '').replace(/^sha256=/, '')
-  const age = Math.abs(Date.now() / 1000 - Number(ts))
-  const expected = createHmac('sha256', secret).update(`${ts}.${raw}`).digest('hex')
-  const okSig = sig.length === expected.length && timingSafeEqual(Buffer.from(sig), Buffer.from(expected))
-  if (!ts || !Number.isFinite(age) || age > TOLERANCE_S || !okSig) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  if (!verifyWebhookSignature({ secret, timestamp: ts, signature: sig, rawBody: raw, toleranceS: TOLERANCE_S })) return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
 
   let body: any
   try { body = JSON.parse(raw) } catch { return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 }) }
