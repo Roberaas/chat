@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen, Settings, Flag, ShoppingBag, Cake, PieChart, GitMerge, KeyRound,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen, Settings, Flag, ShoppingBag, Cake, PieChart, GitMerge, KeyRound, Tags, Wallet, CalendarRange, ListPlus,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -30,6 +30,8 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   ]},
   { g: 'Kurumsal', items: [
     { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read' },
+    { href: '/crm/fiyatlar', label: 'Fiyat Listeleri', Icon: Tags, perm: 'pricing.read' },
+    { href: '/crm/cari', label: 'Cari / Kredi', Icon: Wallet, perm: 'credit.read' },
   ]},
   { g: 'Yönetim', items: [
     { href: '/crm/aktivite', label: 'Aktivite İzleme', Icon: Activity, perm: 'activity.read' },
@@ -39,6 +41,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/ayarlar', label: 'Ayarlar / API', Icon: Settings, perm: 'integrations.manage' },
     { href: '/crm/magazalar',   label: 'Mağazalar',    Icon: Store,      anyOf: ['stores.manage', 'users.read'] },
     { href: '/crm/kullanicilar', label: 'Kullanıcılar', Icon: UserCog,    perm: 'users.read' },
+    { href: '/crm/alanlar', label: 'Özel Alanlar / Etiketler', Icon: ListPlus, perm: 'settings.manage' },
     { href: '/crm/roller', label: 'Roller ve Yetkiler', Icon: KeyRound, perm: 'settings.manage' },
     { href: '/crm/mukerrerler', label: 'Mükerrer Kayıtlar', Icon: GitMerge, perm: 'customers.merge' },
     { href: '/crm/denetim',     label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read' },

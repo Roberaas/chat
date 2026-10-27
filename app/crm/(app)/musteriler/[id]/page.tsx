@@ -8,11 +8,14 @@ import ConfirmModal from '@/components/ConfirmModal'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { SOURCE_LABEL, CHANNEL_LABEL, INTERACTION_LABEL } from '@/lib/crm/labels'
+import CustomerTags from '@/components/crm/CustomerTags'
+import CustomFieldsCard from '@/components/crm/CustomFieldsCard'
+import Attachments from '@/components/crm/Attachments'
 
 type Cust = {
   id: string; customer_no: number; first_name: string; last_name: string; phone: string | null; email: string | null; source: string
   city: string | null; birth_date: string | null; store_id: string; assigned_to: string | null; is_vip: boolean; vip_since: string | null
-  registered_at: string; total_spent: number; order_count: number; last_purchase_at: string | null; status: string
+  registered_at: string; total_spent: number; order_count: number; last_purchase_at: string | null; status: string; custom: Record<string, any>
 }
 type Person = { id: string; first_name: string; last_name: string }
 type Store = { id: string; name: string }
@@ -26,7 +29,7 @@ type Interest = { id: string; product_id: string | null; collection_id: string |
 type Order = { id: string; order_no: string | null; status: string; total: number; currency: string; ordered_at: string; source_system: string; store_id: string | null }
 type Found = { id: string; customer_no: number; first_name: string; last_name: string; phone: string | null }
 
-const TABS = ['Genel', 'Notlar', 'Etkileşimler', 'Ziyaretler', 'Siparişler', 'Adresler', 'İzinler', 'İlgi'] as const
+const TABS = ['Genel', 'Notlar', 'Etkileşimler', 'Ziyaretler', 'Siparişler', 'Adresler', 'İzinler', 'İlgi', 'Dosyalar'] as const
 const CONSENT_LABEL: Record<string, [string, string]> = { granted: ['Onaylı', 'badge-green'], revoked: ['İptal', 'badge-red'], pending: ['Beklemede', 'badge-amber'], unknown: ['Bilinmiyor', 'badge-muted'] }
 const dt = (v: string | null) => v ? new Date(v).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' }) : '—'
 
@@ -225,15 +228,18 @@ export default function MusteriDetay() {
         </div>
 
         <div className="card" style={{ overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--bdr)' }}><CustomerTags customerId={c.id} canWrite={canWrite && c.status === 'active'} /></div>
           <div className="tabs" style={{ overflowX: 'auto' }}>{TABS.map(t => <button key={t} className={`tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>{t}</button>)}</div>
           <div style={{ padding: 16 }}>
-            {tab === 'Genel' && (
+            {tab === 'Genel' && (<>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, fontSize: 13, color: 'var(--tx2)' }}>
                 <div>Doğum tarihi: <b style={{ color: 'var(--tx)' }}>{c.birth_date ? new Date(c.birth_date).toLocaleDateString('tr-TR') : '—'}</b></div>
                 <div>VIP başlangıç: <b style={{ color: 'var(--tx)' }}>{c.vip_since ? new Date(c.vip_since).toLocaleDateString('tr-TR') : '—'}</b></div>
                 <div>Etkileşim: <b style={{ color: 'var(--tx)' }}>{inter.length}</b> · Ziyaret: <b style={{ color: 'var(--tx)' }}>{visits.length}</b> · Not: <b style={{ color: 'var(--tx)' }}>{notes.length}</b></div>
               </div>
+              <CustomFieldsCard customerId={c.id} values={c.custom || {}} canWrite={canWrite && c.status === 'active'} onSaved={load} /></>
             )}
+            {tab === 'Dosyalar' && <Attachments entity="customer" entityId={c.id} canWrite={active} />}
             {tab === 'Notlar' && (<>
               {canWrite && active && <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}><textarea className="inp" rows={2} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Not ekle" /><button className="btn" onClick={addNote}>Ekle</button></div>}
               {notes.length === 0 ? empty('Not yok') : notes.map(n => <div key={n.id} style={{ borderTop: '1px solid var(--bdr)', padding: '10px 0', fontSize: 13 }}><div style={{ color: 'var(--tx)', whiteSpace: 'pre-wrap' }}>{n.body}</div><div style={{ fontSize: 11.5, color: 'var(--tx3)', marginTop: 4 }}>{pname(n.author_id)} · {dt(n.created_at)}</div></div>)}

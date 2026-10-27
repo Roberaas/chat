@@ -1,17 +1,25 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Contact, ShoppingBag, Gem, Target, Building2 } from 'lucide-react'
+import { Search, Contact, ShoppingBag, Gem, Target, Building2, CornerDownRight } from 'lucide-react'
+import { useCrm } from '@/components/crm/CrmProvider'
+import { crmNavFor } from '@/lib/crm/nav'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
 type R = { kind: string; id: string; title: string; sub: string; link: string }
-const KIND: Record<string, [string, any]> = { customer: ['Müşteriler', Contact], order: ['Siparişler', ShoppingBag], product: ['Ürünler', Gem], opportunity: ['Fırsatlar', Target], b2b: ['B2B firmalar', Building2] }
+const norm = (s: string) => s.toLocaleLowerCase('tr').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+const KIND: Record<string, [string, any]> = { page: ['Sayfalar', CornerDownRight], customer: ['Müşteriler', Contact], order: ['Siparişler', ShoppingBag], product: ['Ürünler', Gem], opportunity: ['Fırsatlar', Target], b2b: ['B2B firmalar', Building2] }
 
 export default function CrmSearch() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
-  const [rows, setRows] = useState<R[]>([])
+  const crm = useCrm()
+  const [recs, setRecs] = useState<R[]>([])
+  const pages: R[] = crmNavFor(crm).flatMap(g => g.items.map(it => ({ kind: 'page', id: it.href, title: it.label, sub: g.g, link: it.href })))
+  const nq = norm(q.trim())
+  const pageHits = nq ? pages.filter(p => norm(p.title + ' ' + p.sub).includes(nq)).slice(0, 6) : pages.slice(0, 8)
+  const rows = [...pageHits, ...recs]
   const [i, setI] = useState(0)
   const [busy, setBusy] = useState(false)
   const ref = useRef<HTMLInputElement>(null)
@@ -23,13 +31,13 @@ export default function CrmSearch() {
     }
     window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h)
   }, [])
-  useEffect(() => { if (open) { setQ(''); setRows([]); setI(0); setTimeout(() => ref.current?.focus(), 30) } }, [open])
+  useEffect(() => { if (open) { setQ(''); setRecs([]); setI(0); setTimeout(() => ref.current?.focus(), 30) } }, [open])
   useEffect(() => {
-    if (q.trim().length < 2) { setRows([]); return }
+    if (q.trim().length < 2) { setRecs([]); return }
     setBusy(true)
     const t = setTimeout(async () => {
       const { data } = await createCrmBrowserClient().rpc('global_search', { p_q: q })
-      setRows((data || []) as R[]); setI(0); setBusy(false)
+      setRecs((data || []) as R[]); setI(0); setBusy(false)
     }, 220)
     return () => clearTimeout(t)
   }, [q])
@@ -52,11 +60,11 @@ export default function CrmSearch() {
           <div className="modal anim-pop" style={{ maxWidth: 600, padding: 0, overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px', borderBottom: '1px solid var(--bdr)' }}>
               <Search size={16} style={{ color: 'var(--tx3)' }} />
-              <input ref={ref} value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} placeholder="Müşteri, sipariş, ürün, fırsat veya firma ara" style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--tx)', fontSize: 15 }} />
+              <input ref={ref} value={q} onChange={e => setQ(e.target.value)} onKeyDown={onKey} placeholder="Sayfa, müşteri, sipariş, ürün, fırsat veya firma ara" style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--tx)', fontSize: 15 }} />
               <kbd style={{ fontSize: 11, color: 'var(--tx3)' }}>Esc</kbd>
             </div>
             <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
-              {q.trim().length < 2 && <div style={{ padding: 26, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Ad, telefon, e-posta, sipariş no veya stok kodu yazın. Yukarı ve aşağı oklarla seçin, Enter ile açın.</div>}
+              {q.trim().length < 2 && <div style={{ padding: '10px 18px 0', fontSize: 12, color: 'var(--tx3)' }}>Sayfa adı yazın ya da ad, telefon, e-posta, sipariş no, stok kodu ile kayıt arayın. Oklarla seçin, Enter ile açın.</div>}
               {q.trim().length >= 2 && !busy && rows.length === 0 && <div style={{ padding: 26, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>"{q}" için sonuç yok. Yazımı kontrol edin veya erişiminiz olmayan bir kayıt olabilir.</div>}
               {rows.map((r, n) => {
                 const [label, Icon] = KIND[r.kind] || [r.kind, Search]

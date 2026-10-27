@@ -22,6 +22,8 @@ export default function UrunlerPage() {
   const [pf, setPf] = useState<(typeof EP & { show: boolean }) | null>(null)
   const [cf, setCf] = useState<{ show: boolean; id: string; code: string; name: string; description: string; is_active: boolean } | null>(null)
   const [err, setErr] = useState('')
+  const [dp, setDp] = useState<Record<string, number>>({})
+  const showDealer = !crm.isSuperAdmin && crm.can('pricing.read') && crm.storeIds.length > 0
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -29,6 +31,10 @@ export default function UrunlerPage() {
     setProds((p.data || []) as Prod[]); setColls((c.data || []) as Coll[]); setLoading(false)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [load])
+  useEffect(() => {
+    if (!showDealer) return
+    supabase.rpc('priced_products', { p_store: crm.storeIds[0] }).then(r => setDp(Object.fromEntries(((r.data || []) as any[]).map(x => [x.id, Number(x.dealer_price)]))))
+  }, [showDealer])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const cname = (id: string | null) => colls.find(c => c.id === id)?.name || '—'
   const list = prods.filter(p => !q.trim() || `${p.name} ${p.sku}`.toLowerCase().includes(q.trim().toLowerCase()))
@@ -66,13 +72,14 @@ export default function UrunlerPage() {
           {loading ? <div className="anim-pulse" style={{ height: 120 }} /> : tab === 'urun' ? (
             list.length === 0 ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Ürün yok. ERP/e-ticaret entegrasyonu bağlanana kadar elle ekleyebilirsiniz.</div> : (
               <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                <thead><tr style={{ textAlign: 'left', color: 'var(--tx3)', fontSize: 11.5 }}>{['SKU', 'Ürün', 'Koleksiyon', 'Fiyat', 'Durum', ''].map(h => <th key={h} style={{ padding: '10px 14px' }}>{h}</th>)}</tr></thead>
+                <thead><tr style={{ textAlign: 'left', color: 'var(--tx3)', fontSize: 11.5 }}>{['SKU', 'Ürün', 'Koleksiyon', 'Fiyat', ...(showDealer ? ['Bayi fiyatınız'] : []), 'Durum', ''].map(h => <th key={h} style={{ padding: '10px 14px' }}>{h}</th>)}</tr></thead>
                 <tbody>{list.map(p => (
                   <tr key={p.id} style={{ borderTop: '1px solid var(--bdr)' }}>
                     <td style={{ padding: '10px 14px', fontFamily: 'JetBrains Mono, monospace', color: 'var(--tx3)' }}>{p.sku}</td>
                     <td style={{ padding: '10px 14px', color: 'var(--tx)', fontWeight: 600 }}>{p.name}{p.source_system && <span title={`${p.source_system} kaynaklı`}><Lock size={11} style={{ marginLeft: 6, color: 'var(--tx3)' }} /></span>}</td>
                     <td style={{ padding: '10px 14px', color: 'var(--tx2)' }}>{cname(p.collection_id)}</td>
                     <td style={{ padding: '10px 14px' }}>{p.price !== null ? `${Number(p.price).toLocaleString('tr-TR')} ${p.currency === 'TRY' ? '₺' : p.currency}` : '—'}</td>
+                    {showDealer && <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--green)' }}>{dp[p.id] != null ? `${dp[p.id].toLocaleString('tr-TR')} ₺` : '—'}</td>}
                     <td style={{ padding: '10px 14px' }}><span className={`badge ${STATUS[p.status][1]}`}>{STATUS[p.status][0]}</span></td>
                     <td style={{ padding: '10px 14px', textAlign: 'right' }}>{canWrite && <button className="btn-ghost" onClick={() => { setErr(''); setPf({ id: p.id, sku: p.sku, name: p.name, collection_id: p.collection_id || '', category: p.category || '', material: p.material || '', description: p.description || '', price: p.price?.toString() || '', status: p.status, source_system: p.source_system, show: true }) }}>Düzenle</button>}</td>
                   </tr>))}</tbody></table></div>)

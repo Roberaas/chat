@@ -31,6 +31,8 @@ export default function MusterilerPage() {
   const [storeF, setStoreF] = useState('')
   const [vipF, setVipF] = useState(false)
   const [mineF, setMineF] = useState(false)
+  const [tagF, setTagF] = useState('')
+  const [tagList, setTagList] = useState<{ id: string; name: string }[]>([])
   const [stores, setStores] = useState<StoreOpt[]>([])
   const [people, setPeople] = useState<Person[]>([])
   const [form, setForm] = useState<typeof EMPTY & { show: boolean }>({ ...EMPTY, show: false })
@@ -47,6 +49,7 @@ export default function MusterilerPage() {
         supabase.from('profiles').select('id, first_name, last_name'),
       ])
       setStores((s.data || []) as StoreOpt[]); setPeople((p.data || []) as Person[])
+      const t = await supabase.from('tags').select('id, name').order('name'); setTagList((t.data || []) as any)
     })()
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -59,9 +62,10 @@ export default function MusterilerPage() {
     if (storeF) qb = qb.eq('store_id', storeF)
     if (vipF) qb = qb.eq('is_vip', true)
     if (mineF) qb = qb.eq('assigned_to', crm.profile.id)
+    if (tagF) { const { data: ct } = await supabase.from('customer_tags').select('customer_id').eq('tag_id', tagF).limit(5000); qb = qb.in('id', (ct || []).map((x: any) => x.customer_id)) }
     const { data, count } = await qb.order('registered_at', { ascending: false }).range(page * PAGE, page * PAGE + PAGE - 1)
     setRows((data || []) as Row[]); setTotal(count || 0); setLoading(false)
-  }, [qDebounced, storeF, vipF, mineF, page])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [qDebounced, storeF, vipF, mineF, tagF, page])  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [load])
 
   const storeName = (id: string) => stores.find(s => s.id === id)?.name || '—'
@@ -112,6 +116,9 @@ export default function MusterilerPage() {
           <select className="inp" style={{ width: 180 }} value={storeF} onChange={e => { setStoreF(e.target.value); setPage(0) }}>
             <option value="">Tüm mağazalar</option>{stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          {tagList.length > 0 && <select className="inp" style={{ width: 160 }} value={tagF} onChange={e => { setTagF(e.target.value); setPage(0) }}>
+            <option value="">Tüm etiketler</option>{tagList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>}
           <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={vipF} onChange={e => { setVipF(e.target.checked); setPage(0) }} /> Sadece VIP</label>
           <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={mineF} onChange={e => { setMineF(e.target.checked); setPage(0) }} /> Benim müşterilerim</label>
         </div>

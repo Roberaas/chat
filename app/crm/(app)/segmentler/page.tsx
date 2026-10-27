@@ -7,7 +7,7 @@ import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { SOURCE_LABEL } from '@/lib/crm/labels'
 
 type Seg = { id: string; name: string; description: string | null; rules: Record<string, any>; is_active: boolean }
-const EMPTY = { id: '', name: '', description: '', vip: '', store_id: '', min_spent: '', max_spent: '', min_orders: '', inactive_days: '', registered_within_days: '', source: '', city: '', birthday_month: '', consent_channel: '' }
+const EMPTY = { id: '', name: '', description: '', vip: '', store_id: '', min_spent: '', max_spent: '', min_orders: '', inactive_days: '', registered_within_days: '', source: '', city: '', birthday_month: '', consent_channel: '', tag_id: '', custom_key: '', custom_value: '' }
 type Form = typeof EMPTY
 
 function toRules(f: Form) {
@@ -19,9 +19,11 @@ function toRules(f: Form) {
   if (f.source) r.source = f.source
   if (f.city.trim()) r.city = f.city.trim()
   if (f.consent_channel) r.consent_channel = f.consent_channel
+  if (f.tag_id) r.tag_id = f.tag_id
+  if (f.custom_key && f.custom_value.trim()) { r.custom_key = f.custom_key; r.custom_value = f.custom_value.trim() }
   return r
 }
-function describe(r: Record<string, any>, stores: { id: string; name: string }[]) {
+function describe(r: Record<string, any>, stores: { id: string; name: string }[], tags: { id: string; name: string }[] = []) {
   const p: string[] = []
   if (r.vip !== undefined) p.push(r.vip ? 'VIP' : 'VIP değil')
   if (r.store_id) p.push(stores.find(s => s.id === r.store_id)?.name || 'Mağaza')
@@ -34,6 +36,8 @@ function describe(r: Record<string, any>, stores: { id: string; name: string }[]
   if (r.city) p.push(r.city)
   if (r.birthday_month !== undefined) p.push(`Doğum ayı: ${r.birthday_month}`)
   if (r.consent_channel) p.push(`${r.consent_channel.toUpperCase()} izni var`)
+  if (r.tag_id) p.push(`Etiket: ${tags.find(t => t.id === r.tag_id)?.name || '?'}`)
+  if (r.custom_key) p.push(`${r.custom_key} = ${r.custom_value}`)
   return p.length ? p.join(' · ') : 'Tüm aktif müşteriler'
 }
 
@@ -44,6 +48,8 @@ export default function SegmentlerPage() {
   const [segs, setSegs] = useState<Seg[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [stores, setStores] = useState<{ id: string; name: string }[]>([])
+  const [tags, setTags] = useState<{ id: string; name: string }[]>([])
+  const [cfs, setCfs] = useState<{ key: string; label: string; field_type: string; options: string[] }[]>([])
   const [form, setForm] = useState<Form | null>(null)
   const [preview, setPreview] = useState<number | null>(null)
   const [err, setErr] = useState('')
@@ -53,6 +59,8 @@ export default function SegmentlerPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
+    supabase.from('tags').select('id, name').order('name').then(t => setTags((t.data || []) as any))
+    supabase.from('custom_fields').select('key, label, field_type, options').eq('is_active', true).order('label').then(t => setCfs((t.data || []) as any))
     const [s, st, v] = await Promise.all([
       supabase.from('segments').select('*').order('name'),
       supabase.from('stores').select('id, name').eq('is_active', true),
@@ -90,7 +98,7 @@ export default function SegmentlerPage() {
   }
   const fromSeg = (s: Seg): Form => {
     const r = s.rules
-    return { ...EMPTY, id: s.id, name: s.name, description: s.description || '', vip: r.vip === undefined ? '' : String(r.vip), store_id: r.store_id || '', min_spent: r.min_spent ?? '', max_spent: r.max_spent ?? '', min_orders: r.min_orders ?? '', inactive_days: r.inactive_days ?? '', registered_within_days: r.registered_within_days ?? '', source: r.source || '', city: r.city || '', birthday_month: r.birthday_month ?? '', consent_channel: r.consent_channel || '' } as Form
+    return { ...EMPTY, id: s.id, name: s.name, description: s.description || '', vip: r.vip === undefined ? '' : String(r.vip), store_id: r.store_id || '', min_spent: r.min_spent ?? '', max_spent: r.max_spent ?? '', min_orders: r.min_orders ?? '', inactive_days: r.inactive_days ?? '', registered_within_days: r.registered_within_days ?? '', source: r.source || '', city: r.city || '', birthday_month: r.birthday_month ?? '', consent_channel: r.consent_channel || '', tag_id: r.tag_id || '', custom_key: r.custom_key || '', custom_value: r.custom_value || '' } as Form
   }
   const set = (k: keyof Form, v: string) => { if (!form) return; const f = { ...form, [k]: v }; setForm(f); runPreview(f) }
 
@@ -104,7 +112,7 @@ export default function SegmentlerPage() {
             <div key={s.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '12px 16px', borderTop: '1px solid var(--bdr)' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--tx)' }}>{s.name}</div>
-                <div style={{ fontSize: 12, color: 'var(--tx3)' }}>{describe(s.rules, stores)}</div>
+                <div style={{ fontSize: 12, color: 'var(--tx3)' }}>{describe(s.rules, stores, tags)}</div>
               </div>
               <span className="badge badge-ac">{counts[s.id] ?? '…'} müşteri</span>
               {canWrite && <><button className="btn-ghost" onClick={() => { setForm(fromSeg(s)); setErr(''); runPreview(fromSeg(s)) }}>Düzenle</button>
@@ -154,6 +162,11 @@ export default function SegmentlerPage() {
                 <div><label className="label">Şehir</label><input className="inp" value={form.city} onChange={e => set('city', e.target.value)} /></div>
               </div>
               <div><label className="label">Pazarlama izni olanlar</label><select className="inp" value={form.consent_channel} onChange={e => set('consent_channel', e.target.value)}><option value="">Fark etmez</option><option value="sms">SMS</option><option value="email">E-posta</option><option value="whatsapp">WhatsApp</option><option value="call">Arama</option></select></div>
+              <div className="modal-grid">
+                <div><label className="label">Etiket</label><select className="inp" value={form.tag_id} onChange={e => set('tag_id', e.target.value)}><option value="">Fark etmez</option>{tags.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
+                <div><label className="label">Özel alan</label><select className="inp" value={form.custom_key} onChange={e => set('custom_key', e.target.value)}><option value="">Fark etmez</option>{cfs.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}</select></div>
+              </div>
+              {form.custom_key && <div><label className="label">Özel alan değeri</label>{(() => { const c = cfs.find(x => x.key === form.custom_key); return c?.field_type === 'select' ? <select className="inp" value={form.custom_value} onChange={e => set('custom_value', e.target.value)}><option value="">Seçin</option>{c.options.map(o => <option key={o} value={o}>{o}</option>)}</select> : <input className="inp" value={form.custom_value} onChange={e => set('custom_value', e.target.value)} /> })()}</div>}
               <div style={{ fontSize: 13, color: 'var(--tx2)' }}>Eşleşen müşteri: <b style={{ color: 'var(--tx)' }}>{preview ?? '…'}</b></div>
               {err && <div style={{ fontSize: 12.5, color: 'var(--red)' }}>{err}</div>}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}><button className="btn-ghost" onClick={() => setForm(null)}>Vazgeç</button><button className="btn" onClick={save}>Kaydet</button></div>
