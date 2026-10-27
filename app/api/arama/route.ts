@@ -7,7 +7,8 @@ const db = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
-  const q = searchParams.get('q')?.trim().toLowerCase()
+  // PostgREST filtre sözdizimini bozan karakterleri at (filtre enjeksiyonu)
+  const q = searchParams.get('q')?.replace(/[,()%*\\"'`]/g, ' ').trim().toLowerCase().slice(0, 60)
   if (!q || q.length < 2) return NextResponse.json({ sonuclar: [] })
 
   const sonuclar: any[] = []

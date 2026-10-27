@@ -13,7 +13,7 @@ import { verifySession, verifyInternal, SESSION_COOKIE } from '@/lib/panelSessio
 // Oturum gerektirmeyen API'ler: giriş akışı, CRM (kendi yetki kontrolü var), n8n çağrısı (rota içinde ayrıca korunur)
 const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim', '/api/csp-report']
 // Yalnızca admin rolü
-const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar', '/api/kullanim', '/api-kullanimi']
+const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar', '/api/kullanim', '/api-kullanimi', '/api/rapor-ilet', '/api/sms', '/api/bildirim/toplu']
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     if (!user && !(await verifyInternal(request.headers.get('x-internal-token')))) {
       return NextResponse.json({ ok: false, error: 'Oturum gerekli' }, { status: 401 })
     }
-    if (ADMIN_ONLY.some(p => pathname.startsWith(p)) && user?.rol !== 'admin') {
+    if (ADMIN_ONLY.some(p => pathname.startsWith(p)) && user && user.rol !== 'admin') {
       return NextResponse.json({ ok: false, error: 'Yetkiniz yok' }, { status: 403 })
     }
     return NextResponse.next()
