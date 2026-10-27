@@ -1,7 +1,8 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Megaphone } from 'lucide-react'
+import { Megaphone, Bell, Send } from 'lucide-react'
+import Empty from '@/components/crm/Empty'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
@@ -25,6 +26,7 @@ export default function BildirimlerPage() {
   const [stores, setStores] = useState<{ id: string; name: string }[]>([])
   const [f, setF] = useState({ title: '', body: '', severity: 'info', roles: [] as string[], stores: [] as string[] })
   const [msg, setMsg] = useState('')
+  const [composer, setComposer] = useState(false)
   const canAnn = crm.can('announcements.manage')
 
   const load = useCallback(async (append = false) => {
@@ -60,35 +62,37 @@ export default function BildirimlerPage() {
       <CrmTopBar title="Bildirimler" subtitle={unread ? `${unread} okunmamış` : undefined} />
       <div style={{ padding: 22, maxWidth: 900, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {canAnn && (
-          <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div className="card-title"><Megaphone size={14} style={{ verticalAlign: -2 }} /> Duyuru gönder</div>
-            <input className="inp" placeholder="Başlık" maxLength={160} value={f.title} onChange={e => setF({ ...f, title: e.target.value })} />
-            <textarea className="inp" rows={3} placeholder="Mesaj" maxLength={2000} value={f.body} onChange={e => setF({ ...f, body: e.target.value })} />
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', fontSize: 12.5, color: 'var(--tx2)' }}>
-              <select className="inp" style={{ width: 130 }} value={f.severity} onChange={e => setF({ ...f, severity: e.target.value })}><option value="info">Bilgi</option><option value="warning">Uyarı</option><option value="critical">Kritik</option></select>
-              <span>Alıcı roller (boş = herkes):</span>
-              {roles.map(r => <label key={r.code} style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}><input type="checkbox" checked={f.roles.includes(r.code)} onChange={() => setF({ ...f, roles: toggle(f.roles, r.code) })} />{ROLE_LABEL[r.code] || r.name}</label>)}
+          <div className="card">
+            <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div><div className="card-title">Duyuru</div><div style={{ fontSize: 12.5, color: 'var(--tx3)' }}>Ekibe veya bayilere tek mesajla ulaşın. Bildirim olarak düşer.</div></div>
+              <button className={composer ? 'btn-ghost' : 'btn'} onClick={() => setComposer(!composer)}>{composer ? 'Kapat' : <><Megaphone size={14} /> Yeni duyuru</>}</button>
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', fontSize: 12.5, color: 'var(--tx2)' }}>
-              <span>Mağaza / bayi (boş = hepsi):</span>
-              {stores.map(s => <label key={s.id} style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}><input type="checkbox" checked={f.stores.includes(s.id)} onChange={() => setF({ ...f, stores: toggle(f.stores, s.id) })} />{s.name}</label>)}
-            </div>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}><button className="btn" onClick={send}>Gönder</button>{msg && <span style={{ fontSize: 12.5, color: 'var(--tx2)' }}>{msg}</span>}</div>
-            {anns.length > 0 && <div style={{ borderTop: '1px solid var(--bdr)', paddingTop: 8 }}>
-              <div style={{ fontSize: 11.5, color: 'var(--tx3)', marginBottom: 4 }}>Son duyurular</div>
-              {anns.map(a => <div key={a.id} style={{ fontSize: 12.5, color: 'var(--tx2)', padding: '3px 0' }}><span className={`badge ${SEV[a.severity]}`}>{a.sent_count} kişi</span> <b style={{ color: 'var(--tx)' }}>{a.title}</b> · {new Date(a.created_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}</div>)}
+            {composer && (
+              <div style={{ padding: '4px 18px 18px', display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid var(--bdr)' }}>
+                <div style={{ paddingTop: 14 }}><label className="label">Başlık</label><input className="inp" maxLength={160} value={f.title} onChange={e => setF({ ...f, title: e.target.value })} placeholder="Örn. Hafta sonu kampanyası başlıyor" /></div>
+                <div><label className="label">Mesaj</label><textarea className="inp" rows={3} maxLength={2000} value={f.body} onChange={e => setF({ ...f, body: e.target.value })} placeholder="Ne olduğunu ve ne yapılması gerektiğini yazın" /></div>
+                <div><label className="label">Önem</label>
+                  <div className="seg">{([['info', 'Bilgi'], ['warning', 'Uyarı'], ['critical', 'Kritik']] as const).map(([k, l]) => <button key={k} className={f.severity === k ? 'on' : ''} onClick={() => setF({ ...f, severity: k })}>{l}</button>)}</div></div>
+                <div><label className="label">Kimlere gitsin? <span style={{ color: 'var(--tx3)', fontWeight: 400 }}>Seçmezseniz herkese gider</span></label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{roles.map(r => <button key={r.code} className={`chip ${f.roles.includes(r.code) ? 'on' : ''}`} onClick={() => setF({ ...f, roles: toggle(f.roles, r.code) })}>{ROLE_LABEL[r.code] || r.name}</button>)}</div></div>
+                <div><label className="label">Hangi mağaza veya bayi? <span style={{ color: 'var(--tx3)', fontWeight: 400 }}>Seçmezseniz hepsi</span></label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{stores.map(s => <button key={s.id} className={`chip ${f.stores.includes(s.id) ? 'on' : ''}`} onClick={() => setF({ ...f, stores: toggle(f.stores, s.id) })}>{s.name}</button>)}</div></div>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}><button className="btn" onClick={send}><Send size={14} /> Duyuruyu gönder</button>{msg && <span style={{ fontSize: 13, color: 'var(--tx2)' }}>{msg}</span>}</div>
+              </div>)}
+            {anns.length > 0 && <div style={{ borderTop: '1px solid var(--bdr)', padding: '10px 18px 14px' }}>
+              <div style={{ fontSize: 12.5, color: 'var(--tx3)', marginBottom: 6 }}>Son duyurular</div>
+              {anns.map(a => <div key={a.id} style={{ fontSize: 13, color: 'var(--tx2)', padding: '4px 0', display: 'flex', gap: 10, alignItems: 'center' }}><span className={`badge ${SEV[a.severity]}`}>{a.sent_count} kişi</span><b style={{ color: 'var(--tx)', fontWeight: 600 }}>{a.title}</b><span style={{ color: 'var(--tx3)', marginLeft: 'auto', fontSize: 12 }}>{new Date(a.created_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })}</span></div>)}
             </div>}
           </div>)}
 
-        <div className="card" style={{ padding: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button className={!onlyUnread ? 'btn' : 'btn-ghost'} onClick={() => setOnlyUnread(false)}>Tümü</button>
-          <button className={onlyUnread ? 'btn' : 'btn-ghost'} onClick={() => setOnlyUnread(true)}>Okunmamış</button>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="seg"><button className={!onlyUnread ? 'on' : ''} onClick={() => setOnlyUnread(false)}>Tümü</button><button className={onlyUnread ? 'on' : ''} onClick={() => setOnlyUnread(true)}>Okunmamış</button></div>
           <select className="inp" style={{ width: 160 }} value={type} onChange={e => setType(e.target.value)}><option value="">Tüm türler</option>{Object.entries(TYPE).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           <div style={{ flex: 1 }} />
           <button className="btn-ghost" onClick={markAll}>Tümünü okundu yap</button>
         </div>
         <div className="card">
-          {items.length === 0 ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Bildirim yok</div> : items.map(n => {
+          {items.length === 0 ? <Empty Icon={Bell} title="Her şey güncel" desc="Yeni görev, randevu, duyuru ve sistem uyarıları burada toplanır." /> : items.map(n => {
             const body = (<div style={{ padding: '11px 16px', background: n.read_at ? 'transparent' : 'var(--ac2)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
               <span className="badge badge-muted">{TYPE[n.type] || n.type}</span>
               <div style={{ flex: 1, minWidth: 0 }}>

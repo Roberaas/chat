@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
 import { LogOut, Menu, X, MessageCircle } from 'lucide-react'
-import RobertoLogo from '@/components/RobertoLogo'
 import { CrmProvider, useCrm } from './CrmProvider'
 import { crmNavFor, crmIsActive } from '@/lib/crm/nav'
 import { ROLE_LABEL, type CrmContext } from '@/lib/crm/types'
@@ -58,13 +57,23 @@ function UserBox() {
   )
 }
 
+function Gem({ size = 30 }: { size?: number }) {
+  // Pırlanta kesiti: markanın tek grafik öğesi
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
+      <path d="M8 5h16l5 7-13 15L3 12l5-7Z" stroke="var(--ac)" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M3 12h26M12 5l-3 7 7 15 7-15-3-7M12 5l4 7 4-7" stroke="var(--ac)" strokeWidth="1.1" strokeLinejoin="round" opacity=".75" />
+    </svg>
+  )
+}
+
 function Brand({ small }: { small?: boolean }) {
   return (
     <>
-      <RobertoLogo size={small ? 28 : 32} />
+      <Gem size={small ? 26 : 30} />
       <div>
-        <p style={{ fontSize: small ? 12.5 : 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto CRM</p>
-        <p style={{ fontSize: 9.5, color: 'var(--tx3)', marginTop: 2 }}>Müşteri İlişkileri</p>
+        <p style={{ fontFamily: 'var(--serif)', fontSize: small ? 20 : 23, color: 'var(--tx)', lineHeight: 1, letterSpacing: '-.01em' }}>Roberto Bravo</p>
+        <p style={{ fontSize: 11.5, color: 'var(--tx3)', marginTop: 3 }}>Müşteri yönetimi</p>
       </div>
     </>
   )

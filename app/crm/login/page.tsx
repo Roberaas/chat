@@ -2,7 +2,6 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ShieldCheck, ArrowLeft } from 'lucide-react'
-import RobertoLogo from '@/components/RobertoLogo'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 
 function LoginForm() {
@@ -73,15 +72,30 @@ function LoginForm() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)', width: 640, height: 640, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,106,247,.14), transparent 65%)', pointerEvents: 'none' }} />
-      <div className="anim-up" style={{ width: '100%', maxWidth: 380, position: 'relative' }}>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ display: 'inline-block', marginBottom: 14 }}><RobertoLogo size={48} /></div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.4px' }}>Roberto CRM</h1>
-          <p style={{ fontSize: 12.5, color: 'var(--tx3)', marginTop: 4 }}>Müşteri İlişkileri Yönetimi</p>
+    <div className="login">
+      <div className="login-art">
+        <svg viewBox="0 0 600 700" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: .95 }} aria-hidden>
+          <g fill="none" stroke="#e0587c" strokeWidth="1" opacity=".5">
+            <path d="M120 120h360l110 150-290 330L10 270Z" />
+            <path d="M10 270h580M230 120l-70 150 160 330 160-330-70-150M230 120l90 150 90-150" />
+            <path d="M160 270l160 330M480 270L320 600" opacity=".5" />
+          </g>
+          <g fill="#e0587c" opacity=".07"><path d="M230 120l-70 150h160l-90-150Z" /><path d="M410 120l70 150H320l90-150Z" /><path d="M320 270L160 270l160 330Z" /></g>
+        </svg>
+        <div style={{ position: 'relative', fontFamily: 'var(--serif)', fontSize: 26 }}>Roberto Bravo</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <h2>Her müşteriyi tanıyın, her satışı takip edin.</h2>
+          <p>Mağaza, bayi ve toptancı ekibiniz tek yerde: kendi müşterileri, görevleri ve satışlarıyla.</p>
         </div>
-        <div className="card" style={{ padding: 28 }}>
+        <div style={{ position: 'relative', fontSize: 12.5, color: '#6f7886' }}>935 ayar gümüş · Müşteri yönetimi</div>
+      </div>
+      <div className="login-form">
+      <div className="anim-up" style={{ width: '100%', maxWidth: 380, position: 'relative' }}>
+        <div style={{ marginBottom: 26 }}>
+          <h1 className="serif" style={{ fontSize: 38, lineHeight: 1.05 }}>Giriş yapın</h1>
+          <p style={{ fontSize: 13.5, color: 'var(--tx3)', marginTop: 6 }}>Hesabınız yönetici tarafından oluşturulur.</p>
+        </div>
+        <div>
           {!factorId ? (
             <form onSubmit={e => { e.preventDefault(); signIn() }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div><label className="label">E-posta</label>
@@ -106,7 +120,7 @@ function LoginForm() {
             </form>
           )}
         </div>
-        <p style={{ textAlign: 'center', fontSize: 10.5, color: 'var(--tx3)', marginTop: 22 }}>Hesap yönetici tarafından oluşturulur.</p>
+      </div>
       </div>
     </div>
   )

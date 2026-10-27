@@ -4,25 +4,12 @@ import { Download } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { ROLE_LABEL } from '@/lib/crm/types'
+import Empty from '@/components/crm/Empty'
+import { FeedRow, TABLE, dt, ago, type FeedItem } from '@/components/crm/ActivityFeed'
 
 type U = { id: string; name: string; email: string; active: boolean; roles: string; stores: string; last_sign_in_at: string | null; last_seen_at: string | null; logins: number; actions: number; creates: number; updates: number; deletes: number; exports: number }
-type F = { id: number; created_at: string; actor_id: string | null; actor_name: string; actor_roles: string | null; action: string; table_name: string; record_id: string | null; store_name: string | null; changed: string[] | null }
+type F = FeedItem
 type L = { id: number; created_at: string; user_id: string; user_name: string }
-const TABLE: Record<string, string> = {
-  customers: 'müşteri', opportunities: 'fırsat', tasks: 'görev', appointments: 'randevu', orders: 'sipariş', service_requests: 'servis talebi',
-  profiles: 'kullanıcı', stores: 'mağaza', user_roles: 'rol ataması', store_memberships: 'mağaza üyeliği', business_accounts: 'B2B firma',
-  business_contacts: 'B2B kişi', business_opportunities: 'B2B fırsat', products: 'ürün', campaigns: 'kampanya', segments: 'segment',
-  customer_interactions: 'etkileşim', customer_notes: 'not', customer_consents: 'iletişim izni', import_jobs: 'içe aktarma', integrations: 'entegrasyon',
-  automation_rules: 'otomasyon kuralı', quotations: 'teklif', customers_export: 'müşteri listesi',
-}
-const ACT: Record<string, string> = { INSERT: 'oluşturdu', UPDATE: 'güncelledi', DELETE: 'sildi', EXPORT: 'dışa aktardı' }
-const ACT_COLOR: Record<string, string> = { INSERT: 'badge-green', UPDATE: 'badge-amber', DELETE: 'badge-red', EXPORT: 'badge-muted' }
-const dt = (s: string | null) => s ? new Date(s).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' }) : '—'
-const ago = (s: string | null) => {
-  if (!s) return '—'
-  const m = Math.floor((Date.now() - new Date(s).getTime()) / 60000)
-  return m < 1 ? 'şimdi' : m < 60 ? `${m} dk önce` : m < 1440 ? `${Math.floor(m / 60)} sa önce` : `${Math.floor(m / 1440)} gün önce`
-}
 const iso = (d: Date) => d.toISOString().slice(0, 10)
 const th = { padding: '8px 14px', whiteSpace: 'nowrap' as const }
 const td = { padding: '9px 14px', whiteSpace: 'nowrap' as const }
@@ -103,16 +90,7 @@ export default function AktivitePage() {
             {(actor || table || store) && <button className="btn-ghost" onClick={() => { setActor(''); setTable(''); setStore('') }}>Temizle</button>}
           </div>
           <div className="card">
-            {feed.length === 0 ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Bu filtrede işlem yok</div> : feed.map(a => (
-              <div key={a.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 16px', borderTop: '1px solid var(--bdr)', fontSize: 13 }}>
-                <span className={`badge ${ACT_COLOR[a.action] || 'badge-muted'}`} style={{ minWidth: 76, justifyContent: 'center' }}>{ACT[a.action] || a.action}</span>
-                <div style={{ flex: 1, minWidth: 0, color: 'var(--tx2)' }}>
-                  <b style={{ color: 'var(--tx)' }}>{a.actor_name}</b> <span style={{ color: 'var(--tx3)' }}>({roleText(a.actor_roles || '')})</span> · {TABLE[a.table_name] || a.table_name}
-                  {a.store_name && <> · <span style={{ color: 'var(--tx3)' }}>{a.store_name}</span></>}
-                  {a.changed && a.changed.length > 0 && <div style={{ fontSize: 11.5, color: 'var(--tx3)' }}>Değişen: {a.changed.join(', ')}</div>}
-                </div>
-                <span style={{ color: 'var(--tx3)', fontSize: 12, whiteSpace: 'nowrap' }}>{dt(a.created_at)}</span>
-              </div>))}
+            {feed.length === 0 ? <Empty title="Bu filtrede işlem yok" desc="Tarih aralığını genişletin veya filtreleri temizleyin." /> : feed.map(a => <FeedRow key={a.id} a={a} />)}
             {more && feed.length > 0 && <div style={{ padding: 12, textAlign: 'center' }}><button className="btn-ghost" onClick={() => loadFeed(true)}>Daha fazla</button></div>}
           </div>
         </>)}
