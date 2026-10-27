@@ -27,6 +27,9 @@ function genPassword() {
 export default function KullanicilarPage() {
   const crm = useCrm()
   const isAdmin = crm.isSuperAdmin
+  const canManage = crm.can('users.manage')
+  const DELEGABLE = crm.roles.includes('dealer_admin') ? ['dealer_user', 'sales_advisor'] : ['sales_advisor']
+  const manageable = (r: Row) => isAdmin || (canManage && r.id !== crm.userId && r.store_memberships.length > 0 && r.store_memberships.every(m => crm.storeIds.includes(m.store_id)) && r.user_roles.every(x => DELEGABLE.includes(x.role_code)))
   const supabase = createCrmBrowserClient()
   const [rows, setRows] = useState<Row[]>([])
   const [stores, setStores] = useState<Opt[]>([])
@@ -113,7 +116,7 @@ export default function KullanicilarPage() {
       <CrmTopBar title="Kullanıcılar" subtitle={`${rows.length} kullanıcı`}
         action={<>
           <button className="btn-ghost" onClick={load} style={{ padding: 8 }} title="Yenile"><RefreshCw size={14} /></button>
-          {isAdmin && <button className="btn" onClick={openNew}><Plus size={14} /> Kullanıcı Ekle</button>}
+          {canManage && <button className="btn" onClick={openNew}><Plus size={14} /> Kullanıcı Ekle</button>}
         </>} />
       <div style={{ padding: 22, maxWidth: 1280, width: '100%', margin: '0 auto' }}>
         {info && !show && <div className="toast toast-ok" style={{ margin: '0 0 14px', wordBreak: 'break-all' }}>{info}</div>}
@@ -142,7 +145,7 @@ export default function KullanicilarPage() {
                       <td style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdr)' }}><span className={`badge ${r.is_active ? 'badge-green' : 'badge-red'}`}>{r.is_active ? 'Aktif' : 'Pasif'}</span></td>
                       <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--tx3)', fontFamily: 'JetBrains Mono, monospace', borderBottom: '1px solid var(--bdr)' }}>{r.last_sign_in_at ? formatDistanceToNow(new Date(r.last_sign_in_at), { addSuffix: true, locale: tr }) : 'hiç'}</td>
                       <td style={{ padding: '12px 18px', borderBottom: '1px solid var(--bdr)' }}>
-                        {isAdmin && (
+                        {manageable(r) && (
                           <div style={{ display: 'flex', gap: 2 }}>
                             <button title="Düzenle" onClick={() => openEdit(r)} style={{ background: 'none', border: 'none', color: 'var(--tx3)', padding: 6 }}><Edit2 size={14} /></button>
                             <button title="Şifre sıfırla" onClick={() => setReset({ id: r.id, name: `${r.first_name} ${r.last_name}`, password: genPassword() })} style={{ background: 'none', border: 'none', color: 'var(--tx3)', padding: 6 }}><KeyRound size={14} /></button>
@@ -188,7 +191,7 @@ export default function KullanicilarPage() {
                 </div>
                 <div><label className="label">Rol *</label>
                   <select className="inp" value={form.role_code} onChange={e => setForm(f => ({ ...f, role_code: e.target.value }))}>
-                    {roles.map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
+                    {roles.filter(r => isAdmin || DELEGABLE.includes(r.code)).map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
                   </select></div>
                 <div><label className="label">Mağazalar * (birden fazla seçilebilir; ilk seçilen ana mağaza)</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>

@@ -7,10 +7,10 @@ import { isEmail, isUuid, str, optStr, strongPassword, normPhone } from '@/lib/c
 
 const bad = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status })
 
-// Kullanıcı oluştur — yalnızca Super Admin.
+// Kullanıcı oluştur — Super Admin (serbest) veya users.manage yetkili bayi/mağaza yöneticisi (yalnız kendi mağazası, devredilebilir roller; DB'de zorlanır).
 // Auth kullanıcısı service role ile; profil/rol/üyelik yazımları KULLANICININ oturumuyla (RLS + audit actor).
 export async function POST(req: Request) {
-  const g = await apiGuard({ superAdmin: true })
+  const g = await apiGuard('users.manage')
   if ('res' in g) return g.res
   const { ctx } = g
 
@@ -31,6 +31,19 @@ export async function POST(req: Request) {
   if (storeIds.length === 0) return bad('En az bir mağaza seçin')
 
   const db = createCrmServerClient()
+  if (!ctx.isSuperAdmin) {
+    // Devredilmiş yetki: tüm denetimler delegated_provision_user içinde (rol, mağaza kapsamı)
+    const admin = createCrmAdminClient()
+    const created = await admin.auth.admin.createUser({ email, password: b.password, email_confirm: true })
+    if (created.error || !created.data.user) {
+      const dup = /already|registered|exists/i.test(created.error?.message || '')
+      return bad(dup ? 'Bu e-posta ile kayıtlı kullanıcı var' : 'Kullanıcı oluşturulamadı', dup ? 409 : 500)
+    }
+    const uid = created.data.user.id
+    const { error } = await db.rpc('delegated_provision_user', { p_uid: uid, p_first: first, p_last: last, p_email: email, p_phone: phone, p_role: role, p_stores: storeIds })
+    if (error) { await admin.auth.admin.deleteUser(uid); return bad(error.code === '42501' ? error.message : 'Kayıt tamamlanamadı: ' + error.message, error.code === '42501' ? 403 : 400) }
+    return NextResponse.json({ ok: true, id: uid })
+  }
   const { data: roleRow } = await db.from('roles').select('code').eq('code', role).maybeSingle()
   if (!roleRow) return bad('Rol bulunamadı')
   const { data: stores } = await db.from('stores').select('id').in('id', storeIds)

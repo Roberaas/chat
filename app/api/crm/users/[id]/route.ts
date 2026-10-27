@@ -8,7 +8,7 @@ import { isUuid, str, optStr, normPhone, strongPassword } from '@/lib/crm/valida
 const bad = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status })
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  const g = await apiGuard({ superAdmin: true })
+  const g = await apiGuard('users.manage')
   if ('res' in g) return g.res
   const { ctx } = g
   const id = params.id
@@ -17,6 +17,25 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!b) return bad('Geçersiz istek')
 
   const db = createCrmServerClient()
+  if (!ctx.isSuperAdmin) {
+    // Devredilmiş yetki: hedef kullanıcı yalnız yönetilen mağazalarda ve devredilebilir rollerde olabilir (DB'de zorlanır)
+    const first = b.first_name !== undefined ? str(b.first_name, 80) : null
+    const last = b.last_name !== undefined ? str(b.last_name, 80) : null
+    if ((b.first_name !== undefined && !first) || (b.last_name !== undefined && !last)) return bad('Ad/soyad geçersiz')
+    let phone: string | null = null
+    if (b.phone !== undefined) { if (b.phone) { phone = normPhone(b.phone); if (!phone) return bad('Telefon geçersiz') } else phone = '' }
+    if (b.is_active !== undefined && typeof b.is_active !== 'boolean') return bad('Durum geçersiz')
+    const stores = b.store_ids !== undefined ? (Array.isArray(b.store_ids) ? b.store_ids.filter(isUuid) : []) : null
+    const role = b.role_code !== undefined ? str(b.role_code, 40) : null
+    if (b.role_code !== undefined && !role) return bad('Rol geçersiz')
+    const { error } = await db.rpc('delegated_update_user', { p_id: id, p_first: first, p_last: last, p_phone: phone, p_active: b.is_active ?? null, p_role: role, p_stores: stores })
+    if (error) return bad(error.message, error.code === '42501' ? 403 : 400)
+    if (b.is_active !== undefined) {
+      const r = await createCrmAdminClient().auth.admin.updateUserById(id, { ban_duration: b.is_active ? 'none' : '876000h' })
+      if (r.error) return bad('Oturum durumu güncellenemedi: ' + r.error.message, 500)
+    }
+    return NextResponse.json({ ok: true })
+  }
   const patch: Record<string, any> = {}
   if (b.first_name !== undefined) { const v = str(b.first_name, 80); if (!v) return bad('Ad geçersiz'); patch.first_name = v }
   if (b.last_name !== undefined) { const v = str(b.last_name, 80); if (!v) return bad('Soyad geçersiz'); patch.last_name = v }

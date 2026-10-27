@@ -6,8 +6,12 @@ import { createCrmAdminClient } from '@/lib/crm/supabase/admin'
 import { isUuid, strongPassword } from '@/lib/crm/validate'
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const g = await apiGuard({ superAdmin: true })
+  const g = await apiGuard('users.manage')
   if ('res' in g) return g.res
+  if (!g.ctx.isSuperAdmin && isUuid(params.id)) {
+    const { data: ok } = await createCrmServerClient().rpc('delegation_ok', { p_target: params.id })
+    if (!ok) return NextResponse.json({ ok: false, error: 'Bu kullanıcıyı yönetme yetkiniz yok' }, { status: 403 })
+  }
   const b = await req.json().catch(() => null)
   if (!isUuid(params.id) || !b || !strongPassword(b.password))
     return NextResponse.json({ ok: false, error: 'Şifre en az 12 karakter, büyük/küçük harf ve rakam içermeli' }, { status: 400 })
