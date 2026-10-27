@@ -7,7 +7,7 @@ const TR_DATETIME = 'dd.mm.yyyy hh:mm'
 
 export async function buildXlsx(sheets: SheetDef[]): Promise<Buffer> {
   const wb = new ExcelJS.Workbook()
-  wb.creator = 'Roberto CRM'; wb.created = new Date()
+  wb.creator = 'Roberto Bravo'; wb.created = new Date()
   for (const s of sheets) {
     const ws = wb.addWorksheet(s.name.slice(0, 31), { views: [{ state: 'frozen', ySplit: 1 }] })
     ws.columns = s.columns.map(c => ({ header: c.header, key: c.key, width: c.width || Math.max(12, c.header.length + 4), style: c.fmt ? { numFmt: c.fmt } : undefined }))

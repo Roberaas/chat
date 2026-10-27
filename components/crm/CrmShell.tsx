@@ -69,7 +69,7 @@ function Brand({ small }: { small?: boolean }) {
     <>
       <RobertoLogo size={small ? 28 : 32} />
       <div>
-        <p style={{ fontSize: small ? 12.5 : 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto CRM</p>
+        <p style={{ fontSize: small ? 12.5 : 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto Bravo</p>
         <p style={{ fontSize: 9.5, color: 'var(--tx3)', marginTop: 2 }}>Müşteri İlişkileri</p>
       </div>
     </>

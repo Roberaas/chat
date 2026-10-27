@@ -85,7 +85,7 @@ function LoginForm() {
           </g>
           <g fill="#7c6af7" opacity=".07"><path d="M230 120l-70 150h160l-90-150Z" /><path d="M410 120l70 150H320l90-150Z" /><path d="M320 270L160 270l160 330Z" /></g>
         </svg>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, fontWeight: 700 }}><RobertoLogo size={34} />Roberto CRM</div>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, fontWeight: 700 }}><RobertoLogo size={34} />Roberto Bravo</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <h2>Her müşteriyi tanıyın, her satışı takip edin.</h2>
           <p>Mağaza, bayi ve toptancı ekibiniz tek yerde: kendi müşterileri, görevleri ve satışlarıyla.</p>
