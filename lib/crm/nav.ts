@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -15,6 +15,11 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/urunler',    label: 'Ürünler',    Icon: Gem,    perm: 'products.read' },
     { href: '/crm/gorevler',   label: 'Görevler',   Icon: CheckSquare, perm: 'tasks.read' },
     { href: '/crm/randevular', label: 'Randevular', Icon: CalendarDays, perm: 'appointments.read' },
+    { href: '/crm/servis',     label: 'Satış Sonrası', Icon: Wrench, perm: 'service.read' },
+  ]},
+  { g: 'Pazarlama', items: [
+    { href: '/crm/segmentler',  label: 'Segmentler',  Icon: Filter,    perm: 'segments.read' },
+    { href: '/crm/kampanyalar', label: 'Kampanyalar', Icon: Megaphone, perm: 'campaigns.read' },
   ]},
   { g: 'Yönetim', items: [
     { href: '/crm/magazalar',   label: 'Mağazalar',    Icon: Store,      anyOf: ['stores.manage', 'users.read'] },
