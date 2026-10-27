@@ -21,7 +21,7 @@ export default function Sidebar() {
       <div className="sb-logo">
         <RobertoLogo size={32} />
         <div>
-          <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto</p>
+          <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.2px', lineHeight: 1.2 }}>Roberto Bravo</p>
           <p style={{ fontSize: 9.5, color: 'var(--tx3)', marginTop: 2 }}>Yönetim Paneli</p>
         </div>
       </div>

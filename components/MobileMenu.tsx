@@ -39,7 +39,7 @@ export default function MobileMenu() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <RobertoLogo size={28} />
               <div>
-                <p style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx)', lineHeight: 1.2 }}>Roberto</p>
+                <p style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--tx)', lineHeight: 1.2 }}>Roberto Bravo</p>
                 <p style={{ fontSize: 9, color: 'var(--tx3)', marginTop: 1 }}>{ROL_ETIKET[rol] || 'Yönetim Paneli'}</p>
               </div>
             </div>

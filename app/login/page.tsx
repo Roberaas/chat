@@ -78,7 +78,7 @@ export default function LoginPage() {
       <div className="anim-up" style={{ width: '100%', maxWidth: 380, position: 'relative' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{ display: 'inline-block', marginBottom: 14 }}><RobertoLogo size={48} /></div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.4px' }}>Roberto</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--tx)', letterSpacing: '-.4px' }}>Roberto Bravo</h1>
           <p style={{ fontSize: 12.5, color: 'var(--tx3)', marginTop: 4 }}>WhatsApp Bot Yönetim Paneli</p>
         </div>
 
