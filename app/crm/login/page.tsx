@@ -11,8 +11,7 @@ function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
-  const [factorId, setFactorId] = useState<string | null>(null)
-  const [error, setError] = useState(params.get('e') === 'pasif' ? 'Hesabınız pasif. Yöneticinize başvurun.' : '')
+    const [error, setError] = useState(params.get('e') === 'pasif' ? 'Hesabınız pasif. Yöneticinize başvurun.' : '')
   const [loading, setLoading] = useState(false)
 
   const nextPath = (() => {
@@ -20,7 +19,17 @@ function LoginForm() {
     return n.startsWith('/crm') && !n.startsWith('//') ? n : '/crm'
   })()
 
-  async function finish(supabase: ReturnType<typeof createCrmBrowserClient>) {
+  const [masked, setMasked] = useState('')
+  const [step, setStep] = useState<'cred' | 'sms'>('cred')
+
+  async function sendSms() {
+    const r = await fetch('/api/crm/auth/sms-send', { method: 'POST' })
+    const j = await r.json().catch(() => ({}))
+    if (!j.ok) { setError(j.error || 'SMS gönderilemedi'); return false }
+    setMasked(j.masked || ''); return true
+  }
+
+  async function afterAuth(supabase: ReturnType<typeof createCrmBrowserClient>) {
     const { data, error } = await supabase.rpc('me')
     if (error || !data?.profile || !data.profile.is_active) {
       await supabase.auth.signOut()
@@ -28,21 +37,20 @@ function LoginForm() {
       setLoading(false)
       return
     }
+    const r = await fetch('/api/crm/auth/sms-send', { method: 'POST' })
+    const j = await r.json().catch(() => ({}))
+    if (!j.ok) { setError(j.error || 'SMS gönderilemedi'); setLoading(false); return }
+    if (!j.skip) { setMasked(j.masked || ''); setStep('sms'); setLoading(false); return }
     router.replace(nextPath); router.refresh()
   }
 
-  // Oturum varsa: MFA bekliyorsa doğrulama adımını aç, tamamsa içeri al
+  // Oturum açıksa ama SMS doğrulaması bekleniyorsa kod adımını aç
   useEffect(() => {
     (async () => {
       const supabase = createCrmBrowserClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const aal = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-      if (aal.data?.nextLevel === 'aal2' && aal.data.currentLevel !== 'aal2') {
-        const { data: f } = await supabase.auth.mfa.listFactors()
-        const totp = f?.totp?.find(x => x.status === 'verified')
-        if (totp) { setFactorId(totp.id); return }
-      }
+      if (params.get('sms') === '1') { if (await sendSms()) setStep('sms'); return }
       router.replace(nextPath)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,22 +62,16 @@ function LoginForm() {
     const supabase = createCrmBrowserClient()
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
     if (error) { setError('E-posta veya şifre hatalı'); setLoading(false); return }
-    const aal = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-    if (aal.data?.nextLevel === 'aal2' && aal.data.currentLevel !== 'aal2') {
-      const { data: f } = await supabase.auth.mfa.listFactors()
-      const totp = f?.totp?.find(x => x.status === 'verified')
-      if (totp) { setFactorId(totp.id); setLoading(false); return }
-    }
-    await finish(supabase)
+    await afterAuth(supabase)
   }
 
-  async function verifyMfa() {
-    if (!factorId || code.length < 6) { setError('6 haneli kodu girin'); return }
+  async function verifySms() {
+    if (code.length < 6) { setError('6 haneli kodu girin'); return }
     setLoading(true); setError('')
-    const supabase = createCrmBrowserClient()
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code })
-    if (error) { setError('Kod hatalı'); setLoading(false); return }
-    await finish(supabase)
+    const r = await fetch('/api/crm/auth/sms-verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) })
+    const j = await r.json().catch(() => ({}))
+    if (!j.ok) { setError(j.error || 'Kod hatalı'); setLoading(false); return }
+    router.replace(nextPath); router.refresh()
   }
 
   return (
@@ -97,7 +99,7 @@ function LoginForm() {
           <p style={{ fontSize: 13.5, color: 'var(--tx3)', marginTop: 6 }}>Hesabınız yönetici tarafından oluşturulur.</p>
         </div>
         <div>
-          {!factorId ? (
+          {step === 'cred' ? (
             <form onSubmit={e => { e.preventDefault(); signIn() }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div><label className="label">E-posta</label>
                 <input className="inp" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="ad@sirket.com" autoComplete="username" /></div>
@@ -107,17 +109,17 @@ function LoginForm() {
               <button className="btn" type="submit" disabled={loading} style={{ justifyContent: 'center', padding: '11px 0' }}>{loading ? 'Doğrulanıyor...' : 'Giriş Yap'}</button>
             </form>
           ) : (
-            <form onSubmit={e => { e.preventDefault(); verifyMfa() }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form onSubmit={e => { e.preventDefault(); verifySms() }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--ac2)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}><ShieldCheck size={18} style={{ color: 'var(--ac)' }} /></div>
                 <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--tx)' }}>İki adımlı doğrulama</p>
-                <p style={{ fontSize: 12, color: 'var(--tx3)', marginTop: 3 }}>Doğrulayıcı uygulamanızdaki 6 haneli kod</p>
+                <p style={{ fontSize: 12, color: 'var(--tx3)', marginTop: 3 }}>{masked ? masked + ' numarasına gönderilen' : 'Telefonunuza gönderilen'} 6 haneli SMS kodu</p>
               </div>
               <input className="inp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))} placeholder="000000"
                 style={{ fontSize: 24, textAlign: 'center', letterSpacing: '.3em', fontFamily: 'JetBrains Mono, monospace' }} autoFocus />
               {error && <div className="toast toast-err" style={{ margin: 0 }}>{error}</div>}
               <button className="btn" type="submit" disabled={loading} style={{ justifyContent: 'center', padding: '11px 0' }}>{loading ? 'Doğrulanıyor...' : 'Doğrula'}</button>
-              <button type="button" className="btn-ghost" onClick={async () => { await createCrmBrowserClient().auth.signOut(); setFactorId(null); setCode(''); setError('') }} style={{ justifyContent: 'center' }}><ArrowLeft size={13} /> Geri dön</button>
+              <button type="button" className="btn-ghost" onClick={async () => { await createCrmBrowserClient().auth.signOut(); setStep('cred'); setCode(''); setError('') }} style={{ justifyContent: 'center' }}><ArrowLeft size={13} /> Geri dön</button>
             </form>
           )}
         </div>

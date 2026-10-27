@@ -1,4 +1,6 @@
 import { cache } from 'react'
+import { cookies } from 'next/headers'
+import { verifyCrm2fa, CRM2FA_COOKIE } from '@/lib/panelSession'
 import { redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { createCrmServerClient } from './supabase/server'
@@ -23,6 +25,14 @@ export const getCrmContext = cache(async (): Promise<CrmContext | null> => {
   }
 })
 
+// SMS ile iki adımlı doğrulama zorunlu roller (env ile genişletilebilir)
+const SMS_ROLES = (process.env.CRM_MFA_ROLES || 'super_admin').split(',').map(s => s.trim()).filter(Boolean)
+export const smsRequired = (ctx: CrmContext) => ctx.roles.some(r => SMS_ROLES.includes(r))
+export async function smsVerified(ctx: CrmContext): Promise<boolean> {
+  if (!smsRequired(ctx)) return true
+  return verifyCrm2fa(cookies().get(CRM2FA_COOKIE)?.value, ctx.userId)
+}
+
 // Sayfa (Server Component) koruması
 export async function requireCrm(perm?: string): Promise<CrmContext> {
   const ctx = await getCrmContext()
@@ -38,6 +48,7 @@ export async function apiGuard(perm?: string | { superAdmin: true }):
   const ctx = await getCrmContext()
   if (!ctx) return { res: NextResponse.json({ ok: false, error: 'Oturum gerekli' }, { status: 401 }) }
   if (!ctx.profile.is_active) return { res: NextResponse.json({ ok: false, error: 'Hesap pasif' }, { status: 403 }) }
+  if (!(await smsVerified(ctx))) return { res: NextResponse.json({ ok: false, error: 'SMS doğrulaması gerekli' }, { status: 401 }) }
   if (perm) {
     const allowed = typeof perm === 'string' ? can(ctx, perm) : ctx.isSuperAdmin
     if (!allowed) return { res: NextResponse.json({ ok: false, error: 'Yetkiniz yok' }, { status: 403 }) }

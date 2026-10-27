@@ -52,3 +52,21 @@ export async function verifyInternal(token: string | null): Promise<boolean> {
   if (!token) return false
   try { return await crypto.subtle.verify('HMAC', await key('internal'), fromB64u(token), enc.encode('internal-call')) } catch { return false }
 }
+
+// CRM SMS doğrulaması geçti çerezi (kullanıcıya bağlı, 12 saat)
+export const CRM2FA_COOKIE = 'crm_2fa'
+export async function signCrm2fa(userId: string): Promise<string> {
+  const body = b64u(enc.encode(JSON.stringify({ u: userId, exp: Math.floor(Date.now() / 1000) + 12 * 3600 })))
+  const sig = await crypto.subtle.sign('HMAC', await key('crm2fa'), enc.encode(body))
+  return `${body}.${b64u(sig)}`
+}
+export async function verifyCrm2fa(token: string | undefined | null, userId: string): Promise<boolean> {
+  if (!token || token.length > 1000) return false
+  const [body, sig] = token.split('.')
+  if (!body || !sig) return false
+  try {
+    if (!(await crypto.subtle.verify('HMAC', await key('crm2fa'), fromB64u(sig), enc.encode(body)))) return false
+    const d = JSON.parse(new TextDecoder().decode(fromB64u(body)))
+    return d.u === userId && typeof d.exp === 'number' && d.exp > Date.now() / 1000
+  } catch { return false }
+}
