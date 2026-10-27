@@ -34,7 +34,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
       ))}
       <div>
         <p className="sb-group">Diğer</p>
-        <a href="/" className="sb-item">
+        <a href="/api/crm/panel-gecis" className="sb-item">
           <span className="sb-icon"><MessageCircle size={14} strokeWidth={1.8} /></span>
           <span style={{ flex: 1 }}>WhatsApp Paneli</span>
         </a>
