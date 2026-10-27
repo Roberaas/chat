@@ -21,7 +21,9 @@ export async function crmMiddleware(request: NextRequest) {
       },
     }
   )
-  const { data: { user } } = await supabase.auth.getUser()
+  // Yerel JWT doğrulaması (ağ çağrısı yok); süresi dolmuşsa yeniler. Askıya alma/pasiflik layout'ta DB'den denetlenir.
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const user = claimsData?.claims?.sub ? claimsData.claims : null
   const path = request.nextUrl.pathname
 
   if (!user && !PUBLIC.includes(path)) {

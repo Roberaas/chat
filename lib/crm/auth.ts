@@ -8,10 +8,9 @@ import { can, type CrmContext } from './types'
 // user_metadata veya JWT'deki kullanıcı-değiştirebilir alanlar ASLA kullanılmaz.
 export const getCrmContext = cache(async (): Promise<CrmContext | null> => {
   const supabase = createCrmServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const { data, error } = await supabase.rpc('me')
-  if (error || !data?.profile) return null
+  // Oturum doğrulama ve yetki yüklemesi paralel (kıtalar arası gecikmeyi azaltır)
+  const [{ data: { user } }, { data, error }] = await Promise.all([supabase.auth.getUser(), supabase.rpc('me')])
+  if (!user || error || !data?.profile || data.profile.id !== user.id) return null
   const roles: string[] = data.roles || []
   return {
     userId: user.id,
