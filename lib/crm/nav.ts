@@ -5,6 +5,30 @@ import {
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
 
+// Menüde görünmeyen, Ayarlar sayfasından açılan veri ve yönetim sayfaları
+export const ADMIN_LINKS: (CrmNavItem & { desc: string })[] = [
+  { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read', desc: 'Bayi ve toptancı firmaları, yetkili kişiler' },
+  { href: '/crm/fiyatlar', label: 'Fiyat Listeleri', Icon: Tags, perm: 'pricing.read', desc: 'Bayiye özel fiyat ve iskonto' },
+  { href: '/crm/cari', label: 'Cari / Kredi', Icon: Wallet, perm: 'credit.read', desc: 'Bayi bakiyesi, limit ve vade' },
+  { href: '/crm/iceaktar', label: 'İçe / Dışa Aktar', Icon: FileSpreadsheet, anyOf: ['data.import', 'customers.export', 'reports.export'], desc: 'Excel ile toplu veri yükleme ve indirme' },
+  { href: '/crm/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug, perm: 'integrations.manage', desc: 'Pusula, Crealive, n8n bağlantıları' },
+  { href: '/crm/magazalar', label: 'Mağazalar', Icon: Store, anyOf: ['stores.manage', 'users.read'], desc: 'Mağaza, bayi ve toptancı tanımları' },
+  { href: '/crm/kullanicilar', label: 'Kullanıcılar', Icon: UserCog, perm: 'users.read', desc: 'CRM kullanıcıları ve şifre sıfırlama' },
+  { href: '/crm/alanlar', label: 'Özel Alanlar / Etiketler', Icon: ListPlus, perm: 'settings.manage', desc: 'Müşteri kartına kendi alanlarınız' },
+  { href: '/crm/roller', label: 'Roller ve Yetkiler', Icon: KeyRound, perm: 'settings.manage', desc: 'Kim neyi görür' },
+  { href: '/crm/mukerrerler', label: 'Mükerrer Kayıtlar', Icon: GitMerge, perm: 'customers.merge', desc: 'Çift müşteri kayıtlarını birleştirme' },
+  { href: '/crm/denetim', label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read', desc: 'Kim neyi değiştirdi' },
+  { href: '/crm/guvenlik', label: 'Güvenlik', Icon: ShieldCheck, desc: 'Hesap güvenliği' },
+]
+const ADMIN_PERMS = ['integrations.manage', 'settings.manage', 'b2b.read', 'pricing.read', 'credit.read', 'data.import', 'customers.export', 'reports.export', 'stores.manage', 'users.read', 'customers.merge', 'audit.read']
+
+export function crmItemAllowed(ctx: { isSuperAdmin: boolean; permissions: string[] }, i: CrmNavItem) {
+  if (ctx.isSuperAdmin) return true
+  if (i.perm) return ctx.permissions.includes(i.perm)
+  if (i.anyOf) return i.anyOf.some(p => ctx.permissions.includes(p))
+  return true
+}
+
 // Yeni modüller tamamlandıkça buraya eklenir (işlevsiz/dekoratif menü bırakılmaz).
 export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   { g: 'Genel', items: [
@@ -15,7 +39,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/bildirimler', label: 'Bildirimler', Icon: Bell },
     { href: '/crm/rehber', label: 'Rehber', Icon: BookOpen },
   ]},
-  { g: 'Müşteri', items: [
+  { g: 'Data', items: [
     { href: '/crm/musteriler', label: 'Müşteriler', Icon: Contact, perm: 'customers.read' },
     { href: '/crm/firsatlar',  label: 'Fırsatlar',  Icon: Target, perm: 'opportunities.read' },
     { href: '/crm/siparisler', label: 'Siparişler', Icon: ShoppingBag, perm: 'orders.read' },
@@ -31,26 +55,12 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/segmentler',  label: 'Segmentler',  Icon: Filter,    perm: 'segments.read' },
     { href: '/crm/kampanyalar', label: 'Kampanyalar', Icon: Megaphone, perm: 'campaigns.read' },
   ]},
-  { g: 'Kurumsal', items: [
-    { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read' },
-    { href: '/crm/fiyatlar', label: 'Fiyat Listeleri', Icon: Tags, perm: 'pricing.read' },
-    { href: '/crm/cari', label: 'Cari / Kredi', Icon: Wallet, perm: 'credit.read' },
-  ]},
   { g: 'Yönetim', items: [
     { href: '/crm/aktivite', label: 'Aktivite İzleme', Icon: Activity, perm: 'activity.read' },
-    { href: '/crm/iceaktar', label: 'İçe / Dışa Aktar', Icon: FileSpreadsheet, anyOf: ['data.import', 'customers.export', 'reports.export'] },
     { href: '/crm/otomasyonlar',   label: 'Otomasyonlar',   Icon: Workflow, perm: 'settings.manage' },
-    { href: '/crm/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug,     perm: 'integrations.manage' },
-    { href: '/crm/ayarlar', label: 'Ayarlar / API', Icon: Settings, perm: 'integrations.manage' },
-    { href: '/crm/magazalar',   label: 'Mağazalar',    Icon: Store,      anyOf: ['stores.manage', 'users.read'] },
-    { href: '/crm/kullanicilar', label: 'Kullanıcılar', Icon: UserCog,    perm: 'users.read' },
-    { href: '/crm/alanlar', label: 'Özel Alanlar / Etiketler', Icon: ListPlus, perm: 'settings.manage' },
-    { href: '/crm/roller', label: 'Roller ve Yetkiler', Icon: KeyRound, perm: 'settings.manage' },
-    { href: '/crm/mukerrerler', label: 'Mükerrer Kayıtlar', Icon: GitMerge, perm: 'customers.merge' },
-    { href: '/crm/denetim',     label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read' },
   ]},
-  { g: 'Hesabım', items: [
-    { href: '/crm/guvenlik', label: 'Güvenlik', Icon: ShieldCheck },
+  { g: 'Sistem', items: [
+    { href: '/crm/ayarlar', label: 'Ayarlar', Icon: Settings, anyOf: ADMIN_PERMS },
   ]},
 ]
 
