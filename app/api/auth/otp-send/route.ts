@@ -17,10 +17,14 @@ export async function POST(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-  const { kullanici_adi, sifre } = await req.json()
+  let { kullanici_adi, sifre } = await req.json()
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   if (typeof kullanici_adi !== 'string' || typeof sifre !== 'string' || !rateLimit(`otps:${kullanici_adi}`, 5, 10 * 60_000) || !rateLimit(`otps-ip:${ip}`, 20, 10 * 60_000)) {
     return NextResponse.json({ ok: false, error: 'Çok fazla deneme. Birkaç dakika sonra tekrar deneyin.' }, { status: 429 })
+  }
+  if (kullanici_adi.includes('@')) {
+    const { data: byMail } = await supabase.from('kullanicilar').select('kullanici_adi').eq('eposta', kullanici_adi.trim().toLowerCase()).maybeSingle()
+    if (byMail?.kullanici_adi) kullanici_adi = byMail.kullanici_adi
   }
 
   const { data: row } = await supabase

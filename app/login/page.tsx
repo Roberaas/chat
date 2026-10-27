@@ -86,7 +86,7 @@ export default function LoginPage() {
           {step === 'sifre' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label className="label">Kullanıcı Adı</label>
+                <label className="label">Kullanıcı Adı veya E-posta</label>
                 <input className="inp" type="text" value={kullanici_adi} onChange={e => setKullaniciAdi(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && loginWithPassword()} placeholder="kullanici.adi" autoComplete="username" />
               </div>
