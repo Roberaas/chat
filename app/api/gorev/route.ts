@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     ilgili_siparis:  body.ilgili_siparis?.trim() || null,
     bitis_tarihi:    body.bitis_tarihi || null,        // boş string → null (date tipi)
     sms_saati:       body.sms_saati || null,           // boş string → null (time tipi)
-    sms_telefon:     body.sms_telefon || '905000000000',
+    sms_telefon:     body.sms_telefon || process.env.MERT_GSM || '',
     sms_gonderildi:  false,
   }
 

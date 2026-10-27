@@ -26,7 +26,7 @@ const TUR_RENK: Record<string, string> = {
 const TUR_ICON: Record<string, any> = { teslimat: Truck, gorev: CheckSquare, arama: Phone, siparis: Package, abonelik: Repeat }
 const TUR_LABEL: Record<string, string> = { teslimat: 'Teslimat', gorev: 'Görev', arama: 'Arama', siparis: 'Sipariş', abonelik: 'Abonelik' }
 
-const EMPTY_FORM = { show: false, baslik: '', aciklama: '', tarih: '', sms_saati: '', sms_telefon: '905000000000', oncelik: 'normal' }
+const EMPTY_FORM = { show: false, baslik: '', aciklama: '', tarih: '', sms_saati: '', sms_telefon: '', oncelik: 'normal' }
 
 export default function TakvimPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -49,7 +49,7 @@ export default function TakvimPage() {
         bitis_tarihi: ekleForm.tarih || null,
         oncelik: ekleForm.oncelik,
         sms_saati: ekleForm.sms_saati || null,
-        sms_telefon: ekleForm.sms_telefon || '905000000000',
+        sms_telefon: ekleForm.sms_telefon || '',
         durum: 'bekliyor',
       })
     })

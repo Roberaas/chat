@@ -9,7 +9,7 @@ const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER || ''
 export async function POST(req: Request) {
   const { mesaj, tel } = await req.json()
   // tel yoksa Mert'in numarasına gönder (operasyonel bildirim)
-  const gsm = tel || process.env.MERT_GSM || '905000000000'
+  const gsm = tel || process.env.MERT_GSM || ''
 
   const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${encodeURIComponent(NETGSM_USERCODE)}&password=${encodeURIComponent(NETGSM_PASSWORD)}&gsmno=${gsm}&message=${encodeURIComponent(mesaj)}&msgheader=${encodeURIComponent(NETGSM_MSGHEADER)}`
 

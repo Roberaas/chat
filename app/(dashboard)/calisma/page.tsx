@@ -25,7 +25,7 @@ const ONCELIK_BADGE: Record<string, string> = { dusuk: 'badge-muted', normal: 'b
 const SONUC_BADGE: Record<string, string> = { tamamlandi: 'badge-green', cevapsiz: 'badge-red', geri_aranacak: 'badge-amber', mesaj_birakildi: 'badge-blue' }
 const SONUC_LABEL: Record<string, string> = { tamamlandi: 'Tamamlandı', cevapsiz: 'Cevapsız', geri_aranacak: 'Geri Aranacak', mesaj_birakildi: 'Mesaj Bırakıldı' }
 
-const EMPTY_GOREV = { show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '', sms_saati: '', sms_telefon: '905000000000' }
+const EMPTY_GOREV = { show: false, baslik: '', aciklama: '', oncelik: 'normal', ilgili_telefon: '', ilgili_siparis: '', bitis_tarihi: '', sms_saati: '', sms_telefon: '' }
 const EMPTY_NOT = { show: false, icerik: '', yazan: 'admin', ilgili_telefon: '', ilgili_siparis: '', ilgili_tip: 'genel' }
 const EMPTY_ARAMA = { show: false, telefon: '', musteri_adi: '', sure_dakika: '', notlar: '', sonuc: 'tamamlandi', arayan: 'admin' }
 
