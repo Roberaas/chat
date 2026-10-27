@@ -13,7 +13,7 @@ import { verifySession, verifyInternal, SESSION_COOKIE } from '@/lib/panelSessio
 // Oturum gerektirmeyen API'ler: giriş akışı, CRM (kendi yetki kontrolü var), n8n çağrısı (rota içinde ayrıca korunur)
 const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim', '/api/csp-report']
 // Yalnızca admin rolü
-const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar']
+const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar', '/api/kullanim', '/api-kullanimi']
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
