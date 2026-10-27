@@ -1,10 +1,20 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
+import { rateLimit } from '@/lib/crm/auth'
 
 export async function POST(req: Request) {
   try {
-    const { soru, veri, gecmis } = await req.json()
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (!rateLimit(`asistan:${ip}`, 20, 60_000)) return NextResponse.json({ cevap: 'Çok fazla istek, biraz bekleyin.' }, { status: 429 })
+    const body = await req.json()
+    // Maliyet koruması: girdi boyutları sınırlı
+    const soru = String(body?.soru ?? '').slice(0, 1000)
+    const veri = String(body?.veri ?? '').slice(0, 8000)
+    const gecmis = (Array.isArray(body?.gecmis) ? body.gecmis : []).slice(-10)
+      .filter((m: any) => m && (m.role === 'user' || m.role === 'assistant'))
+      .map((m: any) => ({ role: m.role, content: String(m.content ?? '').slice(0, 1000) }))
+    if (!soru.trim()) return NextResponse.json({ cevap: 'Sorunuzu yazın.' })
 
     const mesajlar = [
       {
