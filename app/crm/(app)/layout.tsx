@@ -20,5 +20,7 @@ export default async function CrmAppLayout({ children }: { children: React.React
       redirect(data?.nextLevel === 'aal2' ? '/crm/login' : '/crm/guvenlik?zorunlu=1')
     }
   }
-  return <CrmShell ctx={ctx}>{children}</CrmShell>
+  const { data: custom } = await createCrmServerClient().from('roles').select('code, name').eq('is_system', false)
+  const roleNames = Object.fromEntries((custom || []).map((r: { code: string; name: string }) => [r.code, r.name]))
+  return <CrmShell ctx={ctx} roleNames={roleNames}>{children}</CrmShell>
 }

@@ -28,13 +28,14 @@ export default function KullanicilarPage() {
   const crm = useCrm()
   const isAdmin = crm.isSuperAdmin
   const canManage = crm.can('users.manage')
-  const DELEGABLE = crm.roles.includes('dealer_admin') ? ['dealer_user', 'sales_advisor'] : ['sales_advisor']
   const manageable = (r: Row) => isAdmin || (canManage && r.id !== crm.userId && r.store_memberships.length > 0 && r.store_memberships.every(m => crm.storeIds.includes(m.store_id)) && r.user_roles.every(x => DELEGABLE.includes(x.role_code)))
   const supabase = createCrmBrowserClient()
   const [rows, setRows] = useState<Row[]>([])
   const [stores, setStores] = useState<Opt[]>([])
   const [depts, setDepts] = useState<Opt[]>([])
-  const [roles, setRoles] = useState<{ code: string; name: string }[]>([])
+  const [roles, setRoles] = useState<{ code: string; name: string; is_system: boolean; delegable: boolean; store_id: string | null; scope: string }[]>([])
+  const BASE = crm.roles.includes('dealer_admin') ? ['dealer_user', 'sales_advisor'] : ['sales_advisor']
+  const DELEGABLE = [...BASE, ...roles.filter(r => !r.is_system && r.delegable && r.scope !== 'all' && (!r.store_id || crm.storeIds.includes(r.store_id))).map(r => r.code)]
   const [loading, setLoading] = useState(true)
   const [q, setQ] = useState('')
   const [form, setForm] = useState(EMPTY)
@@ -51,9 +52,9 @@ export default function KullanicilarPage() {
       supabase.from('profiles').select('id, first_name, last_name, email, phone, department_id, is_active, last_sign_in_at, user_roles(role_code), store_memberships(store_id)').order('first_name'),
       supabase.from('stores').select('id, name').order('name'),
       supabase.from('departments').select('id, name').order('name'),
-      supabase.from('roles').select('code, name').order('sort_order'),
+      supabase.from('roles').select('code, name, is_system, delegable, store_id, scope').order('sort_order'),
     ])
-    setRows((u.data || []) as any); setStores((s.data || []) as Opt[]); setDepts((d.data || []) as Opt[]); setRoles((r.data || []) as any)
+    setRows((u.data || []) as any); setStores((s.data || []) as Opt[]); setDepts((d.data || []) as Opt[]); (r.data || []).forEach((x: any) => { if (!x.is_system) ROLE_LABEL[x.code] = x.name }); setRoles((r.data || []) as any)
     setLoading(false)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load() }, [load])
@@ -191,7 +192,7 @@ export default function KullanicilarPage() {
                 </div>
                 <div><label className="label">Rol *</label>
                   <select className="inp" value={form.role_code} onChange={e => setForm(f => ({ ...f, role_code: e.target.value }))}>
-                    {roles.filter(r => isAdmin || DELEGABLE.includes(r.code)).map(r => <option key={r.code} value={r.code}>{r.name}</option>)}
+                    {roles.filter(r => (isAdmin || DELEGABLE.includes(r.code)) && (!r.store_id || form.store_ids.length === 0 || form.store_ids.every(s => s === r.store_id))).map(r => <option key={r.code} value={r.code}>{r.name}{r.store_id ? ` · ${storeName(r.store_id)}` : ''}</option>)}
                   </select></div>
                 <div><label className="label">Mağazalar * (birden fazla seçilebilir; ilk seçilen ana mağaza)</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>

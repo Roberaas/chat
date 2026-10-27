@@ -109,7 +109,8 @@ function Heartbeat() {
   return null
 }
 
-export default function CrmShell({ ctx, children }: { ctx: CrmContext; children: ReactNode }) {
+export default function CrmShell({ ctx, children, roleNames }: { ctx: CrmContext; children: ReactNode; roleNames?: Record<string, string> }) {
+  if (roleNames) Object.assign(ROLE_LABEL, roleNames)
   return (
     <CrmProvider value={ctx}>
       <Heartbeat />

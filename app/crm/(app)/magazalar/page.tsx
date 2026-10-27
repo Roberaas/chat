@@ -5,6 +5,8 @@ import CrmTopBar from '@/components/crm/CrmTopBar'
 import ConfirmModal from '@/components/ConfirmModal'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
+import Link from 'next/link'
+import { ROLE_LABEL } from '@/lib/crm/types'
 
 type StoreRow = { id: string; code: string; name: string; store_type: string; city: string | null; address: string | null; phone: string | null; manager_id: string | null; is_active: boolean; parent_id: string | null }
 type Person = { id: string; first_name: string; last_name: string }
@@ -20,6 +22,8 @@ export default function MagazalarPage() {
   const [stores, setStores] = useState<StoreRow[]>([])
   const [people, setPeople] = useState<Person[]>([])
   const [members, setMembers] = useState<Member[]>([])
+  const [roleOf, setRoleOf] = useState<Record<string, string>>({})
+  const [roleList, setRoleList] = useState<{ code: string; name: string; store_id: string | null; is_system: boolean }[]>([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState<typeof EMPTY & { show: boolean }>({ ...EMPTY, show: false })
   const [staffOf, setStaffOf] = useState<StoreRow | null>(null)
@@ -30,11 +34,15 @@ export default function MagazalarPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const [s, p, m] = await Promise.all([
+    const [s, p, m, ur, rl] = await Promise.all([
       supabase.from('stores').select('*').order('created_at'),
       supabase.from('profiles').select('id, first_name, last_name').eq('is_active', true).order('first_name'),
       supabase.from('store_memberships').select('user_id, store_id, is_primary'),
+      supabase.from('user_roles').select('user_id, role_code'),
+      supabase.from('roles').select('code, name, store_id, is_system').order('sort_order'),
     ])
+    ;(rl.data || []).forEach((x: any) => { if (!x.is_system) ROLE_LABEL[x.code] = x.name })
+    setRoleList((rl.data || []) as any); setRoleOf(Object.fromEntries((ur.data || []).map((x: any) => [x.user_id, x.role_code])))
     setStores((s.data || []) as StoreRow[]); setPeople((p.data || []) as Person[]); setMembers((m.data || []) as Member[])
     setLoading(false)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
@@ -78,6 +86,11 @@ export default function MagazalarPage() {
     if (del.error) { setErr(del.error.message); return }
     if (mem?.is_primary) await supabase.from('store_memberships').update({ is_primary: true }).eq('user_id', transfer.user).eq('store_id', transfer.to)
     setTransfer({ user: '', to: '' }); setErr(''); load()
+  }
+  async function changeRole(userId: string, role: string) {
+    const { error } = await supabase.from('user_roles').update({ role_code: role }).eq('user_id', userId)
+    if (error) { setErr(error.message); return }
+    setErr(''); load()
   }
   async function removeMember() {
     if (!removeM) return
@@ -180,7 +193,12 @@ export default function MagazalarPage() {
               {staffMembers.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Personel atanmamış</div>}
               {staffMembers.map(m => (
                 <div key={m.user_id} className="row" style={{ justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13 }}>{nameOf(m.user_id)} {m.is_primary && <span className="badge badge-ac" style={{ marginLeft: 6 }}>ana</span>}</span>
+                  <span style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>{nameOf(m.user_id)} {m.is_primary && <span className="badge badge-ac">ana</span>}
+                    {crm.isSuperAdmin && roleOf[m.user_id] && roleOf[m.user_id] !== 'super_admin' ? (
+                      <select className="inp" value={roleOf[m.user_id]} onChange={e => changeRole(m.user_id, e.target.value)} style={{ padding: '3px 8px', fontSize: 12, width: 'auto' }}>
+                        {roleList.filter(x => x.code !== 'super_admin' && (!x.store_id || x.store_id === staffOf.id || x.code === roleOf[m.user_id])).map(x => <option key={x.code} value={x.code}>{ROLE_LABEL[x.code] || x.name}</option>)}
+                      </select>
+                    ) : roleOf[m.user_id] ? <span className="badge badge-muted">{ROLE_LABEL[roleOf[m.user_id]] || roleOf[m.user_id]}</span> : null}</span>
                   {canMembers && (
                     <span style={{ display: 'flex', gap: 4 }}>
                       <button title="Transfer" onClick={() => setTransfer({ user: m.user_id, to: '' })} style={{ background: 'none', border: 'none', color: 'var(--tx3)', padding: 6 }}><ArrowRightLeft size={14} /></button>
@@ -199,6 +217,7 @@ export default function MagazalarPage() {
                   </select>
                   <button className="btn" onClick={addMember} disabled={!addUser}>Ekle</button>
                 </div>
+                {crm.isSuperAdmin && <Link href={`/crm/roller?store=${staffOf.id}`} style={{ fontSize: 12.5, color: 'var(--ac)' }}>+ Bu mağazaya özel rol oluştur (yetkileri siz belirlersiniz) →</Link>}
                 {transfer.user && (
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: 10, background: 'var(--s3)', borderRadius: 10 }}>
                     <span style={{ fontSize: 12.5, color: 'var(--tx2)', flexShrink: 0 }}>{nameOf(transfer.user)} →</span>
