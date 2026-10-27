@@ -44,6 +44,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/musteriler?kanal=eticaret', label: 'E-Ticaret', Icon: ShoppingBag, perm: 'customers.read' },
     { href: '/crm/musteriler?kanal=perakende', label: 'Perakende', Icon: Store, perm: 'customers.read' },
     { href: '/crm/musteriler?kanal=toptan', label: 'Toptan', Icon: Building2, perm: 'customers.read' },
+    { href: '/crm/iceaktar', label: 'Excel İçe / Dışa Aktar', Icon: FileSpreadsheet, anyOf: ['data.import', 'customers.export', 'reports.export'] },
     { href: '/crm/siparisler', label: 'Siparişler', Icon: ShoppingBag, perm: 'orders.read' },
     { href: '/crm/urunler',    label: 'Ürünler',    Icon: Gem,    perm: 'products.read' },
     { href: '/crm/firsatlar',  label: 'Fırsatlar',  Icon: Target, perm: 'opportunities.read' },
