@@ -2,22 +2,35 @@
 export type Preset = { code: string; kind: string; name: string; secret_env: string; how: string[] }
 
 export const PRESETS: Preset[] = [
-  { code: 'ideasoft', kind: 'ecommerce', name: 'Ideasoft (e-ticaret)', secret_env: 'CRM_WEBHOOK_SECRET_IDEASOFT', how: [
-    'Ideasoft yönetim panelinden sipariş/ürün bildirimi (webhook veya API) tanımlayın; doğrudan imza atamıyorsa araya n8n koyun.',
-    'n8n akışı: Ideasoft tetikleyicisi → "Code" düğümü (aşağıdaki örnek imza kodu) → HTTP Request ile CRM adresine POST.',
-    'Gövdeyi "Sipariş" ve "Ürün" örneklerindeki alan adlarına çevirin (veya Alan eşlemeleri bölümünü kullanın).'] },
-  { code: 'tsoft', kind: 'ecommerce', name: 'T-Soft (e-ticaret)', secret_env: 'CRM_WEBHOOK_SECRET_TSOFT', how: [
-    'T-Soft API/webhook çıktısını n8n ile alın, örnek alan adlarına çevirin.',
-    'İmzayı n8n "Code" düğümünde hesaplayıp CRM adresine POST edin.'] },
-  { code: 'ticimax', kind: 'ecommerce', name: 'Ticimax (e-ticaret)', secret_env: 'CRM_WEBHOOK_SECRET_TICIMAX', how: [
-    'Ticimax sipariş/ürün servisinden veriyi n8n ile çekin (zamanlayıcı), örnek alan adlarına çevirin ve imzalı POST edin.'] },
-  { code: 'kalimero', kind: 'pos', name: 'Kalimero (POS / mağaza satışı)', secret_env: 'CRM_WEBHOOK_SECRET_KALIMERO', how: [
-    'Kalimero satış olaylarını n8n üzerinden alın; mağaza kodunu (store_code) ve danışman e-postasını (advisor_email) ekleyin.',
-    'Böylece mağaza satışı doğru mağazaya ve danışmana yazılır.'] },
-  { code: 'erp', kind: 'erp', name: 'ERP (genel)', secret_env: 'CRM_WEBHOOK_SECRET_ERP', how: [
-    'ERP ürün ve sipariş değişikliklerini bu adrese imzalı POST etsin. ERP yetkili kaynaktır: gelen değer CRM\'dekini ezer.'] },
+  { code: 'pusula', kind: 'erp', name: 'Pusula (ERP)', secret_env: 'CRM_WEBHOOK_SECRET_PUSULA', how: [
+    'Pusula ERP yetkili kaynaktır: ürün, stok kodu, fiyat ve mağaza satışları buradan gelir. Gelen değer CRM\'dekini ezer.',
+    'Pusula olay (webhook) gönderemiyorsa n8n zamanlayıcı ile değişenleri (son güncelleme tarihinden) çekip bu adrese imzalı POST edin.',
+    'Şube/depo kodlarını CRM Mağaza kodlarıyla aynı yapın (store_code).'] },
+  { code: 'crealive', kind: 'ecommerce', name: 'Crealive (e-ticaret)', secret_env: 'CRM_WEBHOOK_SECRET_CREALIVE', how: [
+    'Crealive her yeni/güncellenen siparişte bu adrese imzalı POST atacak şekilde ayarlanmalı (özel yazılım olduğu için geliştirici ekleyebilir).',
+    'Webhook mümkün değilse n8n ile sipariş listesi API\'sini zamanlayıcıyla çekin.',
+    'Sipariş gövdesine müşteri telefon/e-posta ve pazarlama izni bilgisini ekletin.'] },
   { code: 'n8n', kind: 'other', name: 'n8n (köprü akışı)', secret_env: 'CRM_WEBHOOK_SECRET_N8N', how: [
-    'Başka sistemlerden gelen veriyi tek noktada toplayıp CRM\'e göndermek için kullanın.'] },
+    'Pusula/Crealive doğrudan imzalı gönderemiyorsa veriyi toplayıp CRM\'e ileten ara katman.'] },
+]
+
+export type ApiReq = { group: string; item: string; why: string; fields: string }
+export const API_REQS: { system: string; role: string; asks: ApiReq[] }[] = [
+  { system: 'Pusula (ERP)', role: 'Ürün, fiyat, stok ve mağaza satışlarının kaynağı', asks: [
+    { group: 'Ürün', item: 'Ürün/stok listesi + "şu tarihten beri değişenler" uç noktası', why: 'Katalog ve fiyatlar CRM\'e otomatik gelir', fields: 'stok kodu, ad, kategori, malzeme, fiyat, para birimi, aktif/pasif, koleksiyon' },
+    { group: 'Satış', item: 'Satış fatura/sipariş listesi (mağaza satışları) + değişenler', why: 'Mağaza satışı müşteriye ve danışmana yazılır', fields: 'fatura no, tarih, cari, şube kodu, satış personeli, kalemler (stok kodu, adet, fiyat), toplam' },
+    { group: 'Müşteri', item: 'Cari (müşteri/bayi/toptancı) listesi', why: 'Müşteri ve bayi eşleştirme, B2B firmaları', fields: 'cari kodu, ünvan/ad soyad, telefon, e-posta, vergi no, il/ilçe, cari tipi' },
+    { group: 'Mağaza', item: 'Şube/depo listesi', why: 'store_code eşlemesi', fields: 'şube kodu, ad, il' },
+    { group: 'B2B', item: 'Cari bakiye ve tahsilat/ödeme (isteğe bağlı)', why: 'Toptancı/bayi kartında bakiye gösterimi', fields: 'cari kodu, bakiye, vade' },
+    { group: 'Erişim', item: 'Adres (base URL), kimlik doğrulama türü, API anahtarı/kullanıcı, test ortamı, IP kısıtı, istek limiti, dokümantasyon bağlantısı', why: 'Bağlantı kurulumu', fields: 'Pusula teknik destekten veya yazılım sağlayıcıdan istenir' },
+  ]},
+  { system: 'Crealive (özel e-ticaret yazılımı)', role: 'Online siparişlerin ve üyelerin kaynağı', asks: [
+    { group: 'Sipariş', item: 'Yeni/güncellenen sipariş için webhook (tercih) veya sipariş listesi API\'si', why: 'Online satışlar müşteriye otomatik işlenir', fields: 'sipariş id/no, durum, tarih, toplam, kalemler (stok kodu, adet, fiyat), iptal/iade durumu' },
+    { group: 'Müşteri', item: 'Üye kaydı bilgisi (sipariş içinde veya ayrı API)', why: 'Müşteri oluşturma ve eşleştirme', fields: 'üye id, ad, soyad, telefon, e-posta' },
+    { group: 'İzin', item: 'İletişim izni alanı (SMS/e-posta/WhatsApp onayı ve tarihi)', why: 'Kampanyalar yalnız izinli müşteriye gider (KVKK/İYS)', fields: 'kanal, onay durumu, onay zamanı' },
+    { group: 'Ürün', item: 'Ürün kataloğu API\'si (Pusula yetkili değilse)', why: 'Ürün eşleştirme (stok kodu ortak olmalı)', fields: 'stok kodu, ad, kategori, fiyat, durum' },
+    { group: 'Erişim', item: 'Webhook imzalama desteği (HMAC-SHA256) veya n8n ile köprü, API anahtarı, test ortamı, dokümantasyon', why: 'Güvenli bağlantı', fields: 'Crealive geliştiricisinden istenir' },
+  ]},
 ]
 
 export const SAMPLE_ORDER = {
