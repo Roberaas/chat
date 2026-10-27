@@ -61,11 +61,12 @@ const DEFS: Record<string, Def> = {
 const bad = (m: string, s = 400) => NextResponse.json({ ok: false, error: m }, { status: s })
 const colDef = (c: Col) => ({ header: c.header, key: c.key, width: c.width, fmt: c.kind === 'date' ? dateFmt : c.kind === 'datetime' ? dateTimeFmt : c.kind === 'num' ? '#,##0.00' : undefined })
 
-export async function GET(req: NextRequest, { params }: { params: { entity: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ entity: string }> }) {
+  const params = await props.params;
   const entity = params.entity
   const sp = req.nextUrl.searchParams
   const fmt = sp.get('format') === 'csv' ? 'csv' : 'xlsx'
-  const store = sp.get('store'); const from = sp.get('from'); const to = sp.get('to')
+  const store = sp.get('store');const from = sp.get('from');const to = sp.get('to')
   if (store && !isUuid(store)) return bad('Geçersiz mağaza')
   const okDate = (v: string | null) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v)
   if (!okDate(from) || !okDate(to)) return bad('Geçersiz tarih')

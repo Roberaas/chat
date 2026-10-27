@@ -11,7 +11,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const BUDGET_MS = 45_000, BATCH = 25, CONCURRENCY = 5
 
 // Kampanya gönderimi: istek başına ~45 sn çalışır, kalan varsa remaining > 0 döner (arayüz tekrar çağırır).
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+export async function POST(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const g = await apiGuard('campaigns.send')
   if ('res' in g) return g.res
   if (!UUID.test(params.id)) return NextResponse.json({ ok: false, error: 'Geçersiz kampanya' }, { status: 400 })
@@ -23,7 +24,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ ok: false, error: `${String(camp.channel).toUpperCase()} sağlayıcısı yapılandırılmamış. Ayarlar → Mesajlaşma bölümüne bakın.` }, { status: 409 })
   }
 
-  const started = Date.now(); let sent = 0, failed = 0, retried = 0, remaining = 0
+  const started = Date.now();let sent = 0, failed = 0, retried = 0, remaining = 0
   while (Date.now() - started < BUDGET_MS) {
     const { data, error } = await db.rpc('campaign_claim', { p_campaign: params.id, p_limit: BATCH })
     if (error) {

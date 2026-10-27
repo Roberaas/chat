@@ -4,10 +4,14 @@ import { createCrmServerClient } from '@/lib/crm/supabase/server'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+
 const ACTION: Record<string, string> = { INSERT: 'Oluşturma', UPDATE: 'Güncelleme', DELETE: 'Silme' }
 const BADGE: Record<string, string> = { INSERT: 'badge-green', UPDATE: 'badge-blue', DELETE: 'badge-red' }
 
-export default async function DenetimPage({ searchParams }: { searchParams: { sayfa?: string } }) {
+export default async function DenetimPage(props: { searchParams: Promise<{ sayfa?: string }> }) {
+  const searchParams = await props.searchParams;
   await requireCrm('audit.read')
   const page = Math.max(1, parseInt(searchParams.sayfa || '1') || 1)
   const size = 50

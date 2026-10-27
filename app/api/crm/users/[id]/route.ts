@@ -7,7 +7,8 @@ import { isUuid, str, optStr, normPhone, strongPassword } from '@/lib/crm/valida
 
 const bad = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status })
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const g = await apiGuard('users.manage')
   if ('res' in g) return g.res
   const { ctx } = g

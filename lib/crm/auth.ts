@@ -30,7 +30,7 @@ const SMS_ROLES = (process.env.CRM_MFA_ROLES || 'super_admin').split(',').map(s 
 export const smsRequired = (ctx: CrmContext) => ctx.roles.some(r => SMS_ROLES.includes(r))
 export async function smsVerified(ctx: CrmContext): Promise<boolean> {
   if (!smsRequired(ctx)) return true
-  return verifyCrm2fa(cookies().get(CRM2FA_COOKIE)?.value, ctx.userId)
+  return verifyCrm2fa((await cookies()).get(CRM2FA_COOKIE)?.value, ctx.userId);
 }
 
 // Sayfa (Server Component) koruması

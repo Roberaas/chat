@@ -3,6 +3,9 @@ import CrmTopBar from '@/components/crm/CrmTopBar'
 import { requireCrm } from '@/lib/crm/auth'
 import { WHERE, ROLES, FIELDS } from '@/lib/crm/guide'
 
+// Remove this opt-out after verifying the segment passes validation without it.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+
 const th = { padding: '8px 14px', textAlign: 'left' as const, color: 'var(--tx3)', fontSize: 11.5 }
 const td = { padding: '9px 14px', fontSize: 12.5, color: 'var(--tx2)', verticalAlign: 'top' as const }
 

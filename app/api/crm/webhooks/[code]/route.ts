@@ -20,7 +20,8 @@ const safeKey = (p: string) => /^[A-Za-z0-9_.]{1,80}$/.test(p) && !/(^|\.)(__pro
 
 // Güvenli webhook girişi: HMAC-SHA256(secret, `${timestamp}.${gövde}`), zaman penceresi, tekrar (idempotent) koruması.
 // Sır DB'de tutulmaz; entegrasyon kaydındaki secret_env adlı ortam değişkeninden okunur.
-export async function POST(req: NextRequest, { params }: { params: { code: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ code: string }> }) {
+  const params = await props.params;
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   if (!rateLimit(`wh:${ip}`, 120)) return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 })
   if (!/^[a-z0-9_-]{2,40}$/.test(params.code)) return NextResponse.json({ ok: false }, { status: 404 })

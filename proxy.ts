@@ -15,7 +15,7 @@ const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim', '/ap
 // Yalnızca admin rolü
 const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar', '/api/kullanim', '/api-kullanimi', '/api/rapor-ilet', '/api/sms', '/api/bildirim/toplu']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   // CRM (Supabase Auth) — WhatsApp paneli cookie girişinden tamamen ayrı
   if (pathname === '/crm' || pathname.startsWith('/crm/')) return crmMiddleware(request)

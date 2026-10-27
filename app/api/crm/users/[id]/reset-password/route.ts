@@ -5,7 +5,8 @@ import { createCrmServerClient } from '@/lib/crm/supabase/server'
 import { createCrmAdminClient } from '@/lib/crm/supabase/admin'
 import { isUuid, strongPassword } from '@/lib/crm/validate'
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const g = await apiGuard('users.manage')
   if ('res' in g) return g.res
   if (!g.ctx.isSuperAdmin && isUuid(params.id)) {
