@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { getCrmContext, rateLimit, smsRequired } from '@/lib/crm/auth'
 import { adminDb } from '@/lib/serverDb'
+import { createCrmAdminClient } from '@/lib/crm/supabase/admin'
 
 export async function POST() {
   const ctx = await getCrmContext()
@@ -19,9 +20,12 @@ export async function POST() {
   const code = crypto.randomInt(100000, 1000000).toString()
   const hash = crypto.createHash('sha256').update(`${ctx.userId}:${code}`).digest('hex')
   await db.from('crm_otp').upsert({ user_id: ctx.userId, code_hash: hash, expires_at: new Date(Date.now() + 5 * 60_000).toISOString(), attempts: 0, used: false, sent_at: new Date().toISOString() }, { onConflict: 'user_id' })
-  const phone = phoneRaw.replace(/\D/g, '').replace(/^90/, '').replace(/^0/, '')
+  const norm = (x: string) => x.replace(/\D/g, '').replace(/^90/, '').replace(/^0/, '')
+  const phone = norm(phoneRaw)
+  const { data: ex } = await createCrmAdminClient().from('profiles').select('sms_extra_phones').eq('id', ctx.userId).maybeSingle()
+  const alici = Array.from(new Set([phone, ...((ex?.sms_extra_phones as string[] | null) || []).map(norm)])).filter(x => /^\d{10}$/.test(x))
   const msg = `Roberto CRM giris kodunuz: ${code}`
-  const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${encodeURIComponent(process.env.NETGSM_USERCODE || '')}&password=${encodeURIComponent(process.env.NETGSM_PASSWORD || '')}&gsmno=${phone}&message=${encodeURIComponent(msg)}&msgheader=${encodeURIComponent(process.env.NETGSM_MSGHEADER || '')}`
+  const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${encodeURIComponent(process.env.NETGSM_USERCODE || '')}&password=${encodeURIComponent(process.env.NETGSM_PASSWORD || '')}&gsmno=${alici.join(',')}&message=${encodeURIComponent(msg)}&msgheader=${encodeURIComponent(process.env.NETGSM_MSGHEADER || '')}`
   try {
     const txt = await (await fetch(url)).text()
     if (!/^0[0-9]/.test(txt.trim()) && !txt.trim().startsWith('00')) console.error('Netgsm CRM:', txt)
