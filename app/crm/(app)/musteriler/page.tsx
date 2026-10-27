@@ -26,6 +26,7 @@ const EMPTY = { first_name: '', last_name: '', phone: '', email: '', store_id: '
 
 export default function MusterilerPage() {
   const crm = useCrm()
+  const showSF = !crm.disabledModules?.includes('storefields')
   const kanal = KANAL[useSearchParams().get('kanal') || '']
   const supabase = createCrmBrowserClient()
   const canWrite = crm.can('customers.write')
@@ -117,16 +118,16 @@ export default function MusterilerPage() {
   return (
     <>
       <CrmTopBar title={kanal ? `${kanal.title} Müşterileri` : 'Müşteriler'} subtitle={`${total} kayıt`}
-        action={canWrite && <button className="btn" onClick={() => { setForm({ ...EMPTY, store_id: stores.length === 1 ? stores[0].id : '', show: true }); setDups([]); setErr('') }}><Plus size={14} /> Müşteri Ekle</button>} />
+        action={canWrite && <button className="btn" onClick={() => { setForm({ ...EMPTY, source: kanal === KANAL.eticaret ? 'ecommerce' : kanal === KANAL.toptan ? 'other' : 'walk_in', store_id: (kanal ? stores.find(x => kanal.types.includes(x.store_type || '')) : null)?.id || stores[0]?.id || '', show: true }); setDups([]); setErr('') }}><Plus size={14} /> Müşteri Ekle</button>} />
       <div style={{ padding: 22, maxWidth: 1300, width: '100%', margin: '0 auto' }}>
         <div className="card" style={{ padding: 12, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
           <div style={{ position: 'relative', flex: '1 1 240px' }}>
             <Search size={14} style={{ position: 'absolute', left: 11, top: 12, color: 'var(--tx3)' }} />
             <input className="inp" style={{ paddingLeft: 32 }} placeholder="Ad, telefon veya e-posta ara" value={q} onChange={e => setQ(e.target.value)} />
           </div>
-          <select className="inp" style={{ width: 180 }} value={storeF} onChange={e => { setStoreF(e.target.value); setPage(0) }}>
+          {showSF && <select className="inp" style={{ width: 180 }} value={storeF} onChange={e => { setStoreF(e.target.value); setPage(0) }}>
             <option value="">Tüm mağazalar</option>{(kanal ? stores.filter(x => kanal.types.includes(x.store_type || '')) : stores).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          </select>}
           {tagList.length > 0 && <select className="inp" style={{ width: 160 }} value={tagF} onChange={e => { setTagF(e.target.value); setPage(0) }}>
             <option value="">Tüm etiketler</option>{tagList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>}
@@ -143,7 +144,7 @@ export default function MusterilerPage() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead><tr style={{ textAlign: 'left', color: 'var(--tx3)', fontSize: 11.5 }}>
-                  {['No', 'Müşteri', 'İletişim', 'Mağaza', 'Danışman', 'Kaynak', 'Kayıt'].map(h => <th key={h} style={{ padding: '10px 14px', fontWeight: 600 }}>{h}</th>)}
+                  {['No', 'Müşteri', 'İletişim', ...(showSF ? ['Mağaza'] : []), 'Danışman', ...(showSF ? ['Kaynak'] : []), 'Kayıt'].map(h => <th key={h} style={{ padding: '10px 14px', fontWeight: 600 }}>{h}</th>)}
                 </tr></thead>
                 <tbody>
                   {rows.map(r => (
@@ -154,9 +155,9 @@ export default function MusterilerPage() {
                         {r.is_vip && <span className="badge badge-amber" style={{ marginLeft: 8 }}><Crown size={11} style={{ marginRight: 3 }} />VIP</span>}
                       </td>
                       <td style={{ padding: '10px 14px', color: 'var(--tx2)' }}>{r.phone || '—'}<div style={{ fontSize: 11.5, color: 'var(--tx3)' }}>{r.email || ''}</div></td>
-                      <td style={{ padding: '10px 14px', color: 'var(--tx2)' }}>{storeName(r.store_id)}</td>
+                      {showSF && <td style={{ padding: '10px 14px', color: 'var(--tx2)' }}>{storeName(r.store_id)}</td>}
                       <td style={{ padding: '10px 14px', color: 'var(--tx2)' }}>{personName(r.assigned_to)}</td>
-                      <td style={{ padding: '10px 14px' }}><span className="badge badge-muted">{SOURCE_LABEL[r.source] || r.source}</span></td>
+                      {showSF && <td style={{ padding: '10px 14px' }}><span className="badge badge-muted">{SOURCE_LABEL[r.source] || r.source}</span></td>}
                       <td style={{ padding: '10px 14px', color: 'var(--tx3)' }}>{new Date(r.registered_at).toLocaleDateString('tr-TR')}</td>
                     </tr>
                   ))}
@@ -192,6 +193,7 @@ export default function MusterilerPage() {
                 <div><label className="label">Telefon</label><input className="inp" inputMode="tel" value={form.phone} onBlur={() => checkDup()} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="05xx xxx xx xx" /></div>
                 <div><label className="label">E-posta</label><input className="inp" type="email" value={form.email} onBlur={() => checkDup()} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div>
               </div>
+              {showSF && (
               <div className="modal-grid">
                 <div><label className="label">Mağaza *</label>
                   <select className="inp" value={form.store_id} onChange={e => setForm(f => ({ ...f, store_id: e.target.value }))}>
@@ -202,6 +204,7 @@ export default function MusterilerPage() {
                     {Object.entries(SOURCE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select></div>
               </div>
+              )}
               <div><label className="label">Şehir</label><input className="inp" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} /></div>
               {crm.can('vip.manage') && <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--tx2)' }}><input type="checkbox" checked={form.is_vip} onChange={e => setForm(f => ({ ...f, is_vip: e.target.checked }))} /> VIP müşteri</label>}
               {dups.length > 0 && (

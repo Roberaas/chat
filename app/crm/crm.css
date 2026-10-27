@@ -119,4 +119,4 @@
 @media(max-width:900px){.crm .login{grid-template-columns:1fr}.crm .login-art{display:none}}
 
 @media(prefers-reduced-motion:reduce){.crm *{animation:none!important;transition:none!important}}
-@media(max-width:768px){.crm .topbar{padding:0 14px 0 58px;height:56px}.crm .hero h1{font-size:25px}}
+@media(max-width:768px){.crm .topbar{padding:8px 14px 8px 58px;height:auto;min-height:56px;flex-wrap:wrap;row-gap:8px}.crm .topbar>div:first-child{flex:1 1 calc(100% - 20px)!important}.crm .topbar>div:last-child{flex:1 1 100%;justify-content:flex-end;flex-wrap:wrap}.crm .tb-title{font-size:18px;flex-shrink:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.crm .tb-sub{display:none}.crm .hero h1{font-size:25px}}

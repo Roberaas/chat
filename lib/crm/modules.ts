@@ -3,6 +3,7 @@ export type CrmModule = { key: string; label: string; desc: string; paths: strin
 
 export const CRM_MODULES: CrmModule[] = [
   { key: 'reports', label: 'Raporlama', desc: 'Dashboard, Raporlar, Müşteri Raporum, Hedefler, Müşteri Analizi', paths: ['/crm', '/crm/raporlar', '/crm/bayi-raporu', '/crm/hedefler', '/crm/analiz'] },
+  { key: 'storefields', label: 'Mağaza ve kaynak alanları', desc: 'Müşteri formunda mağaza/kaynak seçimi ve listede bu sütunlar (kapalıyken kanala göre otomatik atanır)', paths: [] },
   { key: 'orders', label: 'Siparişler', desc: 'Sipariş listesi ve detayları (veri girişi arka planda sürer)', paths: ['/crm/siparisler'] },
   { key: 'products', label: 'Ürünler', desc: 'Ürün kataloğu', paths: ['/crm/urunler'] },
   { key: 'sales', label: 'Satış fırsatları ve teklifler', desc: 'Fırsatlar menüsü', paths: ['/crm/firsatlar'] },
