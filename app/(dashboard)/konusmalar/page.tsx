@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase, Session } from '@/lib/supabase'
+import type { Session } from '@/lib/supabase'
+import { getSessions } from '@/lib/sessionsApi'
 import TopBar from '@/components/TopBar'
 import { Search, X, MessageSquare, StickyNote, Trash2, Plus, ShoppingCart } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
@@ -38,11 +39,11 @@ export default function KonusmalarPage() {
 
   async function load() {
     setLoading(true)
-    let q = supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500)
-    if (filter === 'canli') q = q.eq('bulundugu_menu', 'canli')
-    else if (filter === 'gpt') q = q.eq('bulundugu_menu', 'bot')
-    else if (filter === 'kvkk') q = q.eq('kvkk_onay', false)
-    const { data } = await q
+    const qs = new URLSearchParams({ limit: '500' })
+    if (filter === 'canli') qs.set('menu', 'canli')
+    else if (filter === 'gpt') qs.set('menu', 'bot')
+    else if (filter === 'kvkk') qs.set('kvkk', '0')
+    const { data } = await getSessions(qs.toString())
     let list = (data || []) as Session[]
     if (filter === 'sepet') list = list.filter(s => s.pending_action && String(s.pending_action).includes('order:'))
     setSessions(list); setLoading(false)

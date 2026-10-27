@@ -13,7 +13,7 @@ function buHaftaninCumasi(): string {
 export async function GET() {
   // Bu hafta bildirim gönderildi mi?
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const client = createClient(url, key)
   const hafta = buHaftaninCumasi()
   const { data } = await client.from('bildirim_log').select('*').eq('hafta_tarihi', hafta).single()
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const client = createClient(url, key)
   const hafta = buHaftaninCumasi()
 

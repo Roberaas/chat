@@ -1,7 +1,8 @@
 'use client'
 
+import { getSessions } from '@/lib/sessionsApi'
 import { useEffect, useState } from 'react'
-import { supabase, Session } from '@/lib/supabase'
+import type { Session } from '@/lib/supabase'
 import TopBar from '@/components/TopBar'
 import StatCard from '@/components/StatCard'
 import ConfirmModal from '@/components/ConfirmModal'
@@ -38,7 +39,7 @@ export default function RaporlarPage() {
   async function load() {
     setLoading(true)
     const [s, sla, rakip, etiket] = await Promise.all([
-      supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500),
+      getSessions('limit=500'),
       fetch('/api/sla').then(r => r.json()),
       fetch('/api/rakip').then(r => r.json()),
       fetch('/api/etiket').then(r => r.json()),

@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js'
 export async function POST(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
   const { subscription, kullanici_id } = await req.json()
   if (!subscription?.endpoint) return NextResponse.json({ ok: false, error: 'subscription eksik' }, { status: 400 })
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
   const { endpoint } = await req.json()
   await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint)

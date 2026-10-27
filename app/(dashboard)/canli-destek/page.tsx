@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { supabase, Session } from '@/lib/supabase'
+import type { Session } from '@/lib/supabase'
+import { getSessions, patchSession } from '@/lib/sessionsApi'
 import TopBar from '@/components/TopBar'
 import ConfirmModal from '@/components/ConfirmModal'
 import { Headphones, Clock, X, Send, RefreshCw, CheckCheck, Bell, BellOff, ArrowLeft } from 'lucide-react'
@@ -80,14 +81,14 @@ export default function CanliDestekPage() {
   }
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from('wa_sessions_roberto').select('*').not('slack_thread_ts', 'is', null).neq('slack_thread_ts', '').order('updated_at', { ascending: false })
+    const { data } = await getSessions('slack=1')
     const list = (data || []) as Session[]
 
     // human_handover: bildirim gönderilmemiş olanlar
     const handoverList = list.filter((s: any) => s.last_intent === 'human_handover' && !s.bildirim_gonderildi)
     for (const s of handoverList) {
       notify('🔔 Canlı Destek Talebi', `${(s as any).musteri_adi || s.phone} canlı destek istiyor`)
-      await supabase.from('wa_sessions_roberto').update({ bildirim_gonderildi: true }).eq('phone', s.phone)
+      await patchSession(s.phone, 'bildirim_gonderildi')
     }
 
     const newPhones = list.map(s => s.phone)
@@ -137,7 +138,7 @@ export default function CanliDestekPage() {
   }
 
   async function endLiveSupport(phone: string) {
-    await supabase.from('wa_sessions_roberto').update({ bulundugu_menu: 'bot', slack_thread_ts: '', updated_at: new Date().toISOString() }).eq('phone', phone)
+    await patchSession(phone, 'bota_don')
     setConfirmPhone(null); setSelected(null); setMessages([]); load()
   }
 

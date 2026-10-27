@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bell, Headphones } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { getSessions } from '@/lib/sessionsApi'
 import { fmtRelative } from '@/lib/utils'
 
 type Bekleyen = { phone: string; musteri_adi: string | null; musteri_yazdigi: string | null; updated_at: string }
@@ -16,12 +16,7 @@ export default function NotificationBell() {
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from('wa_sessions_roberto')
-        .select('phone, musteri_adi, musteri_yazdigi, updated_at')
-        .eq('bulundugu_menu', 'canli')
-        .order('updated_at', { ascending: false })
-        .limit(20)
+      const { data } = await getSessions('menu=canli&limit=20')
       setListe((data as Bekleyen[]) || [])
     }
     load()

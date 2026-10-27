@@ -1,9 +1,9 @@
 'use client'
 
+import { getSessions } from '@/lib/sessionsApi'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Mic, MicOff, X, Volume2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 
 type Mesaj = { rol: 'user' | 'assistant'; metin: string }
 
@@ -54,7 +54,7 @@ export default function VoiceAssistant() {
   const tumVeriCek = useCallback(async () => {
     try {
       const [sessRes, gorevRes] = await Promise.all([
-        supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500),
+        getSessions('limit=500'),
         fetch('/api/gorev').then(r => r.json()).catch(() => ({ gorevler: [] })),
       ])
       const sessions: any[] = sessRes.data || []

@@ -1,8 +1,9 @@
 'use client'
 
+import { getSessions } from '@/lib/sessionsApi'
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase, Session } from '@/lib/supabase'
+import type { Session } from '@/lib/supabase'
 import TopBar from '@/components/TopBar'
 import StatCard from '@/components/StatCard'
 import { MessagesSquare, Users, Headphones, CheckCircle2, TrendingUp, Star, Lightbulb, ArrowRight } from 'lucide-react'
@@ -103,7 +104,7 @@ export default function DashboardPage() {
   }, [router])
 
   const load = useCallback(async () => {
-    const { data: all } = await supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }).limit(500)
+    const { data: all } = await getSessions('limit=500')
     const list = (all || []) as Session[]
     const now = new Date()
     const today = startOfDay(now)

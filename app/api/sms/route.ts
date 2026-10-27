@@ -2,16 +2,16 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 
-const NETGSM_USERCODE = '***KULLANICI-KODU-KALDIRILDI***'
-const NETGSM_PASSWORD = '***SIFRE-KALDIRILDI***'
-const NETGSM_MSGHEADER = 'ROBERTOBRVO'
+const NETGSM_USERCODE = process.env.NETGSM_USERCODE || ''
+const NETGSM_PASSWORD = process.env.NETGSM_PASSWORD || ''
+const NETGSM_MSGHEADER = process.env.NETGSM_MSGHEADER || ''
 
 export async function POST(req: Request) {
   const { mesaj, tel } = await req.json()
   // tel yoksa Mert'in numarasına gönder (operasyonel bildirim)
   const gsm = tel || process.env.MERT_GSM || '905000000000'
 
-  const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${NETGSM_USERCODE}&password=${NETGSM_PASSWORD}&gsmno=${gsm}&message=${encodeURIComponent(mesaj)}&msgheader=${NETGSM_MSGHEADER}`
+  const url = `https://api.netgsm.com.tr/sms/send/get/?usercode=${encodeURIComponent(NETGSM_USERCODE)}&password=${encodeURIComponent(NETGSM_PASSWORD)}&gsmno=${gsm}&message=${encodeURIComponent(mesaj)}&msgheader=${encodeURIComponent(NETGSM_MSGHEADER)}`
 
   try {
     const res = await fetch(url)

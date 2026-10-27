@@ -1,6 +1,6 @@
 'use client'
+import { getSessions } from '@/lib/sessionsApi'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 export type Me = { ad: string; rol: string; kullanici_adi?: string } | null
 
@@ -20,7 +20,7 @@ export function useCounts() {
   const [konusmalar, setKonusmalar] = useState(0)
   useEffect(() => {
     async function load() {
-      const { data } = await supabase.from('wa_sessions_roberto').select('phone, updated_at, bulundugu_menu')
+      const { data } = await getSessions('view=mini')
       const s = data || []
       setCanli(s.filter((x: any) => x.bulundugu_menu === 'canli').length)
       setKonusmalar(s.filter((x: any) => new Date(x.updated_at).toDateString() === new Date().toDateString()).length)

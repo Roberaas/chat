@@ -1,7 +1,7 @@
 'use client'
 
+import { getSessions } from '@/lib/sessionsApi'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import TopBar from '@/components/TopBar'
 import StatCard from '@/components/StatCard'
 import { Search, X, ShoppingBag, MessageSquare, Repeat, TrendingUp, Users, Crown, UserX, ChevronRight } from 'lucide-react'
@@ -37,7 +37,7 @@ export default function MusterilerPage() {
   async function load() {
     setLoading(true)
     const [sessionRes] = await Promise.all([
-      supabase.from('wa_sessions_roberto').select('*').order('updated_at', { ascending: false }),
+      getSessions('limit=2000'),
     ])
 
     const sessions = (sessionRes.data || []) as any[]
