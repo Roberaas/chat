@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -10,6 +10,7 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm', label: 'Dashboard', Icon: LayoutDashboard, perm: 'dashboard.read' },
     { href: '/crm/raporlar', label: 'Raporlar', Icon: BarChart3, perm: 'dashboard.read' },
     { href: '/crm/bildirimler', label: 'Bildirimler', Icon: Bell },
+    { href: '/crm/rehber', label: 'Rehber', Icon: BookOpen },
   ]},
   { g: 'Müşteri', items: [
     { href: '/crm/musteriler', label: 'Müşteriler', Icon: Contact, perm: 'customers.read' },

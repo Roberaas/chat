@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Plus, X, RotateCw, Copy } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
+import { PRESETS, SAMPLE_ORDER, SAMPLE_PRODUCT, FIELDS } from '@/lib/crm/guide'
 
 type Ig = { id: string; code: string; kind: string; name: string; status: string; base_url: string | null; secret_env: string | null; last_success_at: string | null; last_error: string | null }
 type Inbox = { id: number; integration_id: string; external_event_id: string; event_type: string; status: string; attempts: number; error: string | null; received_at: string }
@@ -11,6 +12,39 @@ const KIND: Record<string, string> = { erp: 'ERP', pos: 'POS', ecommerce: 'E-tic
 const STATUS: Record<string, [string, string]> = { not_configured: ['Yapılandırılmadı', 'badge-muted'], active: ['Aktif', 'badge-green'], paused: ['Durduruldu', 'badge-amber'], error: ['Hata', 'badge-red'] }
 const ST_IN: Record<string, [string, string]> = { pending: ['Bekliyor', 'badge-muted'], processed: ['İşlendi', 'badge-green'], failed: ['Hata (tekrar denenecek)', 'badge-amber'], dead: ['Ölü', 'badge-red'] }
 const ORIGIN = typeof window !== 'undefined' ? window.location.origin : ''
+
+
+function Setup({ ig, copy }: { ig: Ig; copy: (t: string) => void }) {
+  const url = `${ORIGIN}/api/crm/webhooks/${ig.code}`
+  const preset = PRESETS.find(p => p.code === ig.code)
+  const secretName = ig.secret_env || 'CRM_WEBHOOK_SECRET_XXX'
+  const code = `const crypto = require('crypto');
+const body = JSON.stringify(payload);            // gönderilecek JSON
+const ts = Math.floor(Date.now() / 1000).toString();
+const sig = crypto.createHmac('sha256', process.env.${secretName}).update(ts + '.' + body).digest('hex');
+// POST ${url}
+// Başlıklar: content-type: application/json, x-crm-timestamp: ts, x-crm-signature: sig`
+  const pre = { background: 'var(--bg2, rgba(127,127,127,.1))', padding: 10, borderRadius: 8, fontSize: 11.5, overflowX: 'auto' as const, whiteSpace: 'pre' as const, margin: '6px 0' }
+  const Block = ({ title, text }: { title: string; text: string }) => (<div><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--tx3)' }}><span>{title}</span><button className="btn-ghost" onClick={() => copy(text)}><Copy size={11} /> Kopyala</button></div><pre style={pre}>{text}</pre></div>)
+  return (
+    <div style={{ width: '100%', borderTop: '1px solid var(--bdr)', paddingTop: 12, fontSize: 12.5, color: 'var(--tx2)', lineHeight: 1.7 }}>
+      <b style={{ color: 'var(--tx)' }}>Kurulum adımları</b>
+      <ol style={{ margin: '6px 0 10px 18px', padding: 0 }}>
+        <li>Güçlü rastgele bir anahtar üretin (ör. <code>openssl rand -hex 32</code>).</li>
+        <li>Vercel → <b>chat</b> projesi → Settings → Environment Variables: <code>{secretName}</code> adıyla bu anahtarı ekleyin, yeniden deploy edin.</li>
+        <li>Aynı anahtarı kaynak sistemde/n8n'de imza için kullanın. Adres: <code>{url}</code></li>
+        {(preset?.how || []).map((h, k) => <li key={k}>{h}</li>)}
+        <li>Yukarıdan "Etkinleştir"e basın. İlk olay gelince "Senkron geçmişi"nde görünür.</li>
+      </ol>
+      <Block title="İmza kodu (Node / n8n Code düğümü)" text={code} />
+      <Block title="Örnek sipariş olayı (order.upsert)" text={JSON.stringify(SAMPLE_ORDER, null, 2)} />
+      <Block title="Örnek ürün olayı (product.upsert)" text={JSON.stringify(SAMPLE_PRODUCT, null, 2)} />
+      <details><summary style={{ cursor: 'pointer' }}>Alan sözlüğü (hangi alan CRM'de neye gider)</summary>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 6 }}><tbody>{FIELDS.map(f => <tr key={f.entity + f.field} style={{ borderTop: '1px solid var(--bdr)' }}><td style={{ padding: '4px 6px' }}>{f.entity}</td><td style={{ padding: '4px 6px', fontFamily: 'JetBrains Mono, monospace' }}>{f.field}</td><td style={{ padding: '4px 6px' }}>{f.req}</td><td style={{ padding: '4px 6px' }}>{f.desc}</td></tr>)}</tbody></table>
+      </details>
+    </div>
+  )
+}
 
 export default function EntegrasyonlarPage() {
   const supabase = createCrmBrowserClient()
@@ -21,6 +55,7 @@ export default function EntegrasyonlarPage() {
   const [mapF, setMapF] = useState({ integration_id: '', entity: 'order', source_field: '', target_field: '' })
   const [err, setErr] = useState('')
   const [copied, setCopied] = useState('')
+  const [open, setOpen] = useState('')
 
   const load = useCallback(async () => {
     const [a, b, c] = await Promise.all([
@@ -58,9 +93,17 @@ export default function EntegrasyonlarPage() {
           <b style={{ color: 'var(--tx)' }}>Nasıl çalışır:</b> ERP/POS/e-ticaret sisteminiz olayları aşağıdaki webhook adresine imzalı olarak POST eder. İmza: <code>HMAC-SHA256(sır, "zaman.gövde")</code> → <code>x-crm-signature</code>, zaman damgası <code>x-crm-timestamp</code> (5 dk tolerans). Sır veritabanına yazılmaz; Vercel'de <code>Gizli değişken adı</code> alanındaki ortam değişkeninde tutulur.
           Gövde: <code>{'{ "event_id": "...", "type": "order.upsert" | "product.upsert", "data": { ... } }'}</code>. Sipariş ve ürün için ERP/POS yetkili kaynaktır; aynı olay tekrar gelirse yok sayılır. Kaynağınızın alan adları farklıysa aşağıdan eşleme tanımlayın.
         </div>
+        <div className="card" style={{ padding: 14 }}>
+          <div className="card-title" style={{ marginBottom: 8 }}>Hızlı kurulum: sisteminizi seçin</div>
+          <div style={{ fontSize: 12.5, color: 'var(--tx3)', marginBottom: 10 }}>Seçtiğinizde form hazır dolar; yalnızca kaydedin. Sonra kartın içindeki "Kurulum" bölümünü açıp adımları izleyin.</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {PRESETS.filter(p => !igs.some(i => i.code === p.code)).map(p => <button key={p.code} className="btn-ghost" onClick={() => { setErr(''); setForm({ id: '', code: p.code, kind: p.kind, name: p.name, base_url: '', secret_env: p.secret_env }) }}><Plus size={13} /> {p.name}</button>)}
+            {PRESETS.every(p => igs.some(i => i.code === p.code)) && <span style={{ fontSize: 12.5, color: 'var(--tx3)' }}>Tüm hazır şablonlar eklendi</span>}
+          </div>
+        </div>
         {err && !form && <div style={{ color: 'var(--red)', fontSize: 13 }}>{err}</div>}
         <div className="card">
-          {igs.length === 0 ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Henüz entegrasyon tanımlı değil. Gerçek sistem bilgileri (adres, sır) hazır olduğunda ekleyin.</div> : igs.map(i => (
+          {igs.length === 0 ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--tx3)', fontSize: 13 }}>Henüz bağlantı yok. Yukarıdan sisteminizi seçerek başlayın.</div> : igs.map(i => (
             <div key={i.id} style={{ padding: '12px 16px', borderTop: '1px solid var(--bdr)', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--tx)' }}>{i.name} <span className="badge badge-muted">{KIND[i.kind]}</span></div>
@@ -73,6 +116,8 @@ export default function EntegrasyonlarPage() {
               <span className={`badge ${STATUS[i.status][1]}`}>{STATUS[i.status][0]}</span>
               {i.status !== 'active' ? <button className="btn" disabled={!i.secret_env} title={!i.secret_env ? 'Önce gizli değişken adını girin' : ''} onClick={() => setStatus(i.id, 'active')}>Etkinleştir</button> : <button className="btn-ghost" onClick={() => setStatus(i.id, 'paused')}>Durdur</button>}
               <button className="btn-ghost" onClick={() => setForm({ id: i.id, code: i.code, kind: i.kind, name: i.name, base_url: i.base_url || '', secret_env: i.secret_env || '' })}>Düzenle</button>
+              <button className="btn-ghost" onClick={() => setOpen(open === i.id ? '' : i.id)}>{open === i.id ? 'Kurulumu kapat' : 'Kurulum'}</button>
+              {open === i.id && <Setup ig={i} copy={copy} />}
             </div>))}
         </div>
         <div className="card">
