@@ -23,9 +23,10 @@ type Addr = { id: string; label: string; line: string; district: string | null; 
 type Consent = { id: string; channel: string; purpose: string; status: string; source: string | null; granted_at: string | null; revoked_at: string | null; iys_sync: string }
 type CEvent = { id: number; channel: string; purpose: string; action: string; created_at: string }
 type Interest = { id: string; product_id: string | null; collection_id: string | null; note: string | null }
+type Order = { id: string; order_no: string | null; status: string; total: number; currency: string; ordered_at: string; source_system: string; store_id: string | null }
 type Found = { id: string; customer_no: number; first_name: string; last_name: string; phone: string | null }
 
-const TABS = ['Genel', 'Notlar', 'Etkileşimler', 'Ziyaretler', 'Adresler', 'İzinler', 'İlgi'] as const
+const TABS = ['Genel', 'Notlar', 'Etkileşimler', 'Ziyaretler', 'Siparişler', 'Adresler', 'İzinler', 'İlgi'] as const
 const CONSENT_LABEL: Record<string, [string, string]> = { granted: ['Onaylı', 'badge-green'], revoked: ['İptal', 'badge-red'], pending: ['Beklemede', 'badge-amber'], unknown: ['Bilinmiyor', 'badge-muted'] }
 const dt = (v: string | null) => v ? new Date(v).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' }) : '—'
 
@@ -45,6 +46,7 @@ export default function MusteriDetay() {
   const [addrs, setAddrs] = useState<Addr[]>([])
   const [consents, setConsents] = useState<Consent[]>([])
   const [cevents, setCevents] = useState<CEvent[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [interests, setInterests] = useState<Interest[]>([])
   const [products, setProducts] = useState<{ id: string; name: string; sku: string }[]>([])
   const [collections, setCollections] = useState<{ id: string; name: string }[]>([])
@@ -67,7 +69,7 @@ export default function MusteriDetay() {
     const { data } = await supabase.from('customers').select('*').eq('id', id).maybeSingle()
     if (!data) { setMissing(true); return }
     setC(data as Cust)
-    const [n, i, v, a, k, ke, it, cs, pe, st, pr, co] = await Promise.all([
+    const [n, i, v, a, k, ke, it, cs, pe, st, pr, co, od] = await Promise.all([
       supabase.from('customer_notes').select('*').eq('customer_id', id).order('created_at', { ascending: false }),
       supabase.from('customer_interactions').select('*').eq('customer_id', id).order('occurred_at', { ascending: false }),
       supabase.from('store_visits').select('*').eq('customer_id', id).order('visited_at', { ascending: false }),
@@ -80,7 +82,9 @@ export default function MusteriDetay() {
       supabase.from('stores').select('id, name'),
       supabase.from('products').select('id, name, sku').order('name').limit(500),
       supabase.from('collections').select('id, name').order('name'),
+      supabase.from('orders').select('id, order_no, status, total, currency, ordered_at, source_system, store_id').eq('customer_id', id).eq('is_test', false).order('ordered_at', { ascending: false }),
     ])
+    setOrders((od.data || []) as Order[])
     setNotes((n.data || []) as Note[]); setInter((i.data || []) as Inter[]); setVisits((v.data || []) as Visit[])
     setAddrs((a.data || []) as Addr[]); setConsents((k.data || []) as Consent[]); setCevents((ke.data || []) as CEvent[])
     setInterests((it.data || []) as Interest[]); setCustStores(((cs.data || []) as { store_id: string }[]).map(x => x.store_id))
@@ -250,6 +254,7 @@ export default function MusteriDetay() {
                 <button className="btn" onClick={addVisit}>Ziyaret ekle</button></div>}
               {visits.length === 0 ? empty('Mağaza ziyareti yok') : visits.map(v => <div key={v.id} style={{ borderTop: '1px solid var(--bdr)', padding: '10px 0', fontSize: 13, color: 'var(--tx2)' }}><b style={{ color: 'var(--tx)' }}>{sname(v.store_id)}</b> · {dt(v.visited_at)} · {pname(v.advisor_id)}<div>{[v.purpose, v.outcome, v.notes].filter(Boolean).join(' — ')}</div></div>)}
             </>)}
+            {tab === 'Siparişler' && (orders.length === 0 ? empty('Sipariş yok. Siparişler ERP/POS/e-ticaret entegrasyonundan otomatik gelir.') : orders.map(o => <div key={o.id} style={{ borderTop: '1px solid var(--bdr)', padding: '10px 0', fontSize: 13, color: 'var(--tx2)', display: 'flex', justifyContent: 'space-between' }}><span><b style={{ color: 'var(--tx)' }}>{o.order_no || o.id.slice(0, 8)}</b> · {dt(o.ordered_at)} · {o.store_id ? sname(o.store_id) : o.source_system}</span><span><span className="badge badge-muted">{o.status}</span> <b style={{ color: 'var(--tx)' }}>{Number(o.total).toLocaleString('tr-TR')} ₺</b></span></div>))}
             {tab === 'Adresler' && (<>
               {canWrite && active && <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
                 <input className="inp" style={{ width: 90 }} placeholder="Etiket" value={aForm.label} onChange={e => setAForm(f => ({ ...f, label: e.target.value }))} />
