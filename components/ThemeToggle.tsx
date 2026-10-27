@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react'
 import { Sun, Moon } from 'lucide-react'
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [theme, setTheme] = useState<'dark' | 'light'>('light')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    let saved: 'dark' | 'light' = 'dark'
-    try { saved = (localStorage.getItem('roberto-theme') as 'dark' | 'light') || 'dark' } catch {}
+    let saved: 'dark' | 'light' = 'light'
+    try { saved = (localStorage.getItem('roberto-theme') as 'dark' | 'light') || 'light' } catch {}
     setTheme(saved)
     document.documentElement.setAttribute('data-theme', saved)
     setMounted(true)
