@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -21,7 +21,12 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/segmentler',  label: 'Segmentler',  Icon: Filter,    perm: 'segments.read' },
     { href: '/crm/kampanyalar', label: 'Kampanyalar', Icon: Megaphone, perm: 'campaigns.read' },
   ]},
+  { g: 'Kurumsal', items: [
+    { href: '/crm/b2b', label: 'B2B / Bayi', Icon: Building2, perm: 'b2b.read' },
+  ]},
   { g: 'Yönetim', items: [
+    { href: '/crm/otomasyonlar',   label: 'Otomasyonlar',   Icon: Workflow, perm: 'settings.manage' },
+    { href: '/crm/entegrasyonlar', label: 'Entegrasyonlar', Icon: Plug,     perm: 'integrations.manage' },
     { href: '/crm/magazalar',   label: 'Mağazalar',    Icon: Store,      anyOf: ['stores.manage', 'users.read'] },
     { href: '/crm/kullanicilar', label: 'Kullanıcılar', Icon: UserCog,    perm: 'users.read' },
     { href: '/crm/denetim',     label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read' },
