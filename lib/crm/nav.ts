@@ -20,6 +20,7 @@ export const ADMIN_LINKS: (CrmNavItem & { desc: string })[] = [
   { href: '/crm/roller', label: 'Roller ve Yetkiler', Icon: KeyRound, perm: 'settings.manage', desc: 'Kim neyi görür' },
   { href: '/crm/mukerrerler', label: 'Mükerrer Kayıtlar', Icon: GitMerge, perm: 'customers.merge', desc: 'Çift müşteri kayıtlarını birleştirme' },
   { href: '/crm/denetim', label: 'Denetim Kaydı', Icon: ScrollText, perm: 'audit.read', desc: 'Kim neyi değiştirdi' },
+  { href: '/crm/yasal-metinler', label: 'Yasal Metinler', Icon: ScrollText, perm: 'settings.manage', desc: 'Aydınlatma ve ticari ileti izni metinleri' },
   { href: '/crm/guvenlik', label: 'Güvenlik', Icon: ShieldCheck, desc: 'Hesap güvenliği' },
 ]
 const ADMIN_PERMS = ['customers.read', 'orders.read', 'products.read', 'integrations.manage', 'settings.manage', 'b2b.read', 'pricing.read', 'credit.read', 'data.import', 'customers.export', 'reports.export', 'stores.manage', 'users.read', 'customers.merge', 'audit.read']
@@ -68,7 +69,12 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   ]},
 ]
 
+// Yalnızca mağaza kayıt ekranı kullanan personel (müşteri listesi okuma yetkisi yok)
+export const isStaffOnly = (ctx: { isSuperAdmin: boolean; permissions: string[] }) =>
+  !ctx.isSuperAdmin && ctx.permissions.includes('customers.register') && !ctx.permissions.includes('customers.read')
+
 export function crmNavFor(ctx: { isSuperAdmin: boolean; permissions: string[]; disabledModules?: string[] }) {
+  if (isStaffOnly(ctx)) return [{ g: 'Mağaza', items: [{ href: '/crm/magaza-ekrani', label: 'Müşteri Kaydı', Icon: Store } as CrmNavItem] }]
   const ok = (i: CrmNavItem) => {
     if (hrefDisabled(i.href, ctx.disabledModules)) return false
     if (ctx.isSuperAdmin) return true
