@@ -4,33 +4,44 @@ import { Store, Users } from 'lucide-react'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { TR_PROVINCES, TR_VIEWBOX } from '@/lib/crm/tr-map-data'
 
-type StoreRow = { id: string; name: string; city: string | null; store_type: string }
-type Info = { stores: { name: string; type: string }[]; customers: number }
+type StoreRow = { id: string; name: string; city: string | null; store_type: string; phone: string | null; address: string | null }
+type St = { name: string; type: string; phone?: string | null; address?: string | null }
+type Cu = { name: string; phone: string | null; store: string }
+type Info = { stores: St[]; customers: number; list: Cu[] }
 
 const TYPE_LABEL: Record<string, string> = { store: 'Perakende mağaza', hq: 'Merkez', online: 'E-ticaret', dealer: 'Bayi', wholesale: 'Toptan' }
 const norm = (s: string) => s.toLocaleLowerCase('tr').replace(/[çğıöşü]/g, c => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' }[c] as string)).replace(/[^a-z]/g, '')
 
 // Örnek veri (gerçek kayıt değildir, yalnızca haritayı göstermek içindir)
-const DEMO: Record<string, Info> = {
-  İstanbul: { customers: 412, stores: [{ name: 'Kadıköy Mağaza', type: 'store' }, { name: 'Nişantaşı Mağaza', type: 'store' }, { name: 'İstanbul Toptan', type: 'wholesale' }] },
-  Ankara: { customers: 186, stores: [{ name: 'Ankara Kızılay Mağaza', type: 'store' }, { name: 'Ankara Bayi', type: 'dealer' }] },
-  İzmir: { customers: 154, stores: [{ name: 'Alsancak Mağaza', type: 'store' }] },
-  Bursa: { customers: 97, stores: [{ name: 'Bursa Bayi', type: 'dealer' }] },
-  Kayseri: { customers: 73, stores: [{ name: 'Kayseri Mağaza', type: 'store' }, { name: 'Kayseri Toptan', type: 'wholesale' }] },
-  Antalya: { customers: 61, stores: [{ name: 'Antalya Bayi', type: 'dealer' }] },
-  Gaziantep: { customers: 58, stores: [{ name: 'Gaziantep Toptan', type: 'wholesale' }] },
-  Konya: { customers: 44, stores: [] },
-  Trabzon: { customers: 29, stores: [{ name: 'Trabzon Bayi', type: 'dealer' }] },
-  Adana: { customers: 37, stores: [] },
-  Samsun: { customers: 21, stores: [] },
-  Diyarbakır: { customers: 18, stores: [{ name: 'Diyarbakır Bayi', type: 'dealer' }] },
+const P = (c: string, n: number) => `0${c} ${String(200 + n * 7).slice(0, 3)} ${String(10 + n * 13).slice(0, 2)} ${String(20 + n * 11).slice(0, 2)}`
+type DS = { name: string; type: string; code: string; addr: string }
+const DEMO_BASE: Record<string, { customers: number; area: string; stores: DS[] }> = {
+  İstanbul: { customers: 412, area: '212', stores: [{ name: 'İstanbul Toptan Merkez', type: 'wholesale', code: '1', addr: 'Mahmutbey Mah. Toptancılar Sk. No:12 Bağcılar' }, { name: 'Kadıköy Bayi', type: 'dealer', code: '2', addr: 'Caferağa Mah. Moda Cd. No:48 Kadıköy' }, { name: 'Nişantaşı Mağaza', type: 'store', code: '3', addr: 'Teşvikiye Mah. Abdi İpekçi Cd. No:21 Şişli' }] },
+  Ankara: { customers: 186, area: '312', stores: [{ name: 'Ankara Bayi', type: 'dealer', code: '4', addr: 'Kızılay Mah. Atatürk Blv. No:80 Çankaya' }, { name: 'Ankara Kızılay Mağaza', type: 'store', code: '5', addr: 'Kızılay Mah. Ziya Gökalp Cd. No:9' }] },
+  İzmir: { customers: 154, area: '232', stores: [{ name: 'İzmir Toptan', type: 'wholesale', code: '6', addr: 'Kemeraltı Çarşısı Anafartalar Cd. No:33 Konak' }, { name: 'Alsancak Mağaza', type: 'store', code: '7', addr: 'Alsancak Mah. Kıbrıs Şehitleri Cd. No:17' }] },
+  Bursa: { customers: 97, area: '224', stores: [{ name: 'Bursa Bayi', type: 'dealer', code: '8', addr: 'Osmangazi Mah. Atatürk Cd. No:55' }] },
+  Kayseri: { customers: 73, area: '352', stores: [{ name: 'Kayseri Toptan', type: 'wholesale', code: '9', addr: 'Kapalı Çarşı Mah. Park Cd. No:6 Melikgazi' }, { name: 'Kayseri Mağaza', type: 'store', code: '10', addr: 'Cumhuriyet Mah. Talas Cd. No:14' }] },
+  Antalya: { customers: 61, area: '242', stores: [{ name: 'Antalya Bayi', type: 'dealer', code: '11', addr: 'Muratpaşa Mah. Işıklar Cd. No:42' }] },
+  Gaziantep: { customers: 58, area: '342', stores: [{ name: 'Gaziantep Toptan', type: 'wholesale', code: '12', addr: 'Bakırcılar Çarşısı No:23 Şahinbey' }] },
+  Konya: { customers: 44, area: '332', stores: [{ name: 'Konya Bayi', type: 'dealer', code: '13', addr: 'Selçuklu Mah. Mevlana Cd. No:31' }] },
+  Trabzon: { customers: 29, area: '462', stores: [{ name: 'Trabzon Bayi', type: 'dealer', code: '14', addr: 'Meydan Mah. Uzun Sk. No:8 Ortahisar' }] },
+  Adana: { customers: 37, area: '322', stores: [{ name: 'Adana Toptan', type: 'wholesale', code: '15', addr: 'Kuruköprü Mah. Ziyapaşa Blv. No:60 Seyhan' }] },
+  Samsun: { customers: 21, area: '362', stores: [{ name: 'Samsun Bayi', type: 'dealer', code: '16', addr: 'İlkadım Mah. Cumhuriyet Cd. No:27' }] },
+  Diyarbakır: { customers: 18, area: '412', stores: [{ name: 'Diyarbakır Bayi', type: 'dealer', code: '17', addr: 'Sur Mah. Gazi Cd. No:19' }] },
 }
-
+const FIRST = ['Ahmet', 'Mehmet', 'Ayşe', 'Fatma', 'Mustafa', 'Zeynep', 'Emre', 'Elif', 'Hasan', 'Merve', 'Burak', 'Selin']
+const LAST = ['Yılmaz', 'Kaya', 'Demir', 'Çelik', 'Şahin', 'Yıldız', 'Aydın', 'Öztürk', 'Arslan', 'Doğan', 'Kılıç', 'Aslan']
 function demoFor(types: string[]): Record<string, Info> {
   const out: Record<string, Info> = {}
-  for (const [k, v] of Object.entries(DEMO)) {
+  let n = 0
+  for (const [city, v] of Object.entries(DEMO_BASE)) {
     const stores = v.stores.filter(x => types.includes(x.type))
-    if (stores.length || types.includes('store')) out[k] = { customers: v.customers, stores }
+    if (!stores.length) continue
+    const list: Cu[] = Array.from({ length: Math.min(8, v.customers) }, (_, i) => {
+      n++
+      return { name: `${FIRST[(n * 5) % 12]} ${LAST[(n * 7 + i) % 12]}`, phone: `05${30 + (n % 6)} ${String(200 + n * 17).slice(0, 3)} ${String(10 + n * 3).slice(0, 2)} ${String(40 + n * 7).slice(0, 2)}`, store: stores[i % stores.length].name }
+    })
+    out[city] = { customers: v.customers, list, stores: stores.map((x, i) => ({ name: x.name, type: x.type, address: x.addr, phone: P(v.area, Number(x.code) + i) })) }
   }
   return out
 }
@@ -46,15 +57,21 @@ export default function TurkeyMap({ storeTypes, title }: { storeTypes: string[];
 
   useEffect(() => {
     (async () => {
-      const st = await supabase.from('stores').select('id, name, city, store_type').eq('is_active', true).in('store_type', storeTypes)
-      const ids = ((st.data || []) as StoreRow[]).map(x => x.id)
+      const st = await supabase.from('stores').select('id, name, city, store_type, phone, address').eq('is_active', true).in('store_type', storeTypes)
+      const stores = (st.data || []) as StoreRow[]
+      const ids = stores.map(x => x.id)
+      const sname = new Map(stores.map(x => [x.id, x.name]))
       const cu = ids.length
-        ? await supabase.from('customers').select('city').eq('status', 'active').in('store_id', ids).not('city', 'is', null).limit(50000)
-        : { data: [] as { city: string }[] }
+        ? await supabase.from('customers').select('city, first_name, last_name, phone, store_id').eq('status', 'active').in('store_id', ids).not('city', 'is', null).order('registered_at', { ascending: false }).limit(50000)
+        : { data: [] as { city: string; first_name: string; last_name: string; phone: string | null; store_id: string }[] }
       const m: Record<string, Info> = {}
-      const key = (c: string | null) => { const k = TR_PROVINCES.find(p => norm(p.name) === norm(c || '')); return k?.name || null }
-      for (const s of (st.data || []) as StoreRow[]) { const k = key(s.city); if (k) (m[k] ||= { stores: [], customers: 0 }).stores.push({ name: s.name, type: s.store_type }) }
-      for (const c of (cu.data || []) as { city: string }[]) { const k = key(c.city); if (k) (m[k] ||= { stores: [], customers: 0 }).customers++ }
+      const key = (c: string | null) => TR_PROVINCES.find(p => norm(p.name) === norm(c || ''))?.name || null
+      for (const s of stores) { const k = key(s.city); if (k) (m[k] ||= { stores: [], customers: 0, list: [] }).stores.push({ name: s.name, type: s.store_type, phone: s.phone, address: s.address }) }
+      for (const c of (cu.data || [])) {
+        const k = key(c.city); if (!k) continue
+        const e = (m[k] ||= { stores: [], customers: 0, list: [] }); e.customers++
+        if (e.list.length < 50) e.list.push({ name: `${c.first_name} ${c.last_name}`.trim(), phone: c.phone, store: sname.get(c.store_id) || '' })
+      }
       setReal(m); setLoading(false)
     })()
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
@@ -125,6 +142,22 @@ export default function TurkeyMap({ storeTypes, title }: { storeTypes: string[];
           {active ? (
             <>
               <Tip name={active} info={info} big />
+              {info && info.list.length > 0 && (
+                <div style={{ marginTop: 14 }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--tx)', marginBottom: 6 }}>Müşteriler {info.customers > info.list.length && <span style={{ fontWeight: 400, color: 'var(--tx3)' }}>(ilk {info.list.length} / {info.customers})</span>}</div>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                      <thead><tr style={{ textAlign: 'left', color: 'var(--tx3)', fontSize: 12 }}><th style={{ padding: '6px 10px 6px 0' }}>Müşteri</th><th style={{ padding: '6px 10px' }}>Telefon</th><th style={{ padding: '6px 10px' }}>Mağaza</th></tr></thead>
+                      <tbody>{info.list.map((c, i) => (
+                        <tr key={i} style={{ borderTop: '1px solid var(--bdr)' }}>
+                          <td style={{ padding: '7px 10px 7px 0', fontWeight: 500 }}>{c.name}</td>
+                          <td style={{ padding: '7px 10px', whiteSpace: 'nowrap' }}>{c.phone || '—'}</td>
+                          <td style={{ padding: '7px 10px', color: 'var(--tx2)' }}>{c.store || '—'}</td>
+                        </tr>))}</tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
               {pinned && <button className="btn-ghost" style={{ marginTop: 10 }} onClick={() => setPinned(null)}>Seçimi kaldır</button>}
             </>
           ) : (
@@ -146,7 +179,7 @@ function Tip({ name, info, big }: { name: string; info?: Info | null; big?: bool
           {info.stores.map((s, i) => (
             <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center', color: 'var(--tx)' }}>
               <Store size={13} style={{ color: 'var(--ac)', flexShrink: 0 }} />
-              <span style={{ flex: 1 }}>{s.name}</span>
+              <span style={{ flex: 1 }}>{s.name}{big && (s.phone || s.address) && <span style={{ display: 'block', fontSize: 12, color: 'var(--tx3)' }}>{[s.phone, s.address].filter(Boolean).join(' · ')}</span>}</span>
               <span style={{ fontSize: 11, color: 'var(--tx3)' }}>{TYPE_LABEL[s.type] || s.type}</span>
             </div>
           ))}
