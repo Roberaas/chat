@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { getCrmContext, rateLimit } from '@/lib/crm/auth'
 import { adminDb } from '@/lib/serverDb'
-import { signCrm2fa, CRM2FA_COOKIE } from '@/lib/panelSession'
+import { createCrmServerClient } from '@/lib/crm/supabase/server'
+import { createCrmAdminClient } from '@/lib/crm/supabase/admin'
+
+const SMS_WINDOW_HOURS = 2
 
 export async function POST(req: Request) {
   const ctx = await getCrmContext()
@@ -23,7 +26,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Kod hatalı' }, { status: 400 })
   }
   await db.from('crm_otp').update({ used: true }).eq('user_id', ctx.userId)
-  const res = NextResponse.json({ ok: true })
-  res.cookies.set(CRM2FA_COOKIE, await signCrm2fa(ctx.userId), { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 12 * 3600 })
-  return res
+  // Doğrulama bu Supabase oturumuna (session_id) bağlanır; RLS bunu veritabanında kontrol eder.
+  const { data: claims } = await createCrmServerClient().auth.getClaims()
+  const sid = claims?.claims?.session_id as string | undefined
+  if (!sid) return NextResponse.json({ ok: false, error: 'Oturum bulunamadı, yeniden giriş yapın.' }, { status: 401 })
+  const admin = createCrmAdminClient()
+  await admin.schema('crm').from('sms_sessions').delete().lt('expires_at', new Date().toISOString())
+  const { error } = await admin.schema('crm').from('sms_sessions').upsert({ session_id: sid, user_id: ctx.userId, expires_at: new Date(Date.now() + SMS_WINDOW_HOURS * 3600_000).toISOString() })
+  if (error) return NextResponse.json({ ok: false, error: 'Doğrulama kaydedilemedi' }, { status: 500 })
+  return NextResponse.json({ ok: true })
 }

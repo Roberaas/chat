@@ -1,6 +1,4 @@
 import { cache } from 'react'
-import { cookies } from 'next/headers'
-import { verifyCrm2fa, CRM2FA_COOKIE } from '@/lib/panelSession'
 import { redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { createCrmServerClient } from './supabase/server'
@@ -30,7 +28,9 @@ const SMS_ROLES = (process.env.CRM_MFA_ROLES || 'super_admin').split(',').map(s 
 export const smsRequired = (ctx: CrmContext) => ctx.roles.some(r => SMS_ROLES.includes(r))
 export async function smsVerified(ctx: CrmContext): Promise<boolean> {
   if (!smsRequired(ctx)) return true
-  return verifyCrm2fa((await cookies()).get(CRM2FA_COOKIE)?.value, ctx.userId);
+  // Gerçek kaynak veritabanı: bu oturum SMS ile doğrulanmış ve süresi dolmamış mı
+  const { data } = await createCrmServerClient().rpc('sms_ok')
+  return data === true
 }
 
 // Sayfa (Server Component) koruması
