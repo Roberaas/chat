@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Plus, Search, X, Crown, ChevronLeft, ChevronRight } from 'lucide-react'
 import CrmTopBar from '@/components/crm/CrmTopBar'
+import TurkeyMap from '@/components/crm/TurkeyMap'
 import { useCrm } from '@/components/crm/CrmProvider'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { SOURCE_LABEL } from '@/lib/crm/labels'
@@ -132,6 +133,8 @@ export default function MusterilerPage() {
             <option value="">Tüm etiketler</option>{tagList.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>}
         </div>
+
+        {kanal === KANAL.toptan && <TurkeyMap storeTypes={['wholesale', 'dealer']} title="Toptan / Bayi Haritası" />}
 
         <div className="card" style={{ overflow: 'hidden' }}>
           {loading ? <div className="anim-pulse" style={{ height: 160 }} /> : rows.length === 0 ? (

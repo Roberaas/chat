@@ -1,6 +1,6 @@
 import { hrefDisabled } from '@/lib/crm/modules'
 import {
-  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, MapPin, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen, Settings, Flag, ShoppingBag, Cake, PieChart, GitMerge, KeyRound, Tags, Wallet, CalendarRange, ListPlus,
+  LayoutDashboard, Store, UserCog, ScrollText, ShieldCheck, Contact, Target, Gem, CheckSquare, CalendarDays, Filter, Megaphone, Wrench, Building2, Workflow, Plug, BarChart3, FileSpreadsheet, Activity, Bell, BookOpen, Settings, Flag, ShoppingBag, Cake, PieChart, GitMerge, KeyRound, Tags, Wallet, CalendarRange, ListPlus,
 } from 'lucide-react'
 
 export type CrmNavItem = { href: string; label: string; Icon: any; perm?: string; anyOf?: string[] }
@@ -44,7 +44,6 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
     { href: '/crm/musteriler?kanal=eticaret', label: 'E-Ticaret', Icon: ShoppingBag, perm: 'customers.read' },
     { href: '/crm/musteriler?kanal=perakende', label: 'Perakende', Icon: Store, perm: 'customers.read' },
     { href: '/crm/musteriler?kanal=toptan', label: 'Toptan', Icon: Building2, perm: 'customers.read' },
-    { href: '/crm/harita', label: 'Türkiye Haritası', Icon: MapPin, perm: 'customers.read' },
     { href: '/crm/iceaktar', label: 'Excel İçe / Dışa Aktar', Icon: FileSpreadsheet, anyOf: ['data.import', 'customers.export', 'reports.export'] },
     { href: '/crm/siparisler', label: 'Siparişler', Icon: ShoppingBag, perm: 'orders.read' },
     { href: '/crm/urunler',    label: 'Ürünler',    Icon: Gem,    perm: 'products.read' },

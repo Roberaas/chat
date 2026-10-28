@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
 import { Store, Users } from 'lucide-react'
-import CrmTopBar from '@/components/crm/CrmTopBar'
 import { createCrmBrowserClient } from '@/lib/crm/supabase/client'
 import { TR_PROVINCES, TR_VIEWBOX } from '@/lib/crm/tr-map-data'
 
@@ -27,7 +26,16 @@ const DEMO: Record<string, Info> = {
   Diyarbakır: { customers: 18, stores: [{ name: 'Diyarbakır Bayi', type: 'dealer' }] },
 }
 
-export default function HaritaPage() {
+function demoFor(types: string[]): Record<string, Info> {
+  const out: Record<string, Info> = {}
+  for (const [k, v] of Object.entries(DEMO)) {
+    const stores = v.stores.filter(x => types.includes(x.type))
+    if (stores.length || types.includes('store')) out[k] = { customers: v.customers, stores }
+  }
+  return out
+}
+
+export default function TurkeyMap({ storeTypes, title }: { storeTypes: string[]; title?: string }) {
   const supabase = createCrmBrowserClient()
   const [real, setReal] = useState<Record<string, Info>>({})
   const [loading, setLoading] = useState(true)
@@ -38,10 +46,11 @@ export default function HaritaPage() {
 
   useEffect(() => {
     (async () => {
-      const [st, cu] = await Promise.all([
-        supabase.from('stores').select('id, name, city, store_type').eq('is_active', true),
-        supabase.from('customers').select('city').eq('status', 'active').not('city', 'is', null).limit(50000),
-      ])
+      const st = await supabase.from('stores').select('id, name, city, store_type').eq('is_active', true).in('store_type', storeTypes)
+      const ids = ((st.data || []) as StoreRow[]).map(x => x.id)
+      const cu = ids.length
+        ? await supabase.from('customers').select('city').eq('status', 'active').in('store_id', ids).not('city', 'is', null).limit(50000)
+        : { data: [] as { city: string }[] }
       const m: Record<string, Info> = {}
       const key = (c: string | null) => { const k = TR_PROVINCES.find(p => norm(p.name) === norm(c || '')); return k?.name || null }
       for (const s of (st.data || []) as StoreRow[]) { const k = key(s.city); if (k) (m[k] ||= { stores: [], customers: 0 }).stores.push({ name: s.name, type: s.store_type }) }
@@ -52,7 +61,7 @@ export default function HaritaPage() {
 
   const hasReal = Object.keys(real).length > 0
   const useDemo = demo ?? !hasReal
-  const data = useDemo ? DEMO : real
+  const data = useDemo ? demoFor(storeTypes) : real
   const max = useMemo(() => Math.max(1, ...Object.values(data).map(d => d.customers)), [data])
   const active = pinned || hover
   const info = active ? data[active] : null
@@ -68,8 +77,8 @@ export default function HaritaPage() {
 
   return (
     <>
-      <CrmTopBar title="Türkiye Haritası" subtitle={`${withCust} ilde müşteri · ${totalStores} mağaza`} />
-      <div style={{ padding: 22, maxWidth: 1200, width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 14 }}>
+        <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--tx)' }}>{title || 'Türkiye Haritası'} <span style={{ fontWeight: 400, fontSize: 12.5, color: 'var(--tx3)' }}>· {withCust} ilde müşteri · {totalStores} mağaza</span></div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', fontSize: 13, color: 'var(--tx2)' }}>
           <label style={{ display: 'flex', gap: 6, alignItems: 'center', cursor: 'pointer' }}>
             <input type="checkbox" checked={useDemo} onChange={e => setDemo(e.target.checked)} /> Örnek verilerle göster
@@ -100,6 +109,10 @@ export default function HaritaPage() {
                 </path>
               )
             })}
+            {TR_PROVINCES.map(p => (
+              <text key={`l${p.plate}`} x={p.lx} y={p.ly} textAnchor="middle" dominantBaseline="middle" fontSize={8.6} fontWeight={600}
+                style={{ pointerEvents: 'none', paintOrder: 'stroke', stroke: 'rgba(255,255,255,.75)', strokeWidth: 2.2, strokeLinejoin: 'round', fill: '#1f2340' }}>{p.name}</text>
+            ))}
           </svg>
           {hover && pos && (
             <div className="hidden-touch" style={{ position: 'absolute', left: Math.min(pos.x + 14, 9999), top: pos.y + 14, pointerEvents: 'none', background: 'var(--card, #fff)', border: '1px solid var(--bdr)', borderRadius: 10, padding: '10px 12px', boxShadow: '0 8px 24px rgba(0,0,0,.14)', fontSize: 12.5, minWidth: 190, maxWidth: 260, zIndex: 5 }}>
