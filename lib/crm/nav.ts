@@ -62,6 +62,8 @@ export const CRM_NAV: { g: string; items: CrmNavItem[] }[] = [
   ]},
   { g: 'Yönetim', items: [
     { href: '/crm/aktivite', label: 'Aktivite İzleme', Icon: Activity, perm: 'activity.read' },
+    { href: '/crm/magazalar', label: 'Mağazalar', Icon: Store, anyOf: ['stores.manage', 'users.read'] },
+    { href: '/crm/kullanicilar', label: 'Kullanıcılar', Icon: UserCog, perm: 'users.read' },
     { href: '/crm/otomasyonlar',   label: 'Otomasyonlar',   Icon: Workflow, perm: 'settings.manage' },
   ]},
   { g: 'Sistem', items: [
