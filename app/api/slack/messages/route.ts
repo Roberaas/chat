@@ -72,14 +72,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Eksik parametre' })
   }
 
-  // 1) n8n webhook → WhatsApp'a ilet
+  // 1) n8n webhook → WhatsApp'a ilet (gizli başlıkla; sonuç okunur)
+  let waError: string | null = null
   try {
-    await fetch(n8nWebhook, {
+    const r = await fetch(n8nWebhook, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-panel-secret': process.env.N8N_PANEL_SECRET || '' },
       body: JSON.stringify({ phone, text, thread_ts, source: 'admin_panel' }),
+      signal: AbortSignal.timeout(20000),
     })
+    // Eski workflow JSON dönmeyebilir; yalnızca açık "ok:false" hata sayılır
+    const j = await r.json().catch(() => null)
+    if (j && j.ok === false) waError = String(j.error || 'whatsapp_gonderilemedi')
   } catch (_) {}
+  if (waError) return NextResponse.json({ ok: false, error: `WhatsApp'a iletilemedi: ${waError}` })
 
   // 2) Slack thread'e de yaz (panel geçmişi için)
   const res = await fetch('https://slack.com/api/chat.postMessage', {
