@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { internalToken } from '@/lib/panelSession'
-import { rateLimit } from '@/lib/crm/auth'
+import { rateLimit } from '@/lib/rateLimit'
 import { adminDb } from '@/lib/serverDb'
 
 // n8n bu endpoint'i çağırır: müşteri canlı destek istediğinde

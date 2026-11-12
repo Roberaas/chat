@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, MessagesSquare, Headphones, Users, CheckSquare,
-  CalendarDays, BarChart3, FileText, UserCog, Contact, Gauge, Bot,
+  CalendarDays, BarChart3, FileText, UserCog, Gauge, Bot,
 } from 'lucide-react'
 
 export type Rol = 'admin' | 'operasyon' | 'destek'
@@ -37,7 +37,6 @@ export const NAV: { g: string; items: NavItem[] }[] = [
     { href: '/api-kullanimi', label: 'API Kullanımı', Icon: Gauge, roles: ['admin'] },
   ]},
   { g: 'Diğer', items: [
-    { href: '/crm', label: 'CRM', Icon: Contact, roles: ['admin'] },
   ]},
 ]
 

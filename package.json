@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/crm.test.ts tests/panel-session.test.ts tests/panel-password.test.ts"
+    "test": "node --test tests/panel-session.test.ts tests/panel-password.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
@@ -17,7 +17,6 @@
     "@types/nodemailer": "^8.0.1",
     "@types/web-push": "^3.6.4",
     "date-fns": "^3.6.0",
-    "exceljs": "^4.4.0",
     "lucide-react": "^0.460.0",
     "next": "^16.4.3",
     "nodemailer": "^10.2.1",

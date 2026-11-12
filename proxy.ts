@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { crmMiddleware } from '@/lib/crm/supabase/middleware'
 
 const ROL_YETKILER: Record<string, string[]> = {
   admin: [],
@@ -11,15 +10,12 @@ const ROL_YETKILER: Record<string, string[]> = {
 import { verifySession, verifyInternal, SESSION_COOKIE } from '@/lib/panelSession'
 
 // Oturum gerektirmeyen API'ler: giriş akışı, CRM (kendi yetki kontrolü var), n8n çağrısı (rota içinde ayrıca korunur)
-const API_PUBLIC = ['/api/auth', '/api/crm/', '/api/canli-destek-bildirim', '/api/csp-report']
+const API_PUBLIC = ['/api/auth', '/api/canli-destek-bildirim', '/api/csp-report']
 // Yalnızca admin rolü
 const ADMIN_ONLY = ['/api/kullanici', '/api/aktivite', '/kullanicilar', '/api/kullanim', '/api-kullanimi', '/api/rapor-ilet', '/api/sms', '/api/bildirim/toplu', '/api/bot-kurallari', '/bot-kurallari']
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  // CRM (Supabase Auth) — WhatsApp paneli cookie girişinden tamamen ayrı
-  if (pathname === '/crm' || pathname.startsWith('/crm/')) return crmMiddleware(request)
-
   const isApi = pathname.startsWith('/api/')
   if (isApi && API_PUBLIC.some(p => pathname === p || pathname.startsWith(p.endsWith('/') ? p : p + '/') || pathname === p)) return NextResponse.next()
 

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
-import { rateLimit } from '@/lib/crm/auth'
+import { rateLimit } from '@/lib/rateLimit'
 import { verifyPassword, hashPassword } from '@/lib/panelPassword'
 
 

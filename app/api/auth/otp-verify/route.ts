@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { signSession, SESSION_COOKIE, SESSION_MAX_AGE } from '@/lib/panelSession'
-import { rateLimit } from '@/lib/crm/auth'
+import { rateLimit } from '@/lib/rateLimit'
 import { timingSafeEqual } from 'crypto'
 
 export async function POST(req: Request) {

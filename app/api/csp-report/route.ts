@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
-import { rateLimit } from '@/lib/crm/auth'
+import { rateLimit } from '@/lib/rateLimit'
 
 // Tarayıcıların CSP ihlal raporları (yalnız günlüğe yazılır; veri saklanmaz)
 export async function POST(req: Request) {
